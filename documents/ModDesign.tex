@@ -1,0 +1,243 @@
+%! Author = LucunJi
+%! Date = 5/15/21
+
+% Preamble
+\documentclass[11pt]{article}
+\usepackage[UTF8]{ctex}
+% Packages
+\usepackage{graphicx} % for figures
+\usepackage{amsmath}  % for extended math markup
+\usepackage{amssymb}
+\usepackage{subcaption}
+\usepackage{hyperref}  % for url
+
+\title{Uusi Aurinko 模组企划案\\
+\ \\
+\small{（该模组参加 2021 届 TeaCon Mod 开发大赛）}}
+\author{LucunJi}
+
+% Document
+\begin{document}
+    \maketitle
+    \tableofcontents
+
+    \clearpage
+    \section{简介}\label{sec:intro}
+    Uusi Aurinko，是芬兰语中的 New Sun，新太阳。它来自于游戏 Noita 中的一系列成就任务：玩家收集五中元素，通过炼金术般的过程制造出新的太阳。
+
+    通过将这一系列任务带入 minecraft，Uusi Aurinko 模组为玩家增加了一些新的后游戏后期（end of game）玩法。玩家在拥有足够强大的装备后，再次游历一些远古遗迹，从宝箱中拾起曾经不敢接触的物品，通过一系列破坏性（甚至是毁灭性）的操作制造出一颗耀眼的太阳。
+
+    为了保证原汁原味，游戏中的物品会使用 Noita 中的芬兰语命名加本地化的注释。
+
+    \vspace{1em}
+    这份企划案目前使用的图片大多为 Noita 游戏中的素材和截图，均来自 \href{https://noita.fandom.com/wiki/Noita_Wiki}{Noita Wiki}。
+    为了规避版权问题，后续会换成自制素材。
+
+    \clearpage
+    \section{新增物品}\label{sec:new-items}
+
+    \begin{figure}[ht]
+        \begin{subfigure}{7em}
+            \centering
+            \includegraphics[width=7em]{./imgs/Item_brimstone}
+            \caption{Kiuaskivi}
+        \end{subfigure}
+        \begin{subfigure}{7em}
+            \centering
+            \includegraphics[width=7em]{./imgs/Item_waterstone}
+            \caption{Vuoksikivi}
+        \end{subfigure}
+        \begin{subfigure}{7em}
+            \centering
+            \includegraphics[width=7em]{./imgs/Item_thunderstone}
+            \caption{Ukkoskivi}
+        \end{subfigure}
+        \begin{subfigure}{7em}
+            \centering
+            \includegraphics[width=7em]{./imgs/Item_stonestone}
+            \caption{Tannerkivi}
+        \end{subfigure}
+        \begin{subfigure}{7em}
+            \centering
+            \includegraphics[width=7em]{./imgs/Item_kakke}
+            \caption{Kakkakikkare}
+        \end{subfigure}
+        \begin{subfigure}{7em}
+            \centering
+            \includegraphics[width=7em]{./imgs/Item_sunseed}
+            \caption{Auringonsiemen}
+        \end{subfigure}
+        \begin{subfigure}{7em}
+            \centering
+            \includegraphics[width=7em]{./imgs/Item_sunseed_2}
+            \caption{Aurinkokivi}
+        \end{subfigure}
+        \begin{subfigure}{7em}
+            \centering
+            \includegraphics[width=7em]{./imgs/Item_evil_eye}
+            \caption{Paha Silmä}
+        \end{subfigure}
+        \begin{subfigure}{7em}
+            \centering
+            \includegraphics[width=7em]{./imgs/Item_moon}
+            \caption{Kuu}
+        \end{subfigure}\label{fig:items}
+    \end{figure}
+
+    \subsection{元素石}\label{subsec:element-stone}
+    Kiuaskivi：火石。
+    烈焰人有极低概率掉落。地狱宝箱几率刷新。
+    掉落物形式下不会被火焰摧毁。
+    主手或副手持有时玩家获得火焰免疫（但是会有火焰效果），并随机在玩家周围生成火焰。
+
+    Vuoksikivi：水石。
+    远古守卫者概率掉落，守卫者极低概率掉落。水中遗迹宝箱几率刷新。
+    掉落物形式下不会被火焰摧毁。
+    主手或副手持有时身上不会出现火焰效果。
+    周围的岩浆源会变成黑曜石，流动的岩浆会变成圆石。
+    身上所有非信标给予的效果，无论正面或负面，以双倍速度消退。
+    周围会受到水伤害的生物也会受到缓慢的伤害。
+
+    Ukkoskivi：电石。
+    闪电苦力怕概率掉落。骷髅马概率掉落。末地宝箱几率刷新。
+    掉落物形式下不会被火焰摧毁。
+    持有时周围的水和金属块会随机出现扩散性的闪电特效。持有的玩家免疫闪电伤害（但是连带的火焰伤害不算）。
+    被电到的生物，除非持有电石，会受到伤害并获得缓慢效果。被电到的易燃物会燃烧。
+
+    Tannerkivi：地石。
+    基岩周围的石头被玩家挖掘时极低概率掉落。主世界的废弃矿坑、丛林神庙与沙漠神殿中的宝箱几率刷新。
+    掉落物形式下不会被火焰摧毁。
+    持有时周围的方块会随机变成泥土，液体、基岩、末地传送门框架、末地传送门等方块除外。
+    玩家持有它近战攻击时造成小范围地震（周围方块变成对应的掉落沙，箱子等容器会被破坏）。
+
+    Kakkakikkare：粪石。
+    僵尸极低概率掉落。主世界地牢宝箱概率刷新。
+    掉落物形式下不会被火焰摧毁。
+    玩家持有时随机造成自己短时间反胃，中毒。
+    玩家周围的液体概率变成粪水（地狱中则会变成黑石）。
+
+    \subsection{太阳石}\label{subsec:solar-stone}
+    Auringonsiemen：太阳种子。
+    击杀灵魂峡谷的特殊 boss 遗忘者 获得。
+    掉落物形式下不会被爆炸或火焰摧毁。
+    持有的玩家周围的沙子，沙砾，混凝土粉末等粉末物质随机消失并爆炸。
+    给予玩家看到\textit{遗忘者}的能力。
+
+    Aurinkokivi：太阳石。
+    将\textit{太阳种子}在白天露天放置在沙漠神殿处获得。
+    掉落物形式下不会被爆炸或火焰摧毁。
+    第一次拾起后给予玩家凋零效果。
+    周围粉末物质随机转化为火焰。给予给予玩家看到\textit{遗忘者}的能力。
+    在一秒内受到六次爆炸后变成一个最基础的\textit{新日}。
+
+    \subsection{其他}\label{subsec:others}
+    Paha Silmä：邪眼。
+    终末之眼加恶魂眼泪合成，可以佩戴在头部。
+    持有或佩戴时给玩家看到\textit{遗忘者}的能力。
+    生效时随时间减少耐久，不可附魔。
+
+    Kuu：微型月球。
+    末地石和黑曜石合成。
+    右键投掷出去后会在空中缓慢地漂浮。对着漂浮物右键可以将其收回背包。
+    被投掷出去或持有时，将周围的\textit{新日}灵魂沙、弹射物和掉落物缓慢地拉向自己。自己也会因为这些实体而移动（相互吸引）。
+
+
+    \clearpage
+    \section{新增实体}\label{sec:new-entities}
+
+    \subsection{遗忘之地怪物}\label{subsec:forgottens}
+    \begin{figure}[ht]
+        \begin{subfigure}{10em}
+            \centering
+            \includegraphics[width=10em]{./imgs/Monster_Boss_Ghost}
+            \caption{Unohdettu}
+        \end{subfigure}
+        \begin{subfigure}{10em}
+            \centering
+            \includegraphics[width=10em]{./imgs/Monster_hpcrystal}
+            \caption{Elvytyskristalli}
+        \end{subfigure}
+        \begin{subfigure}{10em}
+            \centering
+            \includegraphics[width=10em]{./imgs/Monster_snowcrystal}
+            \caption{Haamukivi}
+        \end{subfigure}\label{fig:entities}
+    \end{figure}
+    Unohdettu：遗忘者。
+    这是一只白色，比恶魂略大，独眼，骷髅状的飞行生物。血量与凋灵相当。
+    生成在灵魂峡谷中的特殊结构\textit{遗忘之地}中。
+    除非借助邪眼、太阳石、太阳种子，玩家无法看见它。
+
+    只会受到来源为玩家的伤害。无法看见它的玩家无法对它造成任何伤害。
+    会被\textit{恢复水晶}治疗。攻击方式是朝玩家发射蓝色的激光。
+    被击杀后固定掉落一个\textit{太阳种子}。
+
+    Elvytyskristalli：恢复水晶。
+    末地水晶的绿色版。破碎后不会产生爆炸，但是有较高的血量（100）。
+    与\textit{遗忘者}一起在\textit{遗忘之地}中生成，一般会有4～6个。
+    每隔一段时间尝试给附近的遗忘者恢复生命。
+    破碎后掉落较多的恶魂之泪。
+
+    Haamukivi：幽灵水晶。
+    末地水晶的灰色版。破碎后不会产生爆炸，但是有较高的血量（100）。
+    每隔一段时间检测周围的\textit{幽灵怪物}数量。若被它生成的\textit{幽灵怪物}小于一定数量则补充生成一些。
+    破碎后所有被它生成的\textit{幽灵怪物}会一起消失。掉落较多的恶魂之泪。
+
+    幽灵怪物：
+    灰色、半透明版的原版怪物。他们被\textit{幽灵水晶}生成。
+    它们不会受到任何伤害，但是在距离生成它们的\textit{幽灵水晶}过远时会消失。生成它们的\textit{幽灵水晶}消失时，它们也会消失。
+    以下怪物有幽灵版本：
+    \begin{itemize}
+        \item 僵尸
+        \item 尸壳
+        \item 僵尸村民
+        \item 骷髅
+        \item 流浪者
+        \item 蜘蛛
+    \end{itemize}
+
+    \subsection{新日}\label{subsec:new-sun}
+    \begin{figure}[ht]
+        \includegraphics[width=\textwidth]{./imgs/New_Sun}
+        \caption{Uusi Aurinko}\label{fig:new-sun}
+    \end{figure}
+    \subsection{太阳}\label{subsec:sun}
+    Uusi Aurinko：新日。
+    随机将周围的\textbf{任何}方块变成流动的岩浆（不是岩浆源）。末地传送门除外。
+    内部会有一些不会被摧毁的发光方块提供亮度。
+    会朝着末地的$(0, 200, 0)$坐标，主世界的$(0, 200, 0)$坐标或附近手中或漂浮的\textit{微型月球}移动。
+    周围的所有实体都会被持续地点燃并被拉向它的中心。所有死亡的生物脚下都会生成流动的岩浆。
+
+    最开始很小且较暗。在周围死亡100只生物后会变大一圈，变得更白、更亮。
+    第一次变大后，玩家可以向内部投入元素石。投入的元素石会消失并使新日变大一些。此外：
+    \begin{itemize}
+        \item \textit{水石}使它颜色变紫。
+        \item \textit{地石}使它变绿并增强引力效应。
+        \item \textit{火石}使它变红并增强火焰伤害。
+        \item \textit{雷石}使它变蓝并在周围随机生成闪电与爆炸。
+    \end{itemize}
+    投入除\textit{粪石}以外的所有四种元素石后，它将完成生长。
+
+    如果在投入三种元素石后投入\textit{粪石}，它会以一种“特别”的方式完成生长：
+    体积几乎变为两倍大，颜色变成黑色，火焰伤害和引力效果变得极大。
+
+    完整尺寸的普通新日与黑色新日相遇时会发生一次剧烈的爆炸。
+    所有世界中的所有生物并获得强烈的燃烧、凋零与缓慢效果。玩家则会直接死亡，死亡信息是“xxx死于强烈的高速粒子流”。
+
+    \clearpage
+    \section{新增进度}\label{sec:achievements}
+    \begin{itemize}
+        \item \textbf{掌中炽焱} \quad 条件：获得\textit{火石}
+        \item \textbf{固态水。等等，这不是冰？！} \quad 条件：获得\textit{水石}
+        \item \textbf{ElectroBOOM} \quad 条件：获得\textit{电石}
+        \item \textbf{大地在颤动} \quad 条件：获得\textit{地石}
+        \item \textbf{呕——} \quad 条件：获得\textit{粪石}
+        \item \textbf{追忆} \quad 条件：击杀\textit{遗忘者}
+        \item \textbf{转变} \quad 条件：造出\textit{新日}
+        \item \textbf{血与火的成长} \quad 条件：\textit{新日}周围死亡100个生物
+        \item \textbf{太阳照常升起} \quad 条件：成长完全的普通\textit{新日}移动到主世界的$(0, 200, 0)$附近
+        \item \textbf{腐坏} \quad 条件：\textit{新日}变成黑色
+        \item \textbf{新秩序} \quad 条件：成长完全的黑色\textit{新日}移动到末地的$(0, 200, 0)$附近
+        \item \textbf{毁灭性中和} \quad 条件：黑色与普通\textit{新日}相互碰撞
+    \end{itemize}
+\end{document}
