@@ -23,11 +23,12 @@
 
     \clearpage
     \section{简介}\label{sec:intro}
-    Uusi Aurinko，是芬兰语中的 New Sun，新太阳。它来自于游戏 Noita 中的一系列成就任务：玩家收集五中元素，通过炼金术般的过程制造出新的太阳。
+    Uusi Aurinko，芬兰语，即 New Sun，新太阳。它来自游戏 Noita 中的一系列成就任务：玩家收集太阳种子和五种元素，通过炼金术般的过程制造出新的太阳。
 
-    通过将这一系列任务带入 minecraft，Uusi Aurinko 模组为玩家增加了一些新的后游戏后期（end of game）玩法。玩家在拥有足够强大的装备后，再次游历一些远古遗迹，从宝箱中拾起曾经不敢接触的物品，通过一系列破坏性（甚至是毁灭性）的操作制造出一颗耀眼的太阳。
+    通过将这一系列任务带入 Minecraft，Uusi Aurinko 模组添加了一些新的游戏后期玩法。
+    玩家在拥有足够强大的装备后，再次游历一些远古遗迹，从宝箱中拾起曾经不敢接触的物品，通过一系列破坏性（甚至是毁灭性）的操作制造出一颗（或两颗）耀眼的（或黑暗的）太阳。
 
-    为了保证原汁原味，游戏中的物品会使用 Noita 中的芬兰语命名加本地化的注释。
+    为了保证原汁原味，游戏中的物品标注会使用 Noita 中的芬兰语命名和本地化的注释。
 
     \vspace{1em}
     这份企划案目前使用的图片大多为 Noita 游戏中的素材和截图，均来自 \href{https://noita.fandom.com/wiki/Noita_Wiki}{Noita Wiki}。
@@ -201,28 +202,34 @@
         \includegraphics[width=\textwidth]{./imgs/New_Sun}
         \caption{Uusi Aurinko}\label{fig:new-sun}
     \end{figure}
-    \subsection{太阳}\label{subsec:sun}
     Uusi Aurinko：新日。
-    随机将周围的\textbf{任何}方块变成流动的岩浆（不是岩浆源）。末地传送门除外。
+    随机将周围末地传送门以外的\textbf{任何}方块变成流动的岩浆（不是岩浆源）。
     内部会有一些不会被摧毁的发光方块提供亮度。
-    会朝着末地的$(0, 200, 0)$坐标，主世界的$(0, 200, 0)$坐标或附近手中或漂浮的\textit{微型月球}移动。
-    周围的所有实体都会被持续地点燃并被拉向它的中心。所有死亡的生物脚下都会生成流动的岩浆。
+    会朝着附近手中或漂浮中的\textit{微型月球}移动。
+    周围的所有实体都会被持续地点燃，受到燃烧上海并被拉向它的中心。所有死亡的生物脚下都会生成流动的岩浆。
 
-    最开始很小且较暗。在周围死亡100只生物后会变大一圈，变得更白、更亮。
-    第一次变大后，玩家可以向内部投入元素石。投入的元素石会消失并使新日变大一些。此外：
+    \textbf{阶段一：}刚被创建时，最开始很小且较暗。在周围死亡100只生物后会变白、变亮并显著变大，进入二阶段。
+
+    \textbf{阶段二：}接下来，玩家可以向内部投入元素石。投入的元素石会消失并使新日略微变大一些。此外：
     \begin{itemize}
         \item \textit{水石}使它颜色变紫。
         \item \textit{地石}使它变绿并增强引力效应。
         \item \textit{火石}使它变红并增强火焰伤害。
         \item \textit{雷石}使它变蓝并在周围随机生成闪电与爆炸。
     \end{itemize}
-    投入除\textit{粪石}以外的所有四种元素石后，它将完成生长。
+
+    \textbf{阶段三：}
+    投入除\textit{粪石}以外的所有四种元素石后，它会显著变大并完成生长（阶段三）。
 
     如果在投入三种元素石后投入\textit{粪石}，它会以一种“特别”的方式完成生长：
-    体积几乎变为两倍大，颜色变成黑色，火焰伤害和引力效果变得极大。
+    体积几乎变为普通阶段三新日的两倍，颜色变成黑色，火焰伤害和引力效果变得极大。
 
-    完整尺寸的普通新日与黑色新日相遇时会发生一次剧烈的爆炸。
-    所有世界中的所有生物并获得强烈的燃烧、凋零与缓慢效果。玩家则会直接死亡，死亡信息是“xxx死于强烈的高速粒子流”。
+    无论是否变成黑色，这一阶段的太阳如果在末地中，会朝着末地的$(0, 200, 0)$坐标缓慢移动；如果在主世界，则会朝着主世界的$(0, 200, 0)$坐标移动。
+    当然，它依然会最优先选择朝着附近手中或漂浮的\textit{微型月球}移动。
+
+    \textbf{湮灭：}
+    完整尺寸的普通新日与黑色新日相遇时，二者会在剧烈的爆炸中湮灭。
+    所有世界中的所有生物并获得强烈的燃烧、凋零与缓慢效果。玩家则会直接死亡，死亡信息是“xxx死于强烈的高速粒子射流”。
 
     \clearpage
     \section{新增进度}\label{sec:achievements}
@@ -240,4 +247,85 @@
         \item \textbf{新秩序} \quad 条件：成长完全的黑色\textit{新日}移动到末地的$(0, 200, 0)$附近
         \item \textbf{毁灭性中和} \quad 条件：黑色与普通\textit{新日}相互碰撞
     \end{itemize}
+
+
+    \clearpage
+    \section{美术设计}\label{sec:artistic}
+
+    模组的整体美术风格应该尽量贴近 1.16.5 的原版像素风格。物品设计极为简单，暂且不表。一些复杂的问题请见下文。
+
+    \subsection{新日}\label{subsec:design-sun}
+
+    新日在设计时需要给予玩家足够的体积感和压迫感。具体体现在大小对比、环境氛围和粒子效果。严格来说，粒子效果也可以算作环境氛围的一部分。
+    可以用这几张截图（\ref{fig:sun-screenshots}）感受一下 Noita 中新日与玩家（旁边紫袍法师）的大小对比和氛围感。
+
+    新日的巨大体积感是最重要的。目前考虑过以下几种模型：
+    \begin{itemize}
+        \item 直接做成一个球体，对渲染技术的要求较高。例子是是龙之研究 mod 的能量塔与反应堆（\ref{fig:sphere-de}）。
+        \item 做成多个正方体组成的球体。为了较好地实现球体效果，模型和贴图会很复杂。
+        \item 做成正方体或接近正方体的形状。模型和贴图都会比较简单。
+        \item 做成单个永远用正面朝着玩家的平面贴图。非常简易。例子是 Minecraft 的火焰弹、雪球。
+    \end{itemize}
+    具体材质根据模型进行绘制。模型可能还会加上旋转的动态效果。
+
+    环境氛围则可以通过让玩家靠近时屏幕颜色变红来营造炽热感。
+    考虑到运行压力，粒子效果可能会削减得较少。
+    作为粒子效果的替代，玩家靠近时，屏幕可以贴上一张动态半透明的图片（类似南瓜头的遮罩效果）来模拟热浪和粒子迸发效果。
+    这里提到的屏幕贴图替代粒子效果，可以参考游戏《超时空方舟》中雪地关卡的“迎面暴雪”效果（\ref{fig:chronoark-snow}）。
+    “雪花”近大远小，近快远慢，且在近处有眼睛没有对焦的模糊效果。
+
+%    ----------------- 图片 -----------------
+    \begin{figure}[ht]
+        \begin{subfigure}{18em}
+            \centering
+            \includegraphics[width=18em]{./imgs/Sun_small}
+            \caption{阶段一，尺寸并不大。区区金黄色的发光球体而已，似乎可以简单地操控}
+        \end{subfigure}
+        \begin{subfigure}{18em}
+            \centering
+            \includegraphics[width=18em]{./imgs/Sun_medium}
+            \caption{阶段二，新日已经吞噬了100个生物。此时已经能感受到体积感}
+        \end{subfigure}
+        \begin{subfigure}{18em}
+            \centering
+            \includegraphics[width=18em]{./imgs/Sun_full}
+            \caption{阶段三，新日很大并且放射出大量光芒和粒子}
+        \end{subfigure}
+        \begin{subfigure}{18em}
+            \centering
+            \includegraphics[width=18em]{./imgs/Sun_dark}
+            \caption{阶段三（黑色），巨大的压迫感}
+        \end{subfigure}
+        \caption{来自视频《\href{https://www.bilibili.com/video/BV1CZ4y1w7AL}{【Noita彩蛋】啦啦啦~种太阳☀}》的几张截图}
+        \label{fig:sun-screenshots}
+    \end{figure}
+
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[width=\textwidth]{./imgs/Draconic_Evolution_sphere}
+        \caption{《龙之进化》的球体。
+        来自视频《\href{https://www.bilibili.com/video/BV11541187n8}{【我的世界模组教程】龙研最稳定比例的反应堆}》}
+        \label{fig:sphere-de}
+    \end{figure}
+
+    \begin{figure}[ht]
+        \centering
+        \begin{subfigure}{\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{./imgs/ChronoArk_snow_1}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{./imgs/ChronoArk_snow_2}
+            \caption{}
+        \end{subfigure}
+        \caption{《超时空方舟》中的“暴雪迎面”效果。
+        来自视频《\href{https://www.bilibili.com/video/BV1K5411r7cd}{ChronoArk推倒死神（游戏已经汉化啦）}》}
+        \label{fig:chronoark-snow}
+    \end{figure}
+%    ----------------- 图片完 -----------------
+
+
+
 \end{document}
