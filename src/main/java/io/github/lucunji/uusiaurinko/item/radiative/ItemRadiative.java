@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -40,5 +41,16 @@ public abstract class ItemRadiative extends ItemBase {
                     random.nextInt(yRange) + yMin, random.nextInt(zRange) - zRadius));
         }
         return list;
+    }
+
+    @Override
+    public boolean hasCustomEntity(ItemStack stack) {
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(World world, Entity location, ItemStack itemstack) {
+        return super.createEntity(world, location, itemstack);
     }
 }
