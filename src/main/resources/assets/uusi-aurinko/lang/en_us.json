@@ -1,0 +1,7 @@
+{
+  "itemGroup.uusi-aurinko.defaults": "Uusi Aurinko",
+  "tooltip.uusi-aurinko.shift_more": "§oMore Info: Press <Shift>§r",
+  "tooltip.uusi-aurinko.shift_less": "\n§7§oLess Info: Release <Shift>§r",
+  "item.uusi-aurinko.fire_stone": "§eKiuaskivi§r",
+  "item.uusi-aurinko.fire_stone.tooltip": "This tiny rock looks most fiery, but when touched only a pleasant warmth can be felt.\nThis rock may provide limited fire protection, which is not effective in lava."
+}

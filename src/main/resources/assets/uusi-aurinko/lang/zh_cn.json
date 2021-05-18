@@ -1,0 +1,7 @@
+{
+  "itemGroup.uusi-aurinko.defaults": "Uusi Aurinko",
+  "tooltip.uusi-aurinko.shift_more": "§o更多信息：按下 <Shift>§r",
+  "tooltip.uusi-aurinko.shift_less": "\n§7§o更少信息：松开 <Shift>§r",
+  "item.uusi-aurinko.fire_stone": "§eKiuaskivi§r",
+  "item.uusi-aurinko.fire_stone.tooltip": "这块石头看似炽热，摸着只是暖意融融。\n似乎能提供有限的火焰防护效果，遇到岩浆时效果不佳。"
+}
