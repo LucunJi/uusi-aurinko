@@ -7,13 +7,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
 import java.util.Random;
+
+import static io.github.lucunji.uusiaurinko.effects.Effects.FIRE_RESISTANCE_LIMITED;
 
 public class ItemFireStone extends ItemRadiative {
     public ItemFireStone(Item.Properties properties) {
@@ -39,7 +40,7 @@ public class ItemFireStone extends ItemRadiative {
         if (entityIn instanceof LivingEntity) {
             LivingEntity creature = (LivingEntity) entityIn;
             if (!creature.isInLava()) {
-                creature.addPotionEffect(new EffectInstance(Effects.FIRE_RESISTANCE, 1, 0, false, false));
+                creature.addPotionEffect(new EffectInstance(FIRE_RESISTANCE_LIMITED, 1, 0, false, false));
             }
         }
 
