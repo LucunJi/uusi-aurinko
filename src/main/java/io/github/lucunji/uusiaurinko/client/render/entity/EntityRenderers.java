@@ -11,7 +11,7 @@ public class EntityRenderers {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @SubscribeEvent
-    public static void onEntityRenderersRegistry(final FMLClientSetupEvent event){
+    public static void onEntityRenderersRegistry(final FMLClientSetupEvent event) {
 //        LOGGER.info("Register entity renderer");
 //        RenderingRegistry.registerEntityRenderingHandler();
     }

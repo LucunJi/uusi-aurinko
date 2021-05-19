@@ -43,7 +43,7 @@ public class ItemFireStone extends ItemRadiative {
     }
 
     @Override
-    public IParticleData inWorldParticleType() {
+    public IParticleData inWorldParticleType(ItemEntity itemEntity) {
         return ParticleTypes.FLAME;
     }
 

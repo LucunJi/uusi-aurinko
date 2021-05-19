@@ -28,7 +28,7 @@ public abstract class ItemBase extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         if (InputMappings.isKeyDown(windowHandle, 340) || InputMappings.isKeyDown(windowHandle, 344)) {
-            tooltip.add(new TranslationTextComponent(this.getTranslationKey()+".tooltip"));
+            tooltip.add(new TranslationTextComponent(this.getTranslationKey() + ".tooltip"));
             tooltip.add(new TranslationTextComponent("tooltip.uusi-aurinko.shift_less"));
         } else {
             tooltip.add(new TranslationTextComponent("tooltip.uusi-aurinko.shift_more"));

@@ -12,10 +12,12 @@ import static io.github.lucunji.uusiaurinko.effects.LimitedFireResistanceEffect.
 public class LivingAttackEventHandler {
     @SubscribeEvent
     public static void onLivingAttacked(final LivingAttackEvent livingAttackEvent) {
-        if (livingAttackEvent.getEntityLiving().isPotionActive(FIRE_RESISTANCE_LIMITED))
-        for (DamageSource src : BLOCKED_SOURCES) {
-            if (livingAttackEvent.getSource() == src) {
-                livingAttackEvent.setCanceled(true);
+        // main logic for LimitedFireResistanceEffect
+        if (livingAttackEvent.getEntityLiving().isPotionActive(FIRE_RESISTANCE_LIMITED)) {
+            for (DamageSource src : BLOCKED_SOURCES) {
+                if (livingAttackEvent.getSource() == src) {
+                    livingAttackEvent.setCanceled(true);
+                }
             }
         }
     }

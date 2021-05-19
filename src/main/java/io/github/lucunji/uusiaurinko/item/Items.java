@@ -1,6 +1,7 @@
 package io.github.lucunji.uusiaurinko.item;
 
 import io.github.lucunji.uusiaurinko.item.radiative.ItemFireStone;
+import io.github.lucunji.uusiaurinko.item.radiative.ItemWaterStone;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemGroup;
@@ -19,17 +20,21 @@ import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 public class Items {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final ItemGroup DEFAULTS = new DefaultGroup(MODID+".defaults");
+    private static final ItemGroup DEFAULTS = new DefaultGroup(MODID + ".defaults");
 
     @ObjectHolder("fire_stone")
     public static final ItemFireStone FIRE_STONE = null;
+    @ObjectHolder("water_stone")
+    public static final ItemWaterStone WATER_STONE = null;
 
     @SubscribeEvent
     public static void onItemsRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
         LOGGER.info("Register items");
         itemRegistryEvent.getRegistry().registerAll(
                 new ItemFireStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULTS))
-                        .setRegistryName(MODID, "fire_stone")
+                        .setRegistryName(MODID, "fire_stone"),
+                new ItemWaterStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULTS))
+                        .setRegistryName(MODID, "water_stone")
         );
     }
 
