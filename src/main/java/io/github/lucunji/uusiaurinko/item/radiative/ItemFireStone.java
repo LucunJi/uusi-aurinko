@@ -1,12 +1,14 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
-import io.github.lucunji.uusiaurinko.entity.ThrownRockEntity;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -36,8 +38,13 @@ public class ItemFireStone extends ItemRadiative {
     }
 
     @Override
-    public void radiationInWorld(ItemStack stack, ThrownRockEntity rockEntity) {
-        doIgnition(rockEntity.world, rockEntity);
+    public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
+        doIgnition(itemEntity.world, itemEntity);
+    }
+
+    @Override
+    public IParticleData inWorldParticleType() {
+        return ParticleTypes.FLAME;
     }
 
     private void doIgnition(World worldIn, Entity self) {

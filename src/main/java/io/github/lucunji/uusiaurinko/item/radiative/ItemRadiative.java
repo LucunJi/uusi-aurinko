@@ -1,36 +1,41 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
-import io.github.lucunji.uusiaurinko.entity.EntityTypes;
-import io.github.lucunji.uusiaurinko.entity.ThrownRockEntity;
 import io.github.lucunji.uusiaurinko.item.ItemBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static net.minecraft.entity.Entity.horizontalMag;
 
 /**
  * Items which has special effects when held in hands or thrown.
  */
 public abstract class ItemRadiative extends ItemBase {
+    public static Field itemAgeField = null;
 
     public ItemRadiative(Properties properties) {
         super(properties);
     }
 
-    public abstract void radiationInWorld(ItemStack stack, ThrownRockEntity rockEntity);
+    public abstract void radiationInWorld(ItemStack stack, ItemEntity itemEntity);
 
     public abstract void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand);
+
+    public abstract IParticleData inWorldParticleType();
 
     @Override
     public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
@@ -40,6 +45,31 @@ public abstract class ItemRadiative extends ItemBase {
         }
     }
 
+    @Override
+    public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
+        // make particles
+        Random random = new Random();
+        if (random.nextFloat() < 0.07){
+            double posX = entity.getPosX() - 0.25 + random.nextFloat()*0.5;
+            double posY = entity.getPosY() + random.nextFloat()*0.5;
+            double posZ = entity.getPosZ() - 0.25 + random.nextFloat()*0.5;
+            double xSpeed = random.nextFloat()*0.02 - 0.01;
+            double zSpeed = random.nextFloat()*0.02 - 0.01;
+
+            // only runs in client
+            entity.world.addOptionalParticle(inWorldParticleType(),
+                    posX, posY, posZ, xSpeed, 0.04, zSpeed);
+        }
+
+        if (!entity.cannotPickup()) // use pickup delay to item cast effects on player immediately
+            this.radiationInWorld(stack, entity);
+        return false;
+    }
+
+    /**
+     * Pick random positions around a position.
+     * @return a list of random positions, may contain repeated entries.
+     */
     protected static Iterable<BlockPos> randomBlocksAround(BlockPos blockPos, int trials, int xRadius, int zRadius, int yMax, int yMin, Random random) {
         List<BlockPos> list = new ArrayList<>(trials);
         int xRange = xRadius * 2 + 1;
@@ -52,41 +82,86 @@ public abstract class ItemRadiative extends ItemBase {
         return list;
     }
 
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        if (!worldIn.isRemote()) {
-            ThrownRockEntity entity = EntityTypes.THROWN_ROCK.create(worldIn);
-            ItemStack itemStack = playerIn.getHeldItem(handIn);
-            Vector3d userPosVec = playerIn.getPositionVec();
-            entity.setPosition(userPosVec.x, playerIn.getPosYEye() - 0.1, userPosVec.z);
-            entity.setItem(itemStack.copy());
-            entity.setOwnerUUID(playerIn.getUniqueID());
-            if (!playerIn.abilities.isCreativeMode) {
-                itemStack.shrink(1);
-            }
-            entity.setDirectionAndMovement(playerIn, playerIn.rotationPitch, playerIn.rotationYaw,
-                    0.0F, 1.5F, 1.0F);
-            worldIn.addEntity(entity);
-        }
-        return super.onItemRightClick(worldIn, playerIn, handIn);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Nullable
-    @Override
-    public Entity createEntity(World world, Entity oldEntity, ItemStack itemStack) {
-        ThrownRockEntity entity = EntityTypes.THROWN_ROCK.create(world);
-        Vector3d posVec = oldEntity.getPositionVec();
-        entity.setPosition(posVec.x, posVec.y, posVec.z);
-        entity.setMotion(oldEntity.getMotion());
-        entity.setItem(itemStack);
-        if (oldEntity instanceof ItemEntity) entity.setOwnerUUID(((ItemEntity) oldEntity).getOwnerId());
-        return entity;
-    }
-
+    /**
+     * Returns true only to trigger {@code createEntity} method
+     * @return true
+     */
     @Override
     public boolean hasCustomEntity(ItemStack stack) {
         return true;
+    }
+
+    /**
+     * Make the item entity immortal.
+     * Returns {@code null} to keep using the modified the {@code oldEntity}.
+     * @return null
+     */
+    @Override
+    public Entity createEntity(World world, Entity oldEntity, ItemStack itemstack) {
+        if (oldEntity instanceof ItemEntity) {
+            trySetItemAge((ItemEntity) oldEntity, -32768);
+        }
+        return null;
+    }
+
+    /**
+     * Throw the item with greater speed than simply drop the item when click right mouse button.
+     */
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+        ItemStack itemStack = playerIn.getHeldItem(handIn);
+        if (!worldIn.isRemote()) {
+            Vector3d userPosVec = playerIn.getPositionVec();
+            ItemEntity itemEntity = new ItemEntity(worldIn, userPosVec.x, userPosVec.y, userPosVec.z, itemStack.copy());
+            itemEntity.setPickupDelay(20);
+            itemEntity.setOwnerId(playerIn.getUniqueID());
+            setDirectionAndMovement(itemEntity, playerIn, playerIn.rotationPitch, playerIn.rotationYaw,
+                        0.0F, 1.2F, 1.0F);
+            worldIn.addEntity(itemEntity);
+        }
+        if (!playerIn.abilities.isCreativeMode) {
+            itemStack.shrink(1);
+        }
+        return ActionResult.resultSuccess(itemStack);
+    }
+
+    private static void setDirectionAndMovement(Entity thrown, Entity thrower, float pitch, float yaw, float rotation, float velocity, float inaccuracy) {
+        float f = -MathHelper.sin(yaw * ((float)Math.PI / 180F)) * MathHelper.cos(pitch * ((float)Math.PI / 180F));
+        float f1 = -MathHelper.sin((pitch + rotation) * ((float)Math.PI / 180F));
+        float f2 = MathHelper.cos(yaw * ((float)Math.PI / 180F)) * MathHelper.cos(pitch * ((float)Math.PI / 180F));
+        shoot(thrown, f, f1, f2, velocity, inaccuracy);
+        Vector3d vector3d = thrower.getMotion();
+        thrown.setMotion(thrown.getMotion().add(vector3d.x, thrower.isOnGround() ? 0.0D : vector3d.y, vector3d.z));
+    }
+
+    private static void shoot(Entity thrown, double x, double y, double z, float velocity, float inaccuracy) {
+        Random random = new Random();
+        Vector3d vector3d = (new Vector3d(x, y, z)).normalize()
+                .add(random.nextGaussian() * (double)0.0075F * (double)inaccuracy,
+                        random.nextGaussian() * (double)0.0075F * (double)inaccuracy,
+                        random.nextGaussian() * (double)0.0075F * (double)inaccuracy)
+                .scale(velocity);
+        thrown.setMotion(vector3d);
+        float f = MathHelper.sqrt(horizontalMag(vector3d));
+        thrown.rotationYaw = (float)(MathHelper.atan2(vector3d.x, vector3d.z) * (double)(180F / (float)Math.PI));
+        thrown.rotationPitch = (float)(MathHelper.atan2(vector3d.y, f) * (double)(180F / (float)Math.PI));
+        thrown.prevRotationYaw = thrown.rotationYaw;
+        thrown.prevRotationPitch = thrown.rotationPitch;
+    }
+
+    /**
+     * Set item age by reflection, may fail.
+     * It uses {@code itemAgeField} to cache the field to improve performance.
+     */
+    private static void trySetItemAge(ItemEntity entity, int age) {
+        try {
+            if (itemAgeField == null) {
+                itemAgeField = ItemEntity.class.getDeclaredField("age");
+                itemAgeField.setAccessible(true);
+            }
+            itemAgeField.set(entity, age);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 }
