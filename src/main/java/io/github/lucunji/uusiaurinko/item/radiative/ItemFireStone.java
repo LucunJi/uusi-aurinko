@@ -1,10 +1,10 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
+import io.github.lucunji.uusiaurinko.entity.ThrownRockEntity;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
@@ -36,8 +36,8 @@ public class ItemFireStone extends ItemRadiative {
     }
 
     @Override
-    public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
-        doIgnition(itemEntity.world, itemEntity);
+    public void radiationInWorld(ItemStack stack, ThrownRockEntity rockEntity) {
+        doIgnition(rockEntity.world, rockEntity);
     }
 
     private void doIgnition(World worldIn, Entity self) {
@@ -55,11 +55,13 @@ public class ItemFireStone extends ItemRadiative {
         }
 
         // ignite entities
-        worldIn.getEntitiesWithinAABB(Entity.class, self.getBoundingBox().grow(0.5), entity -> entity != self)
-                .forEach(entity -> {
-                    if (Item.random.nextFloat() < 0.05)
-                        entity.setFire(8);
-                });
+        if (!worldIn.isRemote()) {
+            worldIn.getEntitiesWithinAABB(Entity.class, self.getBoundingBox().grow(0.5), entity -> entity != self)
+                    .forEach(entity -> {
+                        if (Item.random.nextFloat() < 0.05)
+                            entity.setFire(8);
+                    });
+        }
     }
 
     private boolean trySpreadFireTo(World worldIn, BlockPos blockPos, Random random, int chance) {
