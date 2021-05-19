@@ -4,6 +4,7 @@ import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
@@ -23,10 +24,27 @@ public class ItemFireStone extends ItemRadiative {
 
     @Override
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
+        doIgnition(worldIn, entityIn);
+
+        // grant fire immunity
+        if (entityIn instanceof LivingEntity) {
+            LivingEntity creature = (LivingEntity) entityIn;
+            if (!creature.isInLava()) {
+                creature.addPotionEffect(new EffectInstance(FIRE_RESISTANCE_LIMITED, 1, 0, false, false));
+            }
+        }
+    }
+
+    @Override
+    public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
+        doIgnition(itemEntity.world, itemEntity);
+    }
+
+    private void doIgnition(World worldIn, Entity self) {
         // ignite blocks
         if (!worldIn.isRemote() && worldIn.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
             Random random = new Random();
-            for (BlockPos pos : randomBlocksAround(entityIn.getPosition(), 1, 1, 1, 3, -1, random)) {
+            for (BlockPos pos : randomBlocksAround(self.getPosition(), 1, 1, 1, 3, -1, random)) {
                 BlockState blockState = AbstractFireBlock.getFireForPlacement(worldIn, pos);
                 int chance = 150 + (worldIn.isBlockinHighHumidity(pos) ? 50 : 0);
                 if (worldIn.isAirBlock(pos) && blockState.isValidPosition(worldIn, pos) &&
@@ -36,16 +54,8 @@ public class ItemFireStone extends ItemRadiative {
             }
         }
 
-        // grant fire immunity
-        if (entityIn instanceof LivingEntity) {
-            LivingEntity creature = (LivingEntity) entityIn;
-            if (!creature.isInLava()) {
-                creature.addPotionEffect(new EffectInstance(FIRE_RESISTANCE_LIMITED, 1, 0, false, false));
-            }
-        }
-
         // ignite entities
-        worldIn.getEntitiesWithinAABB(Entity.class, entityIn.getBoundingBox().grow(0.5), entity -> entity != entityIn)
+        worldIn.getEntitiesWithinAABB(Entity.class, self.getBoundingBox().grow(0.5), entity -> entity != self)
                 .forEach(entity -> {
                     if (Item.random.nextFloat() < 0.05)
                         entity.setFire(8);

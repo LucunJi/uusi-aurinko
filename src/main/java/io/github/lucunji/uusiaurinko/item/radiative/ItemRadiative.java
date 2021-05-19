@@ -2,12 +2,12 @@ package io.github.lucunji.uusiaurinko.item.radiative;
 
 import io.github.lucunji.uusiaurinko.item.ItemBase;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,6 +20,8 @@ public abstract class ItemRadiative extends ItemBase {
     public ItemRadiative(Properties properties) {
         super(properties);
     }
+
+    public abstract void radiationInWorld(ItemStack stack, ItemEntity itemEntity);
 
     public abstract void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand);
 
@@ -44,13 +46,8 @@ public abstract class ItemRadiative extends ItemBase {
     }
 
     @Override
-    public boolean hasCustomEntity(ItemStack stack) {
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public Entity createEntity(World world, Entity location, ItemStack itemstack) {
-        return super.createEntity(world, location, itemstack);
+    public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
+        this.radiationInWorld(stack, entity);
+        return false;
     }
 }
