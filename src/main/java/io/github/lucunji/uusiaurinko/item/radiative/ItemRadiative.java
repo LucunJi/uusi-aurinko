@@ -2,6 +2,7 @@ package io.github.lucunji.uusiaurinko.item.radiative;
 
 import io.github.lucunji.uusiaurinko.item.ItemBase;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -13,6 +14,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -25,7 +29,9 @@ import static net.minecraft.entity.Entity.horizontalMag;
  * Items which has special effects when held in hands or thrown.
  */
 public abstract class ItemRadiative extends ItemBase {
-    public static Field itemAgeField = null; // FIXME: Use ObfuscationReflectionHelper or Mixin instead
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static Field ageFieldCache = null;
 
     public ItemRadiative(Properties properties) {
         super(properties);
@@ -39,9 +45,12 @@ public abstract class ItemRadiative extends ItemBase {
 
     @Override
     public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        boolean inMainHand = EquipmentSlotType.MAINHAND.getSlotIndex() == itemSlot;
-        if (inMainHand && isSelected || EquipmentSlotType.OFFHAND.getSlotIndex() == itemSlot) {
-            this.radiationInHand(stack, worldIn, entityIn, inMainHand);
+        if (!entityIn.isSpectator() && entityIn instanceof LivingEntity) {
+            LivingEntity livingEntity = (LivingEntity) entityIn;
+            boolean inMainHand = livingEntity.getHeldItemMainhand() == stack;
+            if (inMainHand && isSelected || livingEntity.getHeldItemOffhand() == stack) {
+                this.radiationInHand(stack, worldIn, entityIn, inMainHand);
+            }
         }
     }
 
@@ -105,7 +114,7 @@ public abstract class ItemRadiative extends ItemBase {
     @Override
     public Entity createEntity(World world, Entity oldEntity, ItemStack itemstack) {
         if (oldEntity instanceof ItemEntity) {
-            trySetItemAge((ItemEntity) oldEntity, -32768);
+            trySetAge((ItemEntity) oldEntity, -32768);
         }
         return null;
     }
@@ -156,18 +165,23 @@ public abstract class ItemRadiative extends ItemBase {
     }
 
     /**
-     * Set item age by reflection, may fail.
-     * It uses {@code itemAgeField} to cache the field to improve performance.
+     * Attempts to set age of item entity with reflection.
+     * The reflective field will be cached after the first successful operation.
      */
-    private static void trySetItemAge(ItemEntity entity, int age) {
+    private void trySetAge(ItemEntity instance, int age) {
         try {
-            if (itemAgeField == null) {
-                itemAgeField = ItemEntity.class.getDeclaredField("age");
-                itemAgeField.setAccessible(true);
+            if (ageFieldCache == null) {
+                Field temp = ObfuscationReflectionHelper.findField(ItemEntity.class, "age");
+                temp.setAccessible(true);
+                ageFieldCache = temp;
             }
-            itemAgeField.set(entity, age);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            e.printStackTrace();
+            ageFieldCache.set(instance, age);
+        } catch (ObfuscationReflectionHelper.UnableToFindFieldException e) {
+            LOGGER.error("Could not find field 'age' in class 'ItemEntity'", e);
+        } catch (SecurityException e) {
+            LOGGER.error("Could not make field 'age' in class 'ItemEntity' accessible", e);
+        } catch (IllegalAccessException e) {
+            LOGGER.error("Could not give new value to field 'age' in class 'ItemEntity'", e);
         }
     }
 }

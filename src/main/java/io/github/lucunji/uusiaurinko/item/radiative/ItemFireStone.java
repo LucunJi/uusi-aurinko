@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
+import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -17,8 +18,12 @@ import net.minecraft.world.World;
 
 import java.util.Random;
 
-import static io.github.lucunji.uusiaurinko.effects.Effects.FIRE_RESISTANCE_LIMITED;
-
+/**
+ * This stone:
+ * gives holder fire immunity, ignites surrounding entities, and place fire randomly in the world.
+ * Fire blocks tend to appear near flammable blocks.
+ * Fire immunity only appears when someone holds the stone.
+ */
 public class ItemFireStone extends ItemRadiative {
     public ItemFireStone(Item.Properties properties) {
         super(properties);
@@ -32,7 +37,8 @@ public class ItemFireStone extends ItemRadiative {
         if (entityIn instanceof LivingEntity) {
             LivingEntity creature = (LivingEntity) entityIn;
             if (!creature.isInLava()) {
-                creature.addPotionEffect(new EffectInstance(FIRE_RESISTANCE_LIMITED, 1, 0, false, false));
+                creature.addPotionEffect(new EffectInstance(ModEffects.FIRE_RESISTANCE_LIMITED.get(),
+                        1, 0, true, false));
             }
         }
     }

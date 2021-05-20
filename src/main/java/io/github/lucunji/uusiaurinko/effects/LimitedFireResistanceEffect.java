@@ -16,4 +16,6 @@ public class LimitedFireResistanceEffect extends Effect {
     protected LimitedFireResistanceEffect(EffectType typeIn, int liquidColorIn) {
         super(typeIn, liquidColorIn);
     }
+
+
 }
