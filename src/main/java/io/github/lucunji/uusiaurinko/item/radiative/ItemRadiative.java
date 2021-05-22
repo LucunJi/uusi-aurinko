@@ -125,9 +125,9 @@ public abstract class ItemRadiative extends ItemBase {
         ItemStack itemStack = playerIn.getHeldItem(handIn);
         if (!worldIn.isRemote()) {
             Vector3d userPosVec = playerIn.getPositionVec();
-            ItemEntity itemEntity = new ItemEntity(worldIn, userPosVec.x, userPosVec.y, userPosVec.z, itemStack.copy());
-            itemEntity.setPickupDelay(20);
-            itemEntity.setOwnerId(playerIn.getUniqueID());
+            ItemEntity itemEntity = new ItemEntity(worldIn, userPosVec.x, playerIn.getPosYEye() - 0.3F, userPosVec.z, itemStack.copy());
+            itemEntity.setPickupDelay(40);
+            itemEntity.setThrowerId(playerIn.getUniqueID());
             setDirectionAndMovement(itemEntity, playerIn, playerIn.rotationPitch, playerIn.rotationYaw,
                     0.0F, 1.2F, 1.0F);
             worldIn.addEntity(itemEntity);

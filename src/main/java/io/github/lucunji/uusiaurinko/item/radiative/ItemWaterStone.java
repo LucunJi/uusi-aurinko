@@ -26,7 +26,7 @@ import java.util.Random;
 /**
  * This stone:
  * grants holder fire immunity and water breathing, temporarily solidify lava and hurts surrounding water-sensitive mobs.
- * Fire immunity only appears when someone holds the stone.
+ * Fire immunity only appears when someone holds the stone. It also distinguishes any fire on body.
  * Fire on body will be distinguished when player goes out of fire source(lava or fire block).
  * Water breathing only appears when someone holds the stone and stand in water.
  * The solidified lava will melt after some time like frosted ice.
