@@ -1,13 +1,10 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
-import io.github.lucunji.uusiaurinko.block.SolidifiedLavaBlock;
-import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
@@ -50,12 +47,13 @@ public class ItemWaterStone extends ItemRadiative {
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
         chillLava(worldIn, new Random(), entityIn, 2);
         hurtsFireSensitiveCreatures(entityIn.world, entityIn, 1);
+
+        entityIn.forceFireTicks(0);
         if (entityIn instanceof LivingEntity) {
             LivingEntity creature = (LivingEntity) entityIn;
-            if (!creature.isInLava()) {
-                creature.addPotionEffect(new EffectInstance(ModEffects.FIRE_RESISTANCE_LIMITED.get(),
-                        1, 0, true, false));
-            }
+            creature.addPotionEffect(new EffectInstance(Effects.FIRE_RESISTANCE,
+                    1, 0, true, false));
+
             if (creature.isInWater()) {
                 creature.addPotionEffect(new EffectInstance(Effects.WATER_BREATHING,
                         1, 0, true, false));

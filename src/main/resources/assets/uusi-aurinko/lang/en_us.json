@@ -4,11 +4,9 @@
   "tooltip.uusi-aurinko.shift_less": "\n§7§oLess Info: Release <Shift>§r",
 
   "item.uusi-aurinko.fire_stone": "§eKiuaskivi§r",
-  "item.uusi-aurinko.fire_stone.tooltip": "This tiny rock looks most fiery, but when touched only a pleasant warmth can be felt.\nSeem to provide limited fire protection when held in hand, which is ineffective in lava.",
+  "item.uusi-aurinko.fire_stone.tooltip": "This tiny rock looks most fiery, but when touched only a pleasant warmth can be felt.\nSeem to provide fire protection when held in hand, but be careful with your flammable furniture!",
   "item.uusi-aurinko.water_stone": "§eVuoksikivi§r",
   "item.uusi-aurinko.water_stone.tooltip": "This small rock is hard and solid, yet seems to be gushing with water.\nIt is wet enough to damage fire-sensitive creatures, extinguish fire on body and solidify lava temporary.\nIt even makes you breath under water!",
 
-  "block.uusi-aurinko.solidified_lava": "Solidified Laval",
-
-  "effect.uusi-aurinko.fire_resistance_limited": "Fire Resistance(Limited)"
+  "block.uusi-aurinko.solidified_lava": "Solidified Lava"
 }

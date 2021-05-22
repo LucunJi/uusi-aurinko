@@ -5,7 +5,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.util.ActionResult;
@@ -73,8 +72,7 @@ public abstract class ItemRadiative extends ItemBase {
             }
         }
 
-        if (!entity.cannotPickup()) // use pickup delay to item cast effects on player immediately
-            this.radiationInWorld(stack, entity);
+        this.radiationInWorld(stack, entity);
         return false;
     }
 

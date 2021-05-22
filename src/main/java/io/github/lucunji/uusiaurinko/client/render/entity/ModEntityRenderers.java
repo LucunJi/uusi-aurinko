@@ -12,7 +12,7 @@ public class ModEntityRenderers {
 
     @SubscribeEvent
     public static void onEntityRenderersRegistry(final FMLClientSetupEvent event) {
-//        LOGGER.info("Register entity renderer");
+        LOGGER.info("Register entity renderer");
 //        RenderingRegistry.registerEntityRenderingHandler();
     }
 }

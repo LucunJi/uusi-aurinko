@@ -149,7 +149,7 @@ public class SolidifiedLavaBlock extends Block {
                     && ++solidifiedLavaCount >= maxSolidifiedBlocks)
                 return false;
         }
-        return false;
+        return true;
     }
 
     private void becomeLava(BlockState blockState, World world, BlockPos blockPos) {

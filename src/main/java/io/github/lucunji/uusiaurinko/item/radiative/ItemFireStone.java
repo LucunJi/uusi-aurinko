@@ -1,6 +1,5 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
-import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -11,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
@@ -31,21 +31,22 @@ public class ItemFireStone extends ItemRadiative {
 
     @Override
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
-        doIgnition(worldIn, entityIn);
+        igniteBlocks(worldIn, entityIn);
+        igniteEntities(worldIn, entityIn);
 
         // grant fire immunity
         if (entityIn instanceof LivingEntity) {
             LivingEntity creature = (LivingEntity) entityIn;
-            if (!creature.isInLava()) {
-                creature.addPotionEffect(new EffectInstance(ModEffects.FIRE_RESISTANCE_LIMITED.get(),
-                        1, 0, true, false));
-            }
+            creature.addPotionEffect(new EffectInstance(Effects.FIRE_RESISTANCE,
+                    1, 0, true, false));
         }
     }
 
     @Override
     public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
-        doIgnition(itemEntity.world, itemEntity);
+        igniteBlocks(itemEntity.world, itemEntity);
+        if (!itemEntity.cannotPickup()) // use pickup delay to prevent item cast effects on player immediately
+            igniteEntities(itemEntity.world, itemEntity);
     }
 
     @Override
@@ -53,8 +54,7 @@ public class ItemFireStone extends ItemRadiative {
         return ParticleTypes.FLAME;
     }
 
-    private void doIgnition(World worldIn, Entity self) {
-        // ignite blocks
+    private void igniteBlocks(World worldIn, Entity self) {
         if (!worldIn.isRemote() && worldIn.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
             Random random = new Random();
             for (BlockPos pos : randomBlocksAround(self.getPosition(), 1, 1, 1, 3, -1, random)) {
@@ -66,8 +66,9 @@ public class ItemFireStone extends ItemRadiative {
                 }
             }
         }
+    }
 
-        // ignite entities
+    private void igniteEntities(World worldIn, Entity self) {
         if (!worldIn.isRemote()) {
             worldIn.getEntitiesWithinAABB(Entity.class, self.getBoundingBox().grow(0.5), entity -> entity != self)
                     .forEach(entity -> {
