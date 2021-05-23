@@ -8,5 +8,5 @@
   "item.uusi-aurinko.water_stone": "§eVuoksikivi§r",
   "item.uusi-aurinko.water_stone.tooltip": "这块石头坚硬却又水流汩汩。\n它散发的潮气能对怕火的生物造成伤害，熄灭身上的火焰并临时凝固岩浆。\n它甚至让你能在水下呼吸！",
 
-  "block.uusi-aurinko.solidified_lava": "凝固岩浆"
+  "block.uusi-aurinko.semisolid_lava": "半凝固岩浆"
 }

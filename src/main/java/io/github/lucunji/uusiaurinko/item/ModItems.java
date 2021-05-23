@@ -41,6 +41,6 @@ public class ModItems {
             () -> new ItemSunStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
 
 
-    public static final RegistryObject<Item> SOLIDIFIED_LAVA = ITEMS.register("solidified_lava",
-            () -> new BlockItem(ModBlocks.SOLIDIFIED_LAVA.get(), new Properties().group(DEFAULT_GROUP)));
+    public static final RegistryObject<Item> SEMISOLID_LAVA = ITEMS.register("semisolid_lava",
+            () -> new BlockItem(ModBlocks.SEMISOLID_LAVA.get(), new Properties().group(DEFAULT_GROUP)));
 }

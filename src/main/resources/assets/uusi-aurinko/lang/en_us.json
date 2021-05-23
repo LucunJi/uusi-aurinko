@@ -8,5 +8,5 @@
   "item.uusi-aurinko.water_stone": "§eVuoksikivi§r",
   "item.uusi-aurinko.water_stone.tooltip": "This small rock is hard and solid, yet seems to be gushing with water.\nIt is wet enough to damage fire-sensitive creatures, extinguish fire on body and solidify lava temporary.\nIt even makes you breath under water!",
 
-  "block.uusi-aurinko.solidified_lava": "Solidified Lava"
+  "block.uusi-aurinko.semisolid_lava": "Semisolid Lava"
 }

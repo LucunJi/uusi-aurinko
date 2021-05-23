@@ -19,6 +19,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -29,7 +30,7 @@ import java.util.Random;
  * A MagmaBlock melting like a FrostedIce without interactions with bubble columns.
  * Codes are borrowed from both classes.
  */
-public class SolidifiedLavaBlock extends Block {
+public class SemisolidLavaBlock extends Block {
     public static final IntegerProperty AGE = BlockStateProperties.AGE_0_3;
 
     /**
@@ -38,7 +39,7 @@ public class SolidifiedLavaBlock extends Block {
      */
     private static final int LAVA_EXTINGUISH_WORLD_EVENT = 1501;
 
-    public SolidifiedLavaBlock(Properties properties) {
+    public SemisolidLavaBlock(Properties properties) {
         super(properties);
         this.setDefaultState(this.getStateContainer().getBaseState().with(AGE, 0));
     }
@@ -93,12 +94,18 @@ public class SolidifiedLavaBlock extends Block {
                 mutable.setAndMove(pos, direction);
                 BlockState neighborState = worldIn.getBlockState(mutable);
                 if (neighborState.matchesBlock(this) && !furtherMelt(worldIn, neighborState, mutable)) {
-                    worldIn.getPendingBlockTicks().scheduleTick(mutable, this, MathHelper.nextInt(random, 20, 40));
+                    worldIn.getPendingBlockTicks().scheduleTick(mutable, this, getScheduleTickInterval(worldIn, random));
                 }
             }
         } else {
-            worldIn.getPendingBlockTicks().scheduleTick(pos, this, MathHelper.nextInt(random, 20, 40));
+            worldIn.getPendingBlockTicks().scheduleTick(pos, this, getScheduleTickInterval(worldIn, random));
         }
+    }
+
+    private int getScheduleTickInterval(World world, Random random) {
+        if (world.getDimensionType().isUltrawarm())
+            return MathHelper.nextInt(random, 10, 20);
+        return MathHelper.nextInt(random, 20, 40);
     }
 
     /**
@@ -124,7 +131,7 @@ public class SolidifiedLavaBlock extends Block {
     @Override
     public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
         if (checkWater(worldIn, pos)
-                && blockIn == this && this.nearHotLiquidIsolatedEnough(worldIn, pos, 2)) {
+                && blockIn == this && this.nearHotLiquidIsolatedEnough(worldIn, pos, 1)) {
             becomeLava(state, worldIn, pos);
         }
 

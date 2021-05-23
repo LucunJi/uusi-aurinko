@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "uusi-aurinko:block/solidified_lava_1"
+    "all": "uusi-aurinko:block/semisolid_lava_2"
   }
 }

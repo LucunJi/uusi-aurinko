@@ -70,7 +70,7 @@ public class ItemWaterStone extends ItemRadiative {
     private void chillLava(World worldIn, Random random, Entity placer, int range) {
         if (worldIn.isRemote()) return;
 
-        BlockState blockstate = ModBlocks.SOLIDIFIED_LAVA.get().getDefaultState();
+        BlockState blockstate = ModBlocks.SEMISOLID_LAVA.get().getDefaultState();
         int rangeAdjusted = Math.min(16, range);
         BlockPos placerBlockPos = placer.getPosition();
         Vector3d placerDoublePos = placer.getPositionVec();
@@ -85,7 +85,7 @@ public class ItemWaterStone extends ItemRadiative {
                         blockstate.isValidPosition(worldIn, mutableInBox) &&
                         !ForgeEventFactory.onBlockPlace(placer, BlockSnapshot.create(worldIn.getDimensionKey(), worldIn, mutableInBox), Direction.UP)) {
                     worldIn.setBlockState(mutableInBox, blockstate);
-                    worldIn.getPendingBlockTicks().scheduleTick(mutableInBox, ModBlocks.SOLIDIFIED_LAVA.get(), MathHelper.nextInt(random, 60, 120));
+                    worldIn.getPendingBlockTicks().scheduleTick(mutableInBox, ModBlocks.SEMISOLID_LAVA.get(), MathHelper.nextInt(random, 60, 120));
                 }
             }
         }
