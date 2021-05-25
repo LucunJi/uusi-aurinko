@@ -1,8 +1,8 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-//        maven { url = "https://repo.spongepowered.org/maven" }
         mavenCentral()
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
@@ -21,11 +21,10 @@ group = 'io.github.lucunji'
 version = '0.1.0'
 archivesBaseName = 'uusi-aurinko'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
-
-    mappings channel: 'snapshot', version: '20210309-1.16.5'
+    mappings channel: 'snapshot', version: '20210524-yarn-1.16.5'
 
     runs {
         client {
@@ -73,6 +72,13 @@ minecraft {
                 }
             }
         }
+    }
+}
+
+// enable this when using yarn mapping
+repositories {
+    maven {
+        url = 'https://maven.tterrag.com/'
     }
 }
 

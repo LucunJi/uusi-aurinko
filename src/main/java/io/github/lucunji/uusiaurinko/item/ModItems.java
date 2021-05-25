@@ -19,26 +19,26 @@ public class ModItems {
 
 
     public static final RegistryObject<ItemFireStone> FIRE_STONE = ITEMS.register("fire_stone",
-            () -> new ItemFireStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
+            () -> new ItemFireStone(new Properties().fireproof().maxCount(1).group(DEFAULT_GROUP)));
 
     public static final RegistryObject<ItemWaterStone> WATER_STONE = ITEMS.register("water_stone",
-            () -> new ItemWaterStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
+            () -> new ItemWaterStone(new Properties().fireproof().maxCount(1).group(DEFAULT_GROUP)));
 
     public static final RegistryObject<ItemLightningStone> LIGHTNING_STONE = ITEMS.register("lightning_stone",
-            () -> new ItemLightningStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
+            () -> new ItemLightningStone(new Properties().fireproof().maxCount(1).group(DEFAULT_GROUP)));
 
     public static final RegistryObject<ItemEarthStone> EARTH_STONE = ITEMS.register("earth_stone",
-            () -> new ItemEarthStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
+            () -> new ItemEarthStone(new Properties().fireproof().maxCount(1).group(DEFAULT_GROUP)));
 
     public static final RegistryObject<ItemPopStone> POP_STONE = ITEMS.register("pop_stone",
-            () -> new ItemPopStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
+            () -> new ItemPopStone(new Properties().fireproof().maxCount(1).group(DEFAULT_GROUP)));
 
 
     public static final RegistryObject<ItemSunSeed> SUN_SEED = ITEMS.register("sun_seed",
-            () -> new ItemSunSeed(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
+            () -> new ItemSunSeed(new Properties().fireproof().maxCount(1).group(DEFAULT_GROUP)));
 
     public static final RegistryObject<ItemSunStone> SUN_STONE = ITEMS.register("sun_stone",
-            () -> new ItemSunStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
+            () -> new ItemSunStone(new Properties().fireproof().maxCount(1).group(DEFAULT_GROUP)));
 
 
     public static final RegistryObject<Item> SEMISOLID_LAVA = ITEMS.register("semisolid_lava",

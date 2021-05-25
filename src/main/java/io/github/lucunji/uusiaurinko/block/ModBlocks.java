@@ -15,8 +15,8 @@ public class ModBlocks {
 
     public static final RegistryObject<SemisolidLavaBlock> SEMISOLID_LAVA = BLOCKS.register("semisolid_lava",
             () -> new SemisolidLavaBlock(AbstractBlock.Properties
-                    .create(Material.ROCK, MaterialColor.NETHERRACK)
-                    .setLightLevel(state -> 10).tickRandomly().hardnessAndResistance(0.3F)
-                    .setEmmisiveRendering((a, b, c) -> true) // prevent weird rendering when the block has a light level less than 15
-                    .setAllowsSpawn((state, reader, pos, entity) -> entity.isImmuneToFire())));
+                    .of(Material.STONE, MaterialColor.NETHER)
+                    .luminance(state -> 10).ticksRandomly().strength(0.3F)
+                    .emissiveLighting((a, b, c) -> true) // prevent weird rendering when the block has a light level less than 15
+                    .allowsSpawning((state, reader, pos, entity) -> entity.isFireImmune())));
 }

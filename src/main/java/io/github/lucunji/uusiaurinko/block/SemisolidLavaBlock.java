@@ -19,7 +19,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -31,7 +30,7 @@ import java.util.Random;
  * Codes are borrowed from both classes.
  */
 public class SemisolidLavaBlock extends Block {
-    public static final IntegerProperty AGE = BlockStateProperties.AGE_0_3;
+    public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
 
     /**
      * The world event type for playing {@code SoundEvents.BLOCK_LAVA_EXTINGUISH} and
@@ -41,11 +40,11 @@ public class SemisolidLavaBlock extends Block {
 
     public SemisolidLavaBlock(Properties properties) {
         super(properties);
-        this.setDefaultState(this.getStateContainer().getBaseState().with(AGE, 0));
+        this.setDefaultState(this.getStateManager().getDefaultState().with(AGE, 0));
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void appendProperties(StateContainer.Builder<Block, BlockState> builder) {
         builder.add(AGE);
     }
 
@@ -54,9 +53,9 @@ public class SemisolidLavaBlock extends Block {
      * Even if there is silk touch, the loot table fives no block drop.
      */
     @Override
-    public void harvestBlock(World worldIn, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
-        super.harvestBlock(worldIn, player, pos, state, te, stack);
-        if (EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, stack) == 0) {
+    public void afterBreak(World worldIn, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
+        super.afterBreak(worldIn, player, pos, state, te, stack);
+        if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) == 0) {
             worldIn.setBlockState(pos, Blocks.LAVA.getDefaultState());
         }
     }
@@ -65,11 +64,11 @@ public class SemisolidLavaBlock extends Block {
      * Same as the method in {@link net.minecraft.block.MagmaBlock}.
      */
     @Override
-    public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
-        if (!entityIn.isImmuneToFire() && entityIn instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) entityIn)) {
-            entityIn.attackEntityFrom(DamageSource.HOT_FLOOR, 1.0F);
+    public void onSteppedOn(World worldIn, BlockPos pos, Entity entityIn) {
+        if (!entityIn.isFireImmune() && entityIn instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) entityIn)) {
+            entityIn.damage(DamageSource.HOT_FLOOR, 1.0F);
         }
-        super.onEntityWalk(worldIn, pos, entityIn);
+        super.onSteppedOn(worldIn, pos, entityIn);
     }
 
     //********** Melting Logic Starts *********
@@ -77,7 +76,7 @@ public class SemisolidLavaBlock extends Block {
     @SuppressWarnings("deprecation")
     @Override
     public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-        tick(state, worldIn, pos, random);
+        scheduledTick(state, worldIn, pos, random);
     }
 
     /**
@@ -86,24 +85,24 @@ public class SemisolidLavaBlock extends Block {
      */
     @SuppressWarnings("deprecation")
     @Override
-    public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
+    public void scheduledTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
         if ((random.nextInt(3) == 0 || this.nearHotLiquidIsolatedEnough(worldIn, pos, 4))
                 && this.furtherMelt(worldIn, state, pos)) {
             BlockPos.Mutable mutable = new BlockPos.Mutable();
             for (Direction direction : Direction.values()) {
-                mutable.setAndMove(pos, direction);
+                mutable.set(pos, direction);
                 BlockState neighborState = worldIn.getBlockState(mutable);
-                if (neighborState.matchesBlock(this) && !furtherMelt(worldIn, neighborState, mutable)) {
-                    worldIn.getPendingBlockTicks().scheduleTick(mutable, this, getScheduleTickInterval(worldIn, random));
+                if (neighborState.isOf(this) && !furtherMelt(worldIn, neighborState, mutable)) {
+                    worldIn.getBlockTickScheduler().schedule(mutable, this, getScheduleTickInterval(worldIn, random));
                 }
             }
         } else {
-            worldIn.getPendingBlockTicks().scheduleTick(pos, this, getScheduleTickInterval(worldIn, random));
+            worldIn.getBlockTickScheduler().schedule(pos, this, getScheduleTickInterval(worldIn, random));
         }
     }
 
     private int getScheduleTickInterval(World world, Random random) {
-        if (world.getDimensionType().isUltrawarm())
+        if (world.getDimension().isUltrawarm())
             return MathHelper.nextInt(random, 10, 20);
         return MathHelper.nextInt(random, 20, 40);
     }
@@ -129,13 +128,13 @@ public class SemisolidLavaBlock extends Block {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
         if (checkWater(worldIn, pos)
                 && blockIn == this && this.nearHotLiquidIsolatedEnough(worldIn, pos, 1)) {
             becomeLava(state, worldIn, pos);
         }
 
-        super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
+        super.neighborUpdate(state, worldIn, pos, blockIn, fromPos, isMoving);
     }
 
     /**
@@ -148,11 +147,11 @@ public class SemisolidLavaBlock extends Block {
         int solidifiedLavaCount = 0;
         boolean nearHotLiquid = false;
         for (Direction direction : Direction.values()) {
-            neighborPos.setAndMove(blockPos, direction);
+            neighborPos.set(blockPos, direction);
             BlockState neighborState = world.getBlockState(neighborPos);
             if (!nearHotLiquid && neighborState.getFluidState().getFluid().getAttributes().getTemperature() >= lavaTemp)
                 nearHotLiquid = true;
-            if (neighborState.matchesBlock(this)
+            if (neighborState.isOf(this)
                     && ++solidifiedLavaCount >= maxSolidifiedBlocks)
                 return false;
         }
@@ -161,7 +160,7 @@ public class SemisolidLavaBlock extends Block {
 
     private void becomeLava(BlockState blockState, World world, BlockPos blockPos) {
         world.setBlockState(blockPos, Blocks.LAVA.getDefaultState());
-        world.neighborChanged(blockPos, Blocks.LAVA, blockPos);
+        world.updateNeighbor(blockPos, Blocks.LAVA, blockPos);
     }
 
     //********** Melting Logic Ends *********
@@ -178,9 +177,9 @@ public class SemisolidLavaBlock extends Block {
     private boolean checkWater(World worldIn, BlockPos pos) {
         BlockPos.Mutable mutable = new BlockPos.Mutable();
         for (Direction direction : Direction.values()) {
-            mutable.setAndMove(pos, direction);
-            if (worldIn.getBlockState(mutable).getFluidState().isTagged(FluidTags.WATER)) {
-                worldIn.playEvent(LAVA_EXTINGUISH_WORLD_EVENT, pos, 0);
+            mutable.set(pos, direction);
+            if (worldIn.getBlockState(mutable).getFluidState().isIn(FluidTags.WATER)) {
+                worldIn.syncWorldEvent(LAVA_EXTINGUISH_WORLD_EVENT, pos, 0);
                 worldIn.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState());
                 return false;
             }
