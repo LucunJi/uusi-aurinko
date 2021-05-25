@@ -20,11 +20,11 @@ public class ItemLightningStone extends ItemRadiative {
 
     @Override
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
-        if (worldIn.isClient()
-                && Minecraft.getInstance().options.particles != ParticleStatus.MINIMAL
-                && worldIn.getTime() % 30 == 0) {
-            findAllExposedConductorsDFS(worldIn, entityIn.getBlockPos())
-                    .forEach(pos -> worldIn.addImportantParticle(ParticleTypes.FLAME,
+        if (worldIn.isRemote()
+                && Minecraft.getInstance().gameSettings.particles != ParticleStatus.MINIMAL
+                && worldIn.getGameTime() % 30 == 0) {
+            findAllExposedConductorsDFS(worldIn, entityIn.getPosition())
+                    .forEach(pos -> worldIn.addOptionalParticle(ParticleTypes.FLAME,
                             pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0));
         }
     }
@@ -32,11 +32,11 @@ public class ItemLightningStone extends ItemRadiative {
     @Override
     public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
         World world = itemEntity.world;
-        if (world.isClient()
-                && Minecraft.getInstance().options.particles != ParticleStatus.MINIMAL
-                && world.getTime() % 30 == 0) {
-            findAllExposedConductorsDFS(world, itemEntity.getBlockPos())
-                    .forEach(pos -> world.addImportantParticle(ParticleTypes.FLAME,
+        if (world.isRemote()
+                && Minecraft.getInstance().gameSettings.particles != ParticleStatus.MINIMAL
+                && world.getGameTime() % 30 == 0) {
+            findAllExposedConductorsDFS(world, itemEntity.getPosition())
+                    .forEach(pos -> world.addOptionalParticle(ParticleTypes.FLAME,
                             pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0));
         }
     }
@@ -57,19 +57,19 @@ public class ItemLightningStone extends ItemRadiative {
             BlockPos currentPos = openQueue.poll();
             openSet.remove(currentPos);
             closedSet.add(currentPos);
-            if (currentPos.getSquaredDistance(startPos) > 256) continue;
+            if (currentPos.distanceSq(startPos) > 256) continue;
             BlockPos.Mutable neighborPosMut = new BlockPos.Mutable();
             for (int[] offset : NEIGHBORS) {
-                neighborPosMut.set(currentPos, offset[0], offset[1], offset[2]);
+                neighborPosMut.setAndOffset(currentPos, offset[0], offset[1], offset[2]);
                 if (closedSet.contains(neighborPosMut) || openSet.contains(neighborPosMut)) continue;
-                if (world.getBlockState(neighborPosMut).isOf(Blocks.WATER)) {
+                if (world.getBlockState(neighborPosMut).matchesBlock(Blocks.WATER)) {
                     BlockPos immutable = neighborPosMut.toImmutable();
                     openSet.add(immutable);
                     openQueue.add(immutable);
                 } else if ((offset[0] == 0 && offset[1] == 0 ||
                         offset[1] == 0 && offset[2] == 0 ||
                         offset[0] == 0 && offset[2] == 0) &&
-                        world.isAir(neighborPosMut)) {
+                        world.isAirBlock(neighborPosMut)) {
                     exposedSet.add(neighborPosMut.toImmutable());
                 }
             }
@@ -77,7 +77,7 @@ public class ItemLightningStone extends ItemRadiative {
         return new ArrayList<>(exposedSet);
     }
 
-    private static final int[][] NEIGHBORS = BlockPos.stream(new BlockPos(-1, -1, -1), new BlockPos(1, 1, 1))
+    private static int[][] NEIGHBORS = BlockPos.getAllInBox(new BlockPos(-1, -1, -1), new BlockPos(1, 1, 1))
             .map(b -> new int[]{b.getX(), b.getY(), b.getZ()})
             .filter(b -> b[0] != 0 || b[1] != 0 || b[2] != 0)
             .toArray(int[][]::new);

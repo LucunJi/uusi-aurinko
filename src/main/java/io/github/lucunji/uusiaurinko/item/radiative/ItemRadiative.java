@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static net.minecraft.entity.Entity.squaredHorizontalLength;
+import static net.minecraft.entity.Entity.horizontalMag;
 
 /**
  * Items which has special effects when held in hands or thrown.
@@ -46,8 +46,8 @@ public abstract class ItemRadiative extends ItemBase {
     public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         if (!entityIn.isSpectator() && entityIn instanceof LivingEntity) {
             LivingEntity livingEntity = (LivingEntity) entityIn;
-            boolean inMainHand = livingEntity.getMainHandStack() == stack;
-            if (inMainHand && isSelected || livingEntity.getOffHandStack() == stack) {
+            boolean inMainHand = livingEntity.getHeldItemMainhand() == stack;
+            if (inMainHand && isSelected || livingEntity.getHeldItemOffhand() == stack) {
                 this.radiationInHand(stack, worldIn, entityIn, inMainHand);
             }
         }
@@ -60,15 +60,15 @@ public abstract class ItemRadiative extends ItemBase {
         if (particleData != null) {
             Random random = new Random();
             if (random.nextFloat() < 0.07) {
-                double posX = entity.getX() - 0.125 + random.nextFloat() * 0.25;
-                double posY = entity.getY() + random.nextFloat() * 0.20;
-                double posZ = entity.getZ() - 0.125 + random.nextFloat() * 0.25;
+                double posX = entity.getPosX() - 0.125 + random.nextFloat() * 0.25;
+                double posY = entity.getPosY() + random.nextFloat() * 0.20;
+                double posZ = entity.getPosZ() - 0.125 + random.nextFloat() * 0.25;
                 double xSpeed = random.nextFloat() * 0.02 - 0.01;
                 double ySpeed = random.nextFloat() * 0.02 + 0.02;
                 double zSpeed = random.nextFloat() * 0.02 - 0.01;
 
                 // only runs in client
-                entity.world.addImportantParticle(particleData, posX, posY, posZ, xSpeed, ySpeed, zSpeed);
+                entity.world.addOptionalParticle(particleData, posX, posY, posZ, xSpeed, ySpeed, zSpeed);
             }
         }
 
@@ -121,21 +121,21 @@ public abstract class ItemRadiative extends ItemBase {
      * Throw the item with greater speed than simply drop the item when click right mouse button.
      */
     @Override
-    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        ItemStack itemStack = playerIn.getStackInHand(handIn);
-        if (!worldIn.isClient()) {
-            Vector3d userPosVec = playerIn.getPos();
-            ItemEntity itemEntity = new ItemEntity(worldIn, userPosVec.x, playerIn.getEyeY() - 0.3F, userPosVec.z, itemStack.copy());
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+        ItemStack itemStack = playerIn.getHeldItem(handIn);
+        if (!worldIn.isRemote()) {
+            Vector3d userPosVec = playerIn.getPositionVec();
+            ItemEntity itemEntity = new ItemEntity(worldIn, userPosVec.x, playerIn.getPosYEye() - 0.3F, userPosVec.z, itemStack.copy());
             itemEntity.setPickupDelay(40);
-            itemEntity.setThrower(playerIn.getUuid());
-            setDirectionAndMovement(itemEntity, playerIn, playerIn.pitch, playerIn.yaw,
+            itemEntity.setThrowerId(playerIn.getUniqueID());
+            setDirectionAndMovement(itemEntity, playerIn, playerIn.rotationPitch, playerIn.rotationYaw,
                     0.0F, 1.2F, 1.0F);
-            worldIn.spawnEntity(itemEntity);
+            worldIn.addEntity(itemEntity);
         }
-        if (!playerIn.abilities.creativeMode) {
-            itemStack.decrement(1);
+        if (!playerIn.abilities.isCreativeMode) {
+            itemStack.shrink(1);
         }
-        return ActionResult.success(itemStack);
+        return ActionResult.resultSuccess(itemStack);
     }
 
     private static void setDirectionAndMovement(Entity thrown, Entity thrower, float pitch, float yaw, float rotation, float velocity, float inaccuracy) {
@@ -143,8 +143,8 @@ public abstract class ItemRadiative extends ItemBase {
         float f1 = -MathHelper.sin((pitch + rotation) * ((float) Math.PI / 180F));
         float f2 = MathHelper.cos(yaw * ((float) Math.PI / 180F)) * MathHelper.cos(pitch * ((float) Math.PI / 180F));
         shoot(thrown, f, f1, f2, velocity, inaccuracy);
-        Vector3d vector3d = thrower.getVelocity();
-        thrown.setVelocity(thrown.getVelocity().add(vector3d.x, thrower.isOnGround() ? 0.0D : vector3d.y, vector3d.z));
+        Vector3d vector3d = thrower.getMotion();
+        thrown.setMotion(thrown.getMotion().add(vector3d.x, thrower.isOnGround() ? 0.0D : vector3d.y, vector3d.z));
     }
 
     private static void shoot(Entity thrown, double x, double y, double z, float velocity, float inaccuracy) {
@@ -153,13 +153,13 @@ public abstract class ItemRadiative extends ItemBase {
                 .add(random.nextGaussian() * (double) 0.0075F * (double) inaccuracy,
                         random.nextGaussian() * (double) 0.0075F * (double) inaccuracy,
                         random.nextGaussian() * (double) 0.0075F * (double) inaccuracy)
-                .multiply(velocity);
-        thrown.setVelocity(vector3d);
-        float f = MathHelper.sqrt(squaredHorizontalLength(vector3d));
-        thrown.yaw = (float) (MathHelper.atan2(vector3d.x, vector3d.z) * (double) (180F / (float) Math.PI));
-        thrown.pitch = (float) (MathHelper.atan2(vector3d.y, f) * (double) (180F / (float) Math.PI));
-        thrown.prevYaw = thrown.yaw;
-        thrown.prevPitch = thrown.pitch;
+                .scale(velocity);
+        thrown.setMotion(vector3d);
+        float f = MathHelper.sqrt(horizontalMag(vector3d));
+        thrown.rotationYaw = (float) (MathHelper.atan2(vector3d.x, vector3d.z) * (double) (180F / (float) Math.PI));
+        thrown.rotationPitch = (float) (MathHelper.atan2(vector3d.y, f) * (double) (180F / (float) Math.PI));
+        thrown.prevRotationYaw = thrown.rotationYaw;
+        thrown.prevRotationPitch = thrown.rotationPitch;
     }
 
     /**

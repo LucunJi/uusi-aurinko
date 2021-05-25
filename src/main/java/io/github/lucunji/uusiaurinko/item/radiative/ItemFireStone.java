@@ -37,7 +37,7 @@ public class ItemFireStone extends ItemRadiative {
         // grant fire immunity
         if (entityIn instanceof LivingEntity) {
             LivingEntity creature = (LivingEntity) entityIn;
-            creature.addStatusEffect(new EffectInstance(Effects.FIRE_RESISTANCE,
+            creature.addPotionEffect(new EffectInstance(Effects.FIRE_RESISTANCE,
                     1, 0, true, false));
         }
     }
@@ -55,12 +55,12 @@ public class ItemFireStone extends ItemRadiative {
     }
 
     private void igniteBlocks(World worldIn, Entity self) {
-        if (!worldIn.isClient() && worldIn.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
+        if (!worldIn.isRemote() && worldIn.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
             Random random = new Random();
-            for (BlockPos pos : randomBlocksAround(self.getBlockPos(), 1, 1, 1, 3, -1, random)) {
-                BlockState blockState = AbstractFireBlock.getState(worldIn, pos);
-                int chance = 150 + (worldIn.hasHighHumidity(pos) ? 50 : 0);
-                if (worldIn.isAir(pos) && blockState.canPlaceAt(worldIn, pos) &&
+            for (BlockPos pos : randomBlocksAround(self.getPosition(), 1, 1, 1, 3, -1, random)) {
+                BlockState blockState = AbstractFireBlock.getFireForPlacement(worldIn, pos);
+                int chance = 150 + (worldIn.isBlockinHighHumidity(pos) ? 50 : 0);
+                if (worldIn.isAirBlock(pos) && blockState.isValidPosition(worldIn, pos) &&
                         (trySpreadFireTo(worldIn, pos, random, chance) || random.nextFloat() < 0.01)) {
                     worldIn.setBlockState(pos, blockState);
                 }
@@ -69,11 +69,11 @@ public class ItemFireStone extends ItemRadiative {
     }
 
     private void igniteEntities(World worldIn, Entity self) {
-        if (!worldIn.isClient()) {
-            worldIn.getEntitiesByClass(Entity.class, self.getBoundingBox().expand(0.5), entity -> entity != self)
+        if (!worldIn.isRemote()) {
+            worldIn.getEntitiesWithinAABB(Entity.class, self.getBoundingBox().grow(0.5), entity -> entity != self)
                     .forEach(entity -> {
-                        if (Item.RANDOM.nextFloat() < 0.05)
-                            entity.setOnFireFor(8);
+                        if (Item.random.nextFloat() < 0.05)
+                            entity.setFire(8);
                     });
         }
     }

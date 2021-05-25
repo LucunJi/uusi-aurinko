@@ -48,14 +48,14 @@ public class ItemWaterStone extends ItemRadiative {
         chillLava(worldIn, new Random(), entityIn, 2);
         hurtsFireSensitiveCreatures(entityIn.world, entityIn, 1);
 
-        entityIn.setFireTicks(0);
+        entityIn.forceFireTicks(0);
         if (entityIn instanceof LivingEntity) {
             LivingEntity creature = (LivingEntity) entityIn;
-            creature.addStatusEffect(new EffectInstance(Effects.FIRE_RESISTANCE,
+            creature.addPotionEffect(new EffectInstance(Effects.FIRE_RESISTANCE,
                     1, 0, true, false));
 
-            if (creature.isTouchingWater()) {
-                creature.addStatusEffect(new EffectInstance(Effects.WATER_BREATHING,
+            if (creature.isInWater()) {
+                creature.addPotionEffect(new EffectInstance(Effects.WATER_BREATHING,
                         1, 0, true, false));
             }
         }
@@ -68,35 +68,35 @@ public class ItemWaterStone extends ItemRadiative {
      * Only runs in server side.
      */
     private void chillLava(World worldIn, Random random, Entity placer, int range) {
-        if (worldIn.isClient()) return;
+        if (worldIn.isRemote()) return;
 
         BlockState blockstate = ModBlocks.SEMISOLID_LAVA.get().getDefaultState();
         int rangeAdjusted = Math.min(16, range);
-        BlockPos placerBlockPos = placer.getBlockPos();
-        Vector3d placerDoublePos = placer.getPos();
-        for (BlockPos mutableInBox : BlockPos.iterate(
+        BlockPos placerBlockPos = placer.getPosition();
+        Vector3d placerDoublePos = placer.getPositionVec();
+        for (BlockPos mutableInBox : BlockPos.getAllInBoxMutable(
                 placerBlockPos.add(-rangeAdjusted, -rangeAdjusted, -rangeAdjusted),
                 placerBlockPos.add(rangeAdjusted, rangeAdjusted, rangeAdjusted))) {
-            if (mutableInBox.isWithinDistance(placerDoublePos, rangeAdjusted)) {
+            if (mutableInBox.withinDistance(placerDoublePos, rangeAdjusted)) {
                 BlockState blockStateInBox = worldIn.getBlockState(mutableInBox);
-                boolean isLavaSource = blockStateInBox.getFluidState().isIn(FluidTags.LAVA)
-                        && blockStateInBox.getFluidState().isStill();
+                boolean isLavaSource = blockStateInBox.getFluidState().isTagged(FluidTags.LAVA)
+                        && blockStateInBox.getFluidState().isSource();
                 if (isLavaSource &&
-                        blockstate.canPlaceAt(worldIn, mutableInBox) &&
-                        !ForgeEventFactory.onBlockPlace(placer, BlockSnapshot.create(worldIn.getRegistryKey(), worldIn, mutableInBox), Direction.UP)) {
+                        blockstate.isValidPosition(worldIn, mutableInBox) &&
+                        !ForgeEventFactory.onBlockPlace(placer, BlockSnapshot.create(worldIn.getDimensionKey(), worldIn, mutableInBox), Direction.UP)) {
                     worldIn.setBlockState(mutableInBox, blockstate);
-                    worldIn.getBlockTickScheduler().schedule(mutableInBox, ModBlocks.SEMISOLID_LAVA.get(), MathHelper.nextInt(random, 60, 120));
+                    worldIn.getPendingBlockTicks().scheduleTick(mutableInBox, ModBlocks.SEMISOLID_LAVA.get(), MathHelper.nextInt(random, 60, 120));
                 }
             }
         }
     }
 
     private void hurtsFireSensitiveCreatures(World worldIn, Entity emitter, double range) {
-        if (worldIn.isClient()) return;
-        worldIn.getNonSpectatingEntities(LivingEntity.class, emitter.getBoundingBox().expand(range))
+        if (worldIn.isRemote()) return;
+        worldIn.getEntitiesWithinAABB(LivingEntity.class, emitter.getBoundingBox().grow(range))
                 .forEach(entity -> {
-                    if (entity.hurtByWater())
-                        entity.damage(DamageSource.DROWN, 1.0F);
+                    if (entity.isWaterSensitive())
+                        entity.attackEntityFrom(DamageSource.DROWN, 1.0F);
                 });
     }
 
