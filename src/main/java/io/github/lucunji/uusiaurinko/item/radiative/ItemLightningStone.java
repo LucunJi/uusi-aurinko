@@ -54,7 +54,7 @@ public class ItemLightningStone extends ItemRadiative {
         openSet.add(startPos);
         openQueue.add(startPos);
         while (!openSet.isEmpty()) {
-            BlockPos currentPos = openQueue.poll();
+            BlockPos currentPos = openQueue.remove();
             openSet.remove(currentPos);
             closedSet.add(currentPos);
             if (currentPos.distanceSq(startPos) > 256) continue;
@@ -77,7 +77,7 @@ public class ItemLightningStone extends ItemRadiative {
         return new ArrayList<>(exposedSet);
     }
 
-    private static int[][] NEIGHBORS = BlockPos.getAllInBox(new BlockPos(-1, -1, -1), new BlockPos(1, 1, 1))
+    private static final int[][] NEIGHBORS = BlockPos.getAllInBox(new BlockPos(-1, -1, -1), new BlockPos(1, 1, 1))
             .map(b -> new int[]{b.getX(), b.getY(), b.getZ()})
             .filter(b -> b[0] != 0 || b[1] != 0 || b[2] != 0)
             .toArray(int[][]::new);

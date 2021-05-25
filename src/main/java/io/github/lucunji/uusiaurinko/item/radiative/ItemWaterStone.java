@@ -52,11 +52,11 @@ public class ItemWaterStone extends ItemRadiative {
         if (entityIn instanceof LivingEntity) {
             LivingEntity creature = (LivingEntity) entityIn;
             creature.addPotionEffect(new EffectInstance(Effects.FIRE_RESISTANCE,
-                    1, 0, true, false));
+                    2, 0, true, false, true));
 
             if (creature.isInWater()) {
                 creature.addPotionEffect(new EffectInstance(Effects.WATER_BREATHING,
-                        1, 0, true, false));
+                        2, 0, true, false, true));
             }
         }
     }

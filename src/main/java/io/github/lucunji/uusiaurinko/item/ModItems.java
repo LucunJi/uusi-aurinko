@@ -1,8 +1,7 @@
 package io.github.lucunji.uusiaurinko.item;
 
-import io.github.lucunji.uusiaurinko.block.ModBlocks;
 import io.github.lucunji.uusiaurinko.item.radiative.*;
-import net.minecraft.item.BlockItem;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemGroup;
@@ -33,14 +32,15 @@ public class ModItems {
     public static final RegistryObject<ItemPopStone> POP_STONE = ITEMS.register("pop_stone",
             () -> new ItemPopStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
 
-
     public static final RegistryObject<ItemSunSeed> SUN_SEED = ITEMS.register("sun_seed",
             () -> new ItemSunSeed(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
 
     public static final RegistryObject<ItemSunStone> SUN_STONE = ITEMS.register("sun_stone",
             () -> new ItemSunStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
 
+    public static final RegistryObject<ItemEvilEye> EVIL_EYE = ITEMS.register("evil_eye",
+            () -> new ItemEvilEye(ModArmorMaterial.EVIL_EYE, EquipmentSlotType.HEAD, new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
 
-    public static final RegistryObject<Item> SEMISOLID_LAVA = ITEMS.register("semisolid_lava",
-            () -> new BlockItem(ModBlocks.SEMISOLID_LAVA.get(), new Properties().group(DEFAULT_GROUP)));
+    public static final RegistryObject<ItemMoon> MOON = ITEMS.register("moon",
+            () -> new ItemMoon(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
 }

@@ -7,6 +7,22 @@
   "item.uusi-aurinko.fire_stone.tooltip": "This tiny rock looks most fiery, but when touched only a pleasant warmth can be felt.\nSeem to provide fire protection when held in hand, but be careful with your flammable furniture!",
   "item.uusi-aurinko.water_stone": "§eVuoksikivi§r",
   "item.uusi-aurinko.water_stone.tooltip": "This small rock is hard and solid, yet seems to be gushing with water.\nIt is wet enough to damage fire-sensitive creatures, extinguish fire on body and solidify lava temporary.\nIt even makes you breath under water!",
+  "item.uusi-aurinko.lightning_stone": "§eUkkoskivi§r",
+  "item.uusi-aurinko.lightning_stone.tooltip": "This small rock makes you feel very charged.\nHolding it can makes you survive from electric shock. Do not throw it away near conductors.",
+  "item.uusi-aurinko.earth_stone": "§eTannerkivi§r",
+  "item.uusi-aurinko.earth_stone.tooltip": "It looks like it could stand the test of aeons.\nIt quickly turns everything around into soil; with only a slight swing it can make earth collapse.",
+  "item.uusi-aurinko.pop_stone": "§eKakkakikkare§r",
+  "item.uusi-aurinko.pop_stone.tooltip": "This mysterious spiral-shaped artefact smells horrible and feels warm to the touch.\nDisgusting...",
+  "item.uusi-aurinko.sun_seed": "§eAuringonsiemen§r",
+  "item.uusi-aurinko.sun_seed.tooltip": "It glows, full of promise.\nDust and dirt around burst into pieces quickly under its tremendous heat.",
+  "item.uusi-aurinko.sun_stone": "§eAurinkokivi§r",
+  "item.uusi-aurinko.sun_stone.tooltip": "The essence of the Sun, crystallized.\nDust and dirt around are burnt down within seconds.",
+  "item.uusi-aurinko.evil_eye": "§ePaha Silmä§r",
+  "item.uusi-aurinko.evil_eye.tooltip": "This eye-shaped artefact projects a malevolent glare.\nPut it on your forehead, it then reveals everything to you.\nExhausting to you is its intense gaze.",
+  "item.uusi-aurinko.moon": "§eKuu§r",
+  "item.uusi-aurinko.moon.tooltip": "This tiny celestial object has a strong gravitational pull.\nIt attracts everything, especially other stars.",
 
-  "block.uusi-aurinko.semisolid_lava": "Semisolid Lava"
+  "block.uusi-aurinko.semisolid_lava": "Semisolid Lava",
+
+  "effect.uusi-aurinko.true_vision": "True Vision"
 }

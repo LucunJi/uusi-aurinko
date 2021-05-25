@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:item/generated",
+  "display": {
+    "ground": {
+      "translation": [0, 2, 0],
+      "scale": [0.75, 0.75, 0.75]
+    }
+  }
+}

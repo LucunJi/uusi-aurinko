@@ -7,6 +7,22 @@
   "item.uusi-aurinko.fire_stone.tooltip": "这块石头看似炽热，摸着只是暖意融融。\n似乎被握在手中时能提供火焰防护，但是留心你的易燃家具！",
   "item.uusi-aurinko.water_stone": "§eVuoksikivi§r",
   "item.uusi-aurinko.water_stone.tooltip": "这块石头坚硬却又水流汩汩。\n它散发的潮气能对怕火的生物造成伤害，熄灭身上的火焰并临时凝固岩浆。\n它甚至让你能在水下呼吸！",
+  "item.uusi-aurinko.lightning_stone": "§eUkkoskivi§r",
+  "item.uusi-aurinko.lightning_stone.tooltip": "这块石头让你感到自己充满了电力。\n握着它能让你免受电击。请不要在导体附近随意丢弃。",
+  "item.uusi-aurinko.earth_stone": "§eTannerkivi§r",
+  "item.uusi-aurinko.earth_stone.tooltip": "这块石头看起来亘古不衰。\n它周围的一切都快速化为泥土；稍稍挥动它可使大地崩裂。",
+  "item.uusi-aurinko.pop_stone": "§eKakkakikkare§r",
+  "item.uusi-aurinko.pop_stone.tooltip": "这块神秘的螺旋形物体闻着恶臭，摸着温热。\n呕……",
+  "item.uusi-aurinko.sun_seed": "§eAuringonsiemen§r",
+  "item.uusi-aurinko.sun_seed.tooltip": "它发着光，充满希望。\n周围的尘土都因它的热量迅速崩裂。",
+  "item.uusi-aurinko.sun_stone": "§eAurinkokivi§r",
+  "item.uusi-aurinko.sun_stone.tooltip": "太阳精华之结晶。\n周围的尘土在顷刻间被焚烧殆尽。",
+  "item.uusi-aurinko.evil_eye": "§ePaha Silmä§r",
+  "item.uusi-aurinko.evil_eye.tooltip": "这个形似眼球的人工物恶毒地瞪着。\n放在额头上，它将助你看清一切。\n强烈的凝视也使你感到紧张疲惫……",
+  "item.uusi-aurinko.moon": "§eKuu§r",
+  "item.uusi-aurinko.moon.tooltip": "这个小巧的天体有着强大的重力。\n万物都被它吸引，尤其是其它天体。",
 
-  "block.uusi-aurinko.semisolid_lava": "半凝固岩浆"
+  "block.uusi-aurinko.semisolid_lava": "半凝固岩浆",
+
+  "effect.uusi-aurinko.true_vision": "真实之视"
 }

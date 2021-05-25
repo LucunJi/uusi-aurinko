@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "uusi-aurinko:item/radiative",
   "textures": {
     "layer0": "uusi-aurinko:item/water_stone"
   }

@@ -19,7 +19,8 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.DimensionType;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -186,5 +187,13 @@ public class SemisolidLavaBlock extends Block {
             }
         }
         return true;
+    }
+
+    /**
+     * Gives nothing when the player presses pick-block button towards this block.
+     */
+    @Override
+    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+        return ItemStack.EMPTY;
     }
 }
