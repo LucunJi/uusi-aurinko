@@ -1,23 +1,6 @@
 {
-	"credit": "Made by XeKr with Blockbench",
-	"parent": "minecraft:block/block",
-	"textures": {
-		"0": "uusi-aurinko:item/moon",
-		"particle": "uusi-aurinko:item/moon"
-	},
-	"elements": [
-		{
-			"from": [2, 2, 2],
-			"to": [14, 14, 14],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
-			"faces": {
-				"north": {"uv": [0, 8, 8, 16], "texture": "#0"},
-				"east": {"uv": [8, 16, 16, 8], "texture": "#0"},
-				"south": {"uv": [0, 16, 8, 8], "texture": "#0"},
-				"west": {"uv": [8, 8, 16, 16], "texture": "#0"},
-				"up": {"uv": [8, 0, 16, 8], "rotation": 90, "texture": "#0"},
-				"down": {"uv": [8, 8, 16, 0], "rotation": 90, "texture": "#0"}
-			}
-		}
-	]
+  "parent": "uusi-aurinko:item/template_radiative_stone",
+  "textures": {
+    "layer0": "uusi-aurinko:item/moon"
+  }
 }

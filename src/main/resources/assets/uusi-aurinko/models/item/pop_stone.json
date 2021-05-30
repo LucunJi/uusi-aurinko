@@ -1,5 +1,5 @@
 {
-  "parent": "uusi-aurinko:item/radiative",
+  "parent": "uusi-aurinko:item/template_radiative_stone",
   "textures": {
     "layer0": "uusi-aurinko:item/pop_stone"
   }
