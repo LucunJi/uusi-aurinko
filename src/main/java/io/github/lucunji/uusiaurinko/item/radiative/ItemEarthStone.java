@@ -1,9 +1,12 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.world.World;
 
 public class ItemEarthStone extends ItemRadiative {
@@ -21,6 +24,6 @@ public class ItemEarthStone extends ItemRadiative {
 
     @Override
     public IParticleData inWorldParticleType(ItemEntity itemEntity) {
-        return null;
+        return new BlockParticleData(ParticleTypes.FALLING_DUST, Blocks.DIRT.getDefaultState());
     }
 }

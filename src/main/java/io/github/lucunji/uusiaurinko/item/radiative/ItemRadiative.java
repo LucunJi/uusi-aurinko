@@ -60,9 +60,9 @@ public abstract class ItemRadiative extends ItemBase {
         if (particleData != null) {
             Random random = new Random();
             if (random.nextFloat() < 0.07) {
-                double posX = entity.getPosX() - 0.125 + random.nextFloat() * 0.25;
-                double posY = entity.getPosY() + random.nextFloat() * 0.20;
-                double posZ = entity.getPosZ() - 0.125 + random.nextFloat() * 0.25;
+                double posX = entity.getPosX() - 0.2 + random.nextFloat() * 0.4;
+                double posY = entity.getPosY() + random.nextFloat() * 0.4;
+                double posZ = entity.getPosZ() - 0.2 + random.nextFloat() * 0.4;
                 double xSpeed = random.nextFloat() * 0.02 - 0.01;
                 double ySpeed = random.nextFloat() * 0.02 + 0.02;
                 double zSpeed = random.nextFloat() * 0.02 - 0.01;
