@@ -52,7 +52,7 @@ public class SemisolidLavaBlock extends Block {
 
     /**
      * Turns into lava without silk touch.
-     * Even if there is silk touch, the loot table fives no block drop.
+     * Even if there is silk touch, the loot table gives no block drop.
      */
     @Override
     public void harvestBlock(World worldIn, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
