@@ -1,6 +1,5 @@
 package io.github.lucunji.uusiaurinko.particles;
 
-import net.minecraft.client.particle.WaterWakeParticle;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.ParticleType;
 import net.minecraftforge.fml.RegistryObject;

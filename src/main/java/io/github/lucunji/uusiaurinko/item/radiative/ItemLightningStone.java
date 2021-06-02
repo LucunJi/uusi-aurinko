@@ -1,59 +1,40 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableList;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
-import net.minecraft.block.Block;
+import io.github.lucunji.uusiaurinko.util.ConductivityChecker;
+import io.github.lucunji.uusiaurinko.util.IConductivityChecker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.ParticleStatus;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.IParticleData;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
-import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
-
 public class ItemLightningStone extends ItemRadiative {
-    private static final ResourceLocation CONDUCTOR_TAG_LOCATION = new ResourceLocation(MODID, "conductor");
-
     public ItemLightningStone(Properties properties) {
         super(properties);
     }
 
     @Override
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
-//        if (worldIn.isRemote()
-//                && Minecraft.getInstance().gameSettings.particles != ParticleStatus.MINIMAL
-//                && worldIn.getGameTime() % 30 == 0) {
-//            findAllExposedConductorsDFS(worldIn, entityIn.getPosition(), 16)
-//                    .forEach(pos -> worldIn.addOptionalParticle(ParticleTypes.FLAME,
-//                            pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0));
-//        }
+        makeParticleEffects(worldIn, entityIn);
     }
 
     @Override
     public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
-        World world = itemEntity.world;
-        if (world.isRemote()
-                && Minecraft.getInstance().gameSettings.particles != ParticleStatus.MINIMAL
-                && world.getGameTime() % 30 == 0) {
-            Random random = world.getRandom();
-            findAllExposedConductorsDFS(world, itemEntity.getPosition(), 16)
-                    .forEach(pair -> genSparkParticles(world, pair.left, pair.right, 5, random));
-        }
+        makeParticleEffects(itemEntity.world, itemEntity);
     }
 
     @Override
@@ -61,24 +42,51 @@ public class ItemLightningStone extends ItemRadiative {
         return ModParticleTypes.SPARK.get();
     }
 
+    private static void makeParticleEffects(World world, Entity source) {
+        if (world.isRemote()
+                && Minecraft.getInstance().gameSettings.particles != ParticleStatus.MINIMAL
+                && world.getGameTime() % 30 == 0) {
+            Random random = world.getRandom();
+            ConductivityChecker checker = new ConductivityChecker();
+            ImmutableList<BlockPos> startSet = ImmutableList.<BlockPos>builder()
+                    .addAll(BlockPos.getAllInBox(source.getBoundingBox().grow(0.5))
+                            .filter(pos -> checker.isConductor(world.getBlockState(pos)))
+                            .map(BlockPos::toImmutable)
+                            .iterator()).build();
+            findExposedConductorsDFS(world, startSet, source.getPositionVec(), 16, checker)
+                    .forEach(pair -> spreadSpark(world, pair.left, pair.right, 5, random));
+        }
+    }
+
     /**
      * Randomly distribute particles over a block.
+     * <p>
+     * {@code null} direction means the block is transparent so particles can be rendered inside.
+     * Note that particles in semi-transparent blocks, such as water, are invisible for players out of water.
+     *
      * @param number Number of particles to generate
      */
     @OnlyIn(Dist.CLIENT)
-    private static void genSparkParticles(World world, BlockPos blockPos, Direction direction, int number, Random random) {
+    private static void spreadSpark(World world, BlockPos blockPos, @Nullable Direction direction, int number, Random random) {
         if (random.nextFloat() < 0.6) return;
         int x = blockPos.getX();
         int y = blockPos.getY();
         int z = blockPos.getZ();
         BasicParticleType sparkType = ModParticleTypes.SPARK.get();
+        if (direction == null) {
+            float dx = random.nextFloat();
+            float dy = random.nextFloat();
+            float dz = random.nextFloat();
+            world.addOptionalParticle(sparkType, x + dx, y + dy, z + dz, 0.04 * random.nextFloat(), 0.04 * random.nextFloat(), 0.04 * random.nextFloat());
+            return;
+        }
         switch (direction) {
             case UP:
                 for (int i = 0; i < number; ++i) {
                     float dx = random.nextFloat();
                     float dy = 0.2F * random.nextFloat() - 0.1F;
                     float dz = random.nextFloat();
-                    world.addOptionalParticle(sparkType, x + dx, y + 1 + dy, z + dz, 0,  0.04 * random.nextFloat(), 0);
+                    world.addOptionalParticle(sparkType, x + dx, y + 1 + dy, z + dz, 0, 0.04 * random.nextFloat(), 0);
                 }
                 break;
             case DOWN:
@@ -86,7 +94,7 @@ public class ItemLightningStone extends ItemRadiative {
                     float dx = random.nextFloat();
                     float dy = 0.2F * random.nextFloat() - 0.1F;
                     float dz = random.nextFloat();
-                    world.addOptionalParticle(sparkType, x + dx, y + dy, z + dz, 0,  -0.04 * random.nextFloat(), 0);
+                    world.addOptionalParticle(sparkType, x + dx, y + dy, z + dz, 0, -0.04 * random.nextFloat(), 0);
                 }
                 break;
             case NORTH:
@@ -94,7 +102,7 @@ public class ItemLightningStone extends ItemRadiative {
                     float dx = random.nextFloat();
                     float dy = random.nextFloat();
                     float dz = 0.2F * random.nextFloat() - 0.1F;
-                    world.addOptionalParticle(sparkType, x + dx, y + dy, z + dz, 0,  0, -0.04 * random.nextFloat());
+                    world.addOptionalParticle(sparkType, x + dx, y + dy, z + dz, 0, 0, -0.04 * random.nextFloat());
                 }
                 break;
             case SOUTH:
@@ -102,7 +110,7 @@ public class ItemLightningStone extends ItemRadiative {
                     float dx = random.nextFloat();
                     float dy = random.nextFloat();
                     float dz = 0.2F * random.nextFloat() - 0.1F;
-                    world.addOptionalParticle(sparkType, x + dx, y + dy, z + 1 + dz, 0,  0, 0.04 * random.nextFloat());
+                    world.addOptionalParticle(sparkType, x + dx, y + dy, z + 1 + dz, 0, 0, 0.04 * random.nextFloat());
                 }
                 break;
             case WEST:
@@ -110,7 +118,7 @@ public class ItemLightningStone extends ItemRadiative {
                     float dx = 0.2F * random.nextFloat() - 0.1F;
                     float dy = random.nextFloat();
                     float dz = random.nextFloat();
-                    world.addOptionalParticle(sparkType, x + dx, y + dy, z + dz, -0.04 * random.nextFloat(),  0, 0);
+                    world.addOptionalParticle(sparkType, x + dx, y + dy, z + dz, -0.04 * random.nextFloat(), 0, 0);
                 }
                 break;
             case EAST:
@@ -118,44 +126,49 @@ public class ItemLightningStone extends ItemRadiative {
                     float dx = 0.2F * random.nextFloat() - 0.1F;
                     float dy = random.nextFloat();
                     float dz = random.nextFloat();
-                    world.addOptionalParticle(sparkType, x + 1 + dx, y + dy, z + dz, 0.04 * random.nextFloat(),  0, 0);
+                    world.addOptionalParticle(sparkType, x + 1 + dx, y + dy, z + dz, 0.04 * random.nextFloat(), 0, 0);
                 }
                 break;
         }
     }
 
+    /**
+     * Find all conductors visible to players.
+     *
+     * @param startSet A set of blocks to begin with, usually conductors. It has to be immutable to prevent modification.
+     * @param startPos The position of entity. It will be the center of search range.
+     * @param range    The range of search. Any block outside is ignored.
+     * @param checker  A checker for conductivity.
+     * @return A list of Block-Direction pairs. Direction represents the visible face of block, might be {@code null}.
+     * {@code null} represents that the block is transparent so particles can be rendered inside.
+     */
     @OnlyIn(Dist.CLIENT)
-    private static List<ImmutablePair<BlockPos, Direction>> findAllExposedConductorsDFS(World world, BlockPos startPos, int range) {
-        Set<Block> conductorBlocks = Sets.newIdentityHashSet();
-        Optional.ofNullable(BlockTags.getCollection().get(CONDUCTOR_TAG_LOCATION))
-                .map(ITag::getAllElements).ifPresent(conductorBlocks::addAll);
-        Set<Fluid> conductorFluids = Sets.newIdentityHashSet();
-        Optional.ofNullable(FluidTags.getCollection().get(CONDUCTOR_TAG_LOCATION))
-                .map(ITag::getAllElements).ifPresent(conductorFluids::addAll);
-
+    private static List<ImmutablePair<BlockPos, Direction>>
+    findExposedConductorsDFS(World world, final ImmutableList<BlockPos> startSet, final Vector3d startPos, int range,
+                             IConductivityChecker checker) {
         int rangeSq = range * range;
         List<ImmutablePair<BlockPos, Direction>> exposedList = new ArrayList<>(256);
-        Set<BlockPos> openSet = new HashSet<>();
-        Queue<BlockPos> openQueue = new LinkedList<>();
+        Set<BlockPos> openSet = new HashSet<>(startSet);
+        Queue<BlockPos> openQueue = new LinkedList<>(startSet);
         HashSet<BlockPos> closedSet = new HashSet<>(256);
-        openSet.add(startPos);
-        openQueue.add(startPos);
         while (!openSet.isEmpty()) {
             BlockPos currentPos = openQueue.remove();
             openSet.remove(currentPos);
             closedSet.add(currentPos);
-            if (currentPos.distanceSq(startPos) > rangeSq) continue;
+            if (startPos.squareDistanceTo(currentPos.getX(), currentPos.getY(), currentPos.getZ()) > rangeSq) continue;
             BlockPos.Mutable neighborPosMut = new BlockPos.Mutable();
             for (Direction direction : Direction.values()) {
                 neighborPosMut.setAndMove(currentPos, direction);
                 if (closedSet.contains(neighborPosMut) || openSet.contains(neighborPosMut)) continue;
-                if (conductorBlocks.contains(world.getBlockState(neighborPosMut).getBlock()) ||
-                    conductorFluids.contains(world.getFluidState(neighborPosMut).getFluid())) {
+                if (checker.isConductor(world.getBlockState(neighborPosMut))) {
                     BlockPos immutable = neighborPosMut.toImmutable();
                     openSet.add(immutable);
                     openQueue.add(immutable);
-                } else if (world.isAirBlock(neighborPosMut)) {
+                } else if (!world.getBlockState(neighborPosMut).isOpaqueCube(world, neighborPosMut)) {
                     exposedList.add(new ImmutablePair<>(currentPos, direction));
+                }
+                if (!world.getBlockState(currentPos).isOpaqueCube(world, currentPos)) {
+                    exposedList.add(new ImmutablePair<>(currentPos, null));
                 }
             }
         }
