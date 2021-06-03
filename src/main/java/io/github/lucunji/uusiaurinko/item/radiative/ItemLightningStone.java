@@ -1,16 +1,20 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
 import com.google.common.collect.ImmutableList;
+import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
 import io.github.lucunji.uusiaurinko.util.ConductivityChecker;
 import io.github.lucunji.uusiaurinko.util.IConductivityChecker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.ParticleStatus;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.IParticleData;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
@@ -30,6 +34,12 @@ public class ItemLightningStone extends ItemRadiative {
     @Override
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
         makeParticleEffects(worldIn, entityIn);
+
+        if (entityIn instanceof LivingEntity) {
+            LivingEntity creature = (LivingEntity) entityIn;
+            creature.addPotionEffect(new EffectInstance(ModEffects.ELECTRICITY_RESISTANCE.get(),
+                    2, 0, true, false, true));
+        }
     }
 
     @Override

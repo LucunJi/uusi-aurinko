@@ -13,4 +13,7 @@ public class ModEffects {
 
     public static final RegistryObject<Effect> TRUE_VISION = EFFECTS.register("true_vision", () ->
             new BasicModEffect(EffectType.BENEFICIAL, 0x5d4145));
+
+    public static final RegistryObject<Effect> ELECTRICITY_RESISTANCE = EFFECTS.register("electricity_resistance", () ->
+            new BasicModEffect(EffectType.BENEFICIAL, 0x7bffff));
 }
