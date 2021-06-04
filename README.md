@@ -8,6 +8,7 @@ This mod is made by team Ilmarinen, which takes part in the 2021 TeaCon developm
 
 ![](./Ilmarinen_256.png)
 
+## Documents
 Mod Design Document(Chinese): [ModDesign.pdf](https://github.com/LucunJi/uusi-aurinko/blob/master/documents/ModDesign.pdf)
 
 Devlog and other articles(Chinese): [UusiAurinko](https://lucunji.github.io/tags/UusiAurinko/)
