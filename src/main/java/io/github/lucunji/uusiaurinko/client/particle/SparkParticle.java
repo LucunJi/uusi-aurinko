@@ -62,7 +62,7 @@ public class SparkParticle extends SpriteTexturedParticle {
             this.motionZ *= 0.98F;
             float f = (float) i * 0.001F;
             this.setSize(f, f);
-            this.setSprite(this.sprite.get(i % 4, 4));
+            this.setSprite(this.sprite.get(i & 3, 4)); // i & 3 == i % 4
         }
     }
 

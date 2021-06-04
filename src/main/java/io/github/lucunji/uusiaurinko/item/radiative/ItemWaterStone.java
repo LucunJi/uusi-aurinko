@@ -39,13 +39,13 @@ public class ItemWaterStone extends ItemRadiative {
 
     @Override
     public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
-        chillLava(itemEntity.world, new Random(), itemEntity, 2);
+        chillLava(itemEntity.world, itemEntity.world.getRandom(), itemEntity, 2);
         hurtsFireSensitiveCreatures(itemEntity.world, itemEntity, 1);
     }
 
     @Override
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
-        chillLava(worldIn, new Random(), entityIn, 2);
+        chillLava(worldIn, worldIn.getRandom(), entityIn, 2);
         hurtsFireSensitiveCreatures(entityIn.world, entityIn, 1);
 
         entityIn.forceFireTicks(0);

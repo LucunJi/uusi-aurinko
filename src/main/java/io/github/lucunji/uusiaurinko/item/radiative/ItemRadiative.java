@@ -58,19 +58,21 @@ public abstract class ItemRadiative extends ItemBase {
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         // make particles
-        IParticleData particleData = inWorldParticleType(entity);
-        if (particleData != null) {
-            Random random = new Random();
-            if (random.nextFloat() < 0.07) {
-                double posX = entity.getPosX() - 0.2 + random.nextFloat() * 0.4;
-                double posY = entity.getPosY() + random.nextFloat() * 0.4;
-                double posZ = entity.getPosZ() - 0.2 + random.nextFloat() * 0.4;
-                double xSpeed = random.nextFloat() * 0.02 - 0.01;
-                double ySpeed = random.nextFloat() * 0.02 + 0.02;
-                double zSpeed = random.nextFloat() * 0.02 - 0.01;
+        if (entity.world.isRemote()) {
+            IParticleData particleData = inWorldParticleType(entity);
+            if (particleData != null) {
+                Random random = entity.world.getRandom();
+                if (random.nextFloat() < 0.07) {
+                    double posX = entity.getPosX() - 0.2 + random.nextFloat() * 0.4;
+                    double posY = entity.getPosY() + random.nextFloat() * 0.4;
+                    double posZ = entity.getPosZ() - 0.2 + random.nextFloat() * 0.4;
+                    double xSpeed = random.nextFloat() * 0.02 - 0.01;
+                    double ySpeed = random.nextFloat() * 0.02 + 0.02;
+                    double zSpeed = random.nextFloat() * 0.02 - 0.01;
 
-                // only runs in client
-                entity.world.addOptionalParticle(particleData, posX, posY, posZ, xSpeed, ySpeed, zSpeed);
+                    // only runs in client
+                    entity.world.addOptionalParticle(particleData, posX, posY, posZ, xSpeed, ySpeed, zSpeed);
+                }
             }
         }
 

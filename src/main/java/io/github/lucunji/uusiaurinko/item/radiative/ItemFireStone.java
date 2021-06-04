@@ -56,7 +56,7 @@ public class ItemFireStone extends ItemRadiative {
 
     private void igniteBlocks(World worldIn, Entity self) {
         if (!worldIn.isRemote() && worldIn.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
-            Random random = new Random();
+            Random random = worldIn.getRandom();
             for (BlockPos pos : randomBlocksAround(self.getPosition(), 1, 1, 1, 3, -1, random)) {
                 BlockState blockState = AbstractFireBlock.getFireForPlacement(worldIn, pos);
                 int chance = 150 + (worldIn.isBlockinHighHumidity(pos) ? 50 : 0);

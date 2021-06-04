@@ -3,9 +3,9 @@ package io.github.lucunji.uusiaurinko.item.radiative;
 import com.google.common.collect.ImmutableList;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
-import io.github.lucunji.uusiaurinko.util.ConductivityChecker;
-import io.github.lucunji.uusiaurinko.util.IConductivityChecker;
+import io.github.lucunji.uusiaurinko.util.BlockFluidCombinedTag;
 import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.ParticleStatus;
 import net.minecraft.entity.Entity;
@@ -16,6 +16,7 @@ import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
@@ -27,7 +28,11 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
+
 public class ItemLightningStone extends ItemRadiative {
+    private static final ResourceLocation CONDUCTOR_TAG_LOCATION = new ResourceLocation(MODID, "conductor");
+
     public ItemLightningStone(Properties properties) {
         super(properties);
     }
@@ -56,19 +61,23 @@ public class ItemLightningStone extends ItemRadiative {
     private static void makeParticleEffects(World world, Entity source) {
         if (world.isRemote()
                 && Minecraft.getInstance().gameSettings.particles != ParticleStatus.MINIMAL
-                && world.getGameTime() % 30 == 0) {
+                && (world.getGameTime() & 31) == 0) { // i & 31 == i % 32
             Random random = world.getRandom();
-            ConductivityChecker checker = new ConductivityChecker();
+            BlockFluidCombinedTag checker = new BlockFluidCombinedTag(CONDUCTOR_TAG_LOCATION);
             ImmutableList<BlockPos> startSet = ImmutableList.<BlockPos>builder()
                     .addAll(BlockPos.getAllInBox(source.getBoundingBox().grow(0.5))
-                            .filter(pos -> checker.isConductor(world.getBlockState(pos)))
+                            .filter(pos -> checker.contains(world.getBlockState(pos)))
                             .map(BlockPos::toImmutable)
                             .iterator()).build();
             List<ImmutablePair<BlockPos, Direction>> exposure = findExposedConductorsDFS(world, startSet, source.getPositionVec(), 16, checker);
-            if (!exposure.isEmpty())
+            int size = exposure.size();
+            if (size > 0)
                 world.playSound(source.getPosX(), source.getPosY(), source.getPosZ(), ModSoundEvents.ENTITY_LIGHTNING_STONE_EMIT,
                         SoundCategory.BLOCKS, 1, 1.0F + (world.rand.nextFloat() * 0.1F), false);
-            exposure.forEach(pair -> spreadSpark(world, pair.left, pair.right, 10, random));
+            exposure.forEach(pair -> {
+                if (size > 32 && random.nextFloat() < 0.6) return;
+                spreadSpark(world, pair.left, pair.right, 10, random);
+            });
         }
     }
 
@@ -82,7 +91,6 @@ public class ItemLightningStone extends ItemRadiative {
      */
     @OnlyIn(Dist.CLIENT)
     private static void spreadSpark(World world, BlockPos blockPos, @Nullable Direction direction, int number, Random random) {
-        if (random.nextFloat() < 0.6) return;
         int x = blockPos.getX();
         int y = blockPos.getY();
         int z = blockPos.getZ();
@@ -159,7 +167,7 @@ public class ItemLightningStone extends ItemRadiative {
     @OnlyIn(Dist.CLIENT)
     private static List<ImmutablePair<BlockPos, Direction>>
     findExposedConductorsDFS(World world, final ImmutableList<BlockPos> startSet, final Vector3d startPos, int range,
-                             IConductivityChecker checker) {
+                             BlockFluidCombinedTag checker) {
         int rangeSq = range * range;
         List<ImmutablePair<BlockPos, Direction>> exposedList = new ArrayList<>(256);
         Set<BlockPos> openSet = new HashSet<>(startSet);
@@ -174,11 +182,14 @@ public class ItemLightningStone extends ItemRadiative {
             for (Direction direction : Direction.values()) {
                 neighborPosMut.setAndMove(currentPos, direction);
                 if (closedSet.contains(neighborPosMut) || openSet.contains(neighborPosMut)) continue;
-                if (checker.isConductor(world.getBlockState(neighborPosMut))) {
+
+                BlockState neighborState = world.getBlockState(neighborPosMut);
+                if (checker.contains(neighborState)) {
                     BlockPos immutable = neighborPosMut.toImmutable();
                     openSet.add(immutable);
                     openQueue.add(immutable);
-                } else if (!world.getBlockState(neighborPosMut).isOpaqueCube(world, neighborPosMut)) {
+                } else if (!neighborState.isOpaqueCube(world, neighborPosMut) ||
+                        !neighborState.isSolidSide(world, neighborPosMut, direction.getOpposite())) {
                     exposedList.add(new ImmutablePair<>(currentPos, direction));
                 }
                 if (!world.getBlockState(currentPos).isOpaqueCube(world, currentPos)) {
