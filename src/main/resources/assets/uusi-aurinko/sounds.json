@@ -1,0 +1,22 @@
+{
+  "entity.radiative_stone.throw": {
+    "subtitle": "subtitles.uusi-aurinko.entity.radiative_stone.throw",
+    "sounds": [
+      "minecraft:random/bow"
+    ]
+  },
+  "entity.lightning_rock.emit": {
+    "subtitle": "subtitles.uusi-aurinko.entity.lightning_rock.discharge",
+    "sounds": [
+      "uusi-aurinko:electricity_1"
+    ]
+  },
+  "item.evil_eye.equip": {
+    "subtitle": "subtitles.uusi-aurinko.item.evil_eye.equip",
+    "sounds": [
+      "block/end_portal/eyeplace1",
+      "block/end_portal/eyeplace2",
+      "block/end_portal/eyeplace3"
+    ]
+  }
+}

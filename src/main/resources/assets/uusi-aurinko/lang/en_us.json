@@ -25,5 +25,9 @@
   "block.uusi-aurinko.semisolid_lava": "Semisolid Lava",
 
   "effect.uusi-aurinko.true_vision": "True Vision",
-  "effect.uusi-aurinko.electricity_resistance": "Electricity Resis."
+  "effect.uusi-aurinko.electricity_resistance": "Electricity Resis.",
+
+  "subtitles.uusi-aurinko.entity.radiative_stone.throw": "Magical Stone fies",
+  "subtitles.uusi-aurinko.entity.lightning_rock.discharge": "§oUkkoskivi§r discharges",
+  "subtitles.uusi-aurinko.item.evil_eye.equip": "§oPaha Silmä§r attaches"
 }

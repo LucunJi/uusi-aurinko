@@ -5,6 +5,7 @@ import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
 import io.github.lucunji.uusiaurinko.util.ConductivityChecker;
 import io.github.lucunji.uusiaurinko.util.IConductivityChecker;
+import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.ParticleStatus;
 import net.minecraft.entity.Entity;
@@ -14,8 +15,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -63,8 +64,11 @@ public class ItemLightningStone extends ItemRadiative {
                             .filter(pos -> checker.isConductor(world.getBlockState(pos)))
                             .map(BlockPos::toImmutable)
                             .iterator()).build();
-            findExposedConductorsDFS(world, startSet, source.getPositionVec(), 16, checker)
-                    .forEach(pair -> spreadSpark(world, pair.left, pair.right, 5, random));
+            List<ImmutablePair<BlockPos, Direction>> exposure = findExposedConductorsDFS(world, startSet, source.getPositionVec(), 16, checker);
+            if (!exposure.isEmpty())
+                world.playSound(source.getPosX(), source.getPosY(), source.getPosZ(), ModSoundEvents.ENTITY_LIGHTNING_STONE_EMIT,
+                        SoundCategory.BLOCKS, 1, 1.0F + (world.rand.nextFloat() * 0.1F), false);
+            exposure.forEach(pair -> spreadSpark(world, pair.left, pair.right, 10, random));
         }
     }
 

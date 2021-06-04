@@ -1,11 +1,11 @@
 package io.github.lucunji.uusiaurinko.item;
 
+import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.IArmorMaterial;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.LazyValue;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -18,7 +18,7 @@ import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
  */
 public enum ModArmorMaterial implements IArmorMaterial {
     EVIL_EYE(MODID + ":evil_eye", 0, new int[]{0, 0, 0, 0}, 0,
-            SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, 0, 0, () -> Ingredient.EMPTY);
+            ModSoundEvents.ITEM_EVIL_EYE_EQUIP, 0, 0, () -> Ingredient.EMPTY);
 
     private static final int[] MAX_DAMAGE_ARRAY = new int[]{13, 15, 16, 11};
     private final String name;

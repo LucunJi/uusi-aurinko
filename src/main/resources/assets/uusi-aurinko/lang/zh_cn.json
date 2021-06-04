@@ -25,5 +25,9 @@
   "block.uusi-aurinko.semisolid_lava": "半凝固岩浆",
 
   "effect.uusi-aurinko.true_vision": "真实之视",
-  "effect.uusi-aurinko.electricity_resistance": "雷电免疫"
+  "effect.uusi-aurinko.electricity_resistance": "雷电免疫",
+
+  "subtitles.uusi-aurinko.entity.radiative_stone.throw": "魔法石：飞出",
+  "subtitles.uusi-aurinko.entity.lightning_rock.discharge": "§oUkkoskivi§r：放电",
+  "subtitles.uusi-aurinko.item.evil_eye.equip": "§oPaha Silmä§r：嵌入"
 }

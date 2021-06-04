@@ -1,6 +1,7 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
 import io.github.lucunji.uusiaurinko.item.ItemBase;
+import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -9,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -123,6 +125,7 @@ public abstract class ItemRadiative extends ItemBase {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
         ItemStack itemStack = playerIn.getHeldItem(handIn);
+        worldIn.playSound(null, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(), ModSoundEvents.ENTITY_RADIATIVE_STONE_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
         if (!worldIn.isRemote()) {
             Vector3d userPosVec = playerIn.getPositionVec();
             ItemEntity itemEntity = new ItemEntity(worldIn, userPosVec.x, playerIn.getPosYEye() - 0.3F, userPosVec.z, itemStack.copy());
