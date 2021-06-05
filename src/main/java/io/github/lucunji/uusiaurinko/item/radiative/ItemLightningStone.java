@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
 import io.github.lucunji.uusiaurinko.util.BlockFluidCombinedTag;
+import io.github.lucunji.uusiaurinko.util.ModDamageSource;
 import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -28,14 +29,18 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
 public class ItemLightningStone extends ItemRadiative {
     private static final ResourceLocation CONDUCTOR_TAG_LOCATION = new ResourceLocation(MODID, "conductor");
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public ItemLightningStone(Properties properties) {
         super(properties);
@@ -222,42 +227,78 @@ public class ItemLightningStone extends ItemRadiative {
     }
 
     private static void causeElectricDamage(World world, Entity source) {
-        if (source.world.isRemote()) return;
+        if (source.world.isRemote() || (world.getGameTime() & 31) != 0) return; // i & 31 == i % 32
+        LOGGER.debug("～～～Entered method causeElectricDamage～～～");
 
-        Vector3d position = source.getPositionVec();
+        Vector3d sourcePos = source.getPositionVec();
         ServerWorld serverWorld = (ServerWorld) source.world;
-        List<Entity> targets = serverWorld.getEntitiesWithinAABB(LivingEntity.class,
-                new AxisAlignedBB(position.subtract(16, 16, 16), position.add(16, 16, 16)),
-                entity -> !entity.isSpectator() &&
-                        (!(entity instanceof PlayerEntity) || !((PlayerEntity) entity).isCreative()) &&
-                        entity.getPositionVec().squareDistanceTo(position) <= 256);
-
-        if (targets.isEmpty()) return;
-
         BlockFluidCombinedTag checker = new BlockFluidCombinedTag(CONDUCTOR_TAG_LOCATION);
-        Map<Entity, List<BlockPos>> target2ConductorsMap = new IdentityHashMap<>();
-        targets.forEach(entity ->
-                target2ConductorsMap.put(entity, findNearbyConductors(serverWorld, entity, 0.5, checker)));
 
         ImmutableList<BlockPos> startSet = findNearbyConductors(serverWorld, source, 0.5, checker);
-
+        LOGGER.debug(String.format("%d surrounding conductor blocks collected: %s", startSet.size(), startSet));
         if (startSet.isEmpty()) return;
 
+        List<Entity> targets = serverWorld.getEntitiesWithinAABB(LivingEntity.class,
+                new AxisAlignedBB(sourcePos.subtract(16, 16, 16), sourcePos.add(16, 16, 16)),
+                entity -> !entity.isSpectator() &&
+                        (!(entity instanceof PlayerEntity) || !((PlayerEntity) entity).isCreative()) &&
+                        entity.getPositionVec().squareDistanceTo(sourcePos) <= 256);
+        LOGGER.debug(String.format("%d target entities collected: %s", targets.size(), targets.stream().map(entity -> entity.getClass().getSimpleName()).collect(Collectors.toList())));
+
+        Map<Entity, List<BlockPos>> target2ConductorsMap = new IdentityHashMap<>();
+        targets.forEach(entity -> {
+            List<BlockPos> nearbyConductors = findNearbyConductors(serverWorld, entity, 0.5, checker);
+            if (!nearbyConductors.isEmpty()) target2ConductorsMap.put(entity, nearbyConductors);
+        });
+        LOGGER.debug(String.format("Conductor blocks near targets collected, %d remaining entities.", target2ConductorsMap.size()));
+        if (target2ConductorsMap.isEmpty()) return;
+
         // A* part
-        for (Entity entity : targets) {
+        for (Entity entity : target2ConductorsMap.keySet()) {
             List<BlockPos> goals = target2ConductorsMap.get(entity);
             PriorityQueue<ImmutablePair<BlockPos, Integer>> pq = new PriorityQueue<>(Comparator.comparing(Pair::getRight));
             startSet.forEach(blockPos -> pq.add(new ImmutablePair<>(blockPos, minDistance(blockPos, goals))));
             Set<BlockPos> openSet = new HashSet<>(startSet);
             HashSet<BlockPos> closedSet = new HashSet<>(256);
+            boolean success = false;
+            int pass = 0;
+
             while (!openSet.isEmpty()) {
-                // FIXME
+                pass++;
+                LOGGER.debug("Running A*, pass=" + pass);
+                LOGGER.debug("Priority Queue: " + pq);
+                BlockPos currentPos = pq.remove().left;
+                openSet.remove(currentPos);
+                closedSet.add(currentPos);
+                if (sourcePos.squareDistanceTo(currentPos.getX(), currentPos.getY(), currentPos.getZ()) > 256) continue;
+
+                if (goals.contains(currentPos)) {
+                    success = true;
+                    break;
+                }
+
+                BlockPos.Mutable neighborPosMut = new BlockPos.Mutable();
+                for (Direction direction : Direction.values()) {
+                    neighborPosMut.setAndMove(currentPos, direction);
+
+                    if (closedSet.contains(neighborPosMut) || openSet.contains(neighborPosMut)) continue;
+
+                    BlockState neighborState = world.getBlockState(neighborPosMut);
+                    if (checker.contains(neighborState)) {
+                        BlockPos immutable = neighborPosMut.toImmutable();
+                        openSet.add(immutable);
+                        pq.add(new ImmutablePair<>(immutable, minDistance(immutable, goals)));
+                    }
+                }
             }
-            break;
+            if (success) {
+                entity.attackEntityFrom(ModDamageSource.ELECTRICITY, 5F);
+            }
         }
     }
 
     private static int minDistance(BlockPos blockPos, List<BlockPos> targets) {
+        if (targets.isEmpty()) throw new IllegalArgumentException("the second argument cannot be empty");
         int min = Integer.MAX_VALUE;
         for (BlockPos pos : targets) {
             int i0 = blockPos.getX() - pos.getX();
