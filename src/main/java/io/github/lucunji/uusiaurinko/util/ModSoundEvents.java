@@ -15,7 +15,7 @@ import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModSoundEvents {
     public static final SoundEvent ENTITY_RADIATIVE_STONE_THROW = register("entity.radiative_stone.throw");
-    public static final SoundEvent ENTITY_LIGHTNING_STONE_EMIT = register("entity.lightning_rock.emit");
+    public static final SoundEvent ENTITY_LIGHTNING_STONE_DISCHARGE = register("entity.lightning_rock.discharge");
 
     public static final SoundEvent ITEM_EVIL_EYE_EQUIP = register("item.evil_eye.equip");
 
@@ -27,7 +27,7 @@ public class ModSoundEvents {
     public static void registerSoundEvents(final RegistryEvent.Register<SoundEvent> registryEvent) {
         registryEvent.getRegistry().registerAll(
                 ENTITY_RADIATIVE_STONE_THROW,
-                ENTITY_LIGHTNING_STONE_EMIT,
+                ENTITY_LIGHTNING_STONE_DISCHARGE,
                 ITEM_EVIL_EYE_EQUIP);
     }
 }

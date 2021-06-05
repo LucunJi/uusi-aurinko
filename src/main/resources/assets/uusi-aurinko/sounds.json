@@ -5,7 +5,7 @@
       "minecraft:random/bow"
     ]
   },
-  "entity.lightning_rock.emit": {
+  "entity.lightning_rock.discharge": {
     "subtitle": "subtitles.uusi-aurinko.entity.lightning_rock.discharge",
     "sounds": [
       "uusi-aurinko:electricity_1"
