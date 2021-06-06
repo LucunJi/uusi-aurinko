@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -250,7 +251,7 @@ public class ItemLightningStone extends ItemRadiative {
             // reuse the already discovered connection conductors in the last iteration
             // so that we do not need to reset the sets to run algorithm from the ground-up
             if (CollectionHelper.hasAnyOf(discoveredSet, goals)) {
-                target.attackEntityFrom(ModDamageSource.ELECTRICITY, 5F);
+                shockEntity(target);
                 continue;
             }
 
@@ -268,7 +269,7 @@ public class ItemLightningStone extends ItemRadiative {
                 BlockPos currentPos = frontierQueue.remove().left;
 
                 if (goals.contains(currentPos)) {
-                    target.attackEntityFrom(ModDamageSource.ELECTRICITY, 5F);
+                    shockEntity(target);
                     break;
                 }
 
@@ -300,5 +301,18 @@ public class ItemLightningStone extends ItemRadiative {
             if (temp < min) min = temp;
         }
         return min;
+    }
+
+    /**
+     * Shock the entity, giving it some damage and potion effect.
+     *
+     * It is only a make-do version. Wait to be improved with custom paralysis effect.
+     */
+    private static void shockEntity(Entity entity) {
+        if (entity.attackEntityFrom(ModDamageSource.ELECTRICITY, 5.0F) && entity instanceof LivingEntity) {
+            ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.SLOWNESS, 30, 255));
+            ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.MINING_FATIGUE, 30, 255));
+            ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.BLINDNESS, 30));
+        }
     }
 }

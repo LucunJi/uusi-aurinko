@@ -29,5 +29,8 @@
 
   "subtitles.uusi-aurinko.entity.radiative_stone.throw": "Magical Stone fies",
   "subtitles.uusi-aurinko.entity.lightning_rock.discharge": "§oUkkoskivi§r discharges",
-  "subtitles.uusi-aurinko.item.evil_eye.equip": "§oPaha Silmä§r attaches"
+  "subtitles.uusi-aurinko.item.evil_eye.equip": "§oPaha Silmä§r attaches",
+
+  "death.attack.uusi-aurinko.electricity": "%1$s experienced high voltage pass through the body",
+  "death.attack.uusi-aurinko.electricity.player": "%1$s experienced high voltage pass through the body whilst fighting %2$s"
 }
