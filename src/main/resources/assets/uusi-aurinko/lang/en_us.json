@@ -32,5 +32,7 @@
   "subtitles.uusi-aurinko.item.evil_eye.equip": "§oPaha Silmä§r attaches",
 
   "death.attack.uusi-aurinko.electricity": "%1$s experienced high voltage pass through the body",
-  "death.attack.uusi-aurinko.electricity.player": "%1$s experienced high voltage pass through the body whilst fighting %2$s"
+  "death.attack.uusi-aurinko.electricity.player": "%1$s experienced high voltage pass through the body whilst fighting %2$s",
+
+  "entity.uusi-aurinko.radiative_item": "Radiative Magical Stone"
 }

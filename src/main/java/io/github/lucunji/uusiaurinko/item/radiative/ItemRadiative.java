@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
+import io.github.lucunji.uusiaurinko.entity.RadiativeItemEntity;
 import io.github.lucunji.uusiaurinko.item.ItemBase;
 import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
 import net.minecraft.entity.Entity;
@@ -116,7 +117,11 @@ public abstract class ItemRadiative extends ItemBase {
     @Override
     public Entity createEntity(World world, Entity oldEntity, ItemStack itemstack) {
         if (oldEntity instanceof ItemEntity) {
-            trySetAge((ItemEntity) oldEntity, -32768);
+            ItemEntity oldItemEntity = (ItemEntity) oldEntity;
+            trySetAge(oldItemEntity, -32768);
+            RadiativeItemEntity newItemEntity = new RadiativeItemEntity(oldItemEntity);
+            newItemEntity.setPickupDelay(40);
+            return newItemEntity;
         }
         return null;
     }
