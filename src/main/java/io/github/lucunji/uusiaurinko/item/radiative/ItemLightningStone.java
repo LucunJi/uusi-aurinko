@@ -56,13 +56,13 @@ public class ItemLightningStone extends ItemRadiative {
                     2, 0, true, false, true));
         }
 
-        causeElectricDamage(worldIn, entityIn);
+//        causeElectricDamage(worldIn, entityIn);
     }
 
     @Override
     public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
         makeParticleEffects(itemEntity.world, itemEntity);
-        causeElectricDamage(itemEntity.world, itemEntity);
+//        causeElectricDamage(itemEntity.world, itemEntity);
     }
 
     @Override
@@ -78,18 +78,15 @@ public class ItemLightningStone extends ItemRadiative {
 
         if (startSet.isEmpty()) return;
 
-        if (Minecraft.getInstance().gameSettings.particles == ParticleStatus.MINIMAL) {
-            world.playSound(source.getPosX(), source.getPosY(), source.getPosZ(), ModSoundEvents.ENTITY_LIGHTNING_STONE_DISCHARGE,
-                    SoundCategory.BLOCKS, 1, 1.0F + (world.rand.nextFloat() * 0.1F), false);
-            return;
-        }
-
         Random random = world.getRandom();
         List<ImmutablePair<BlockPos, Direction>> exposure = findExposedConductorsDFS(world, startSet, source.getPositionVec(), 16, checker);
-
         if (exposure.isEmpty()) return;
+
+        // volume is the multiplier of spread distance: max distance = 16 * volume
         world.playSound(source.getPosX(), source.getPosY(), source.getPosZ(), ModSoundEvents.ENTITY_LIGHTNING_STONE_DISCHARGE,
-                SoundCategory.BLOCKS, 1, 1.0F + (world.rand.nextFloat() * 0.1F), false);
+                SoundCategory.BLOCKS, 1.5F, 1.0F + (world.rand.nextFloat() * 0.1F), false);
+
+        if (Minecraft.getInstance().gameSettings.particles == ParticleStatus.MINIMAL) return;
         if (exposure.size() <= 32) {
             exposure.forEach(pair -> spreadSpark(world, pair.left, pair.right, 10, random));
         } else {
@@ -188,24 +185,22 @@ public class ItemLightningStone extends ItemRadiative {
                              BlockFluidCombinedTag checker) {
         int rangeSq = range * range;
         List<ImmutablePair<BlockPos, Direction>> exposedList = new ArrayList<>(256);
-        Set<BlockPos> openSet = new HashSet<>(startSet);
-        Queue<BlockPos> openQueue = new LinkedList<>(startSet);
-        HashSet<BlockPos> closedSet = new HashSet<>(256);
-        while (!openSet.isEmpty()) {
-            BlockPos currentPos = openQueue.remove();
-            openSet.remove(currentPos);
-            closedSet.add(currentPos);
+        Queue<BlockPos> frontierQueue = new LinkedList<>(startSet);
+        HashSet<BlockPos> discoveredSet = new HashSet<>(256);
+        while (!frontierQueue.isEmpty()) {
+            BlockPos currentPos = frontierQueue.remove();
+            discoveredSet.add(currentPos);
             if (startPos.squareDistanceTo(currentPos.getX(), currentPos.getY(), currentPos.getZ()) > rangeSq) continue;
             BlockPos.Mutable neighborPosMut = new BlockPos.Mutable();
             for (Direction direction : Direction.values()) {
                 neighborPosMut.setAndMove(currentPos, direction);
-                if (closedSet.contains(neighborPosMut) || openSet.contains(neighborPosMut)) continue;
+                if (discoveredSet.contains(neighborPosMut)) continue;
 
                 BlockState neighborState = world.getBlockState(neighborPosMut);
                 if (checker.contains(neighborState)) {
                     BlockPos immutable = neighborPosMut.toImmutable();
-                    openSet.add(immutable);
-                    openQueue.add(immutable);
+                    frontierQueue.add(immutable);
+                    discoveredSet.add(immutable);
                 } else if (!neighborState.isOpaqueCube(world, neighborPosMut)) {
                     exposedList.add(new ImmutablePair<>(currentPos, direction));
                 }
