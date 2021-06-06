@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
 import io.github.lucunji.uusiaurinko.util.BlockFluidCombinedTag;
+import io.github.lucunji.uusiaurinko.util.CollectionHelper;
 import io.github.lucunji.uusiaurinko.util.ModDamageSource;
 import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
 import net.minecraft.block.BlockState;
@@ -28,19 +29,16 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
 public class ItemLightningStone extends ItemRadiative {
     private static final ResourceLocation CONDUCTOR_TAG_LOCATION = new ResourceLocation(MODID, "conductor");
-    private static final Logger LOGGER = LogManager.getLogger();
 
     public ItemLightningStone(Properties properties) {
         super(properties);
@@ -56,13 +54,13 @@ public class ItemLightningStone extends ItemRadiative {
                     2, 0, true, false, true));
         }
 
-//        causeElectricDamage(worldIn, entityIn);
+        causeElectricDamage(worldIn, entityIn);
     }
 
     @Override
     public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
         makeParticleEffects(itemEntity.world, itemEntity);
-//        causeElectricDamage(itemEntity.world, itemEntity);
+        causeElectricDamage(itemEntity.world, itemEntity);
     }
 
     @Override
@@ -186,14 +184,13 @@ public class ItemLightningStone extends ItemRadiative {
         int rangeSq = range * range;
         List<ImmutablePair<BlockPos, Direction>> exposedList = new ArrayList<>(256);
         Queue<BlockPos> frontierQueue = new LinkedList<>(startSet);
-        HashSet<BlockPos> discoveredSet = new HashSet<>(256);
+        HashSet<BlockPos> discoveredSet = new HashSet<>(startSet);
         while (!frontierQueue.isEmpty()) {
             BlockPos currentPos = frontierQueue.remove();
-            discoveredSet.add(currentPos);
-            if (startPos.squareDistanceTo(currentPos.getX(), currentPos.getY(), currentPos.getZ()) > rangeSq) continue;
             BlockPos.Mutable neighborPosMut = new BlockPos.Mutable();
             for (Direction direction : Direction.values()) {
                 neighborPosMut.setAndMove(currentPos, direction);
+                if (startPos.squareDistanceTo(neighborPosMut.getX(), neighborPosMut.getY(), neighborPosMut.getZ()) > rangeSq) continue;
                 if (discoveredSet.contains(neighborPosMut)) continue;
 
                 BlockState neighborState = world.getBlockState(neighborPosMut);
@@ -223,71 +220,71 @@ public class ItemLightningStone extends ItemRadiative {
 
     private static void causeElectricDamage(World world, Entity source) {
         if (source.world.isRemote() || (world.getGameTime() & 31) != 0) return; // i & 31 == i % 32
-        LOGGER.debug("～～～Entered method causeElectricDamage～～～");
 
         Vector3d sourcePos = source.getPositionVec();
         ServerWorld serverWorld = (ServerWorld) source.world;
         BlockFluidCombinedTag checker = new BlockFluidCombinedTag(CONDUCTOR_TAG_LOCATION);
 
+        // prepare blocks to start with
         ImmutableList<BlockPos> startSet = findNearbyConductors(serverWorld, source, 0.5, checker);
-        LOGGER.debug(String.format("%d surrounding conductor blocks collected: %s", startSet.size(), startSet));
         if (startSet.isEmpty()) return;
 
+        // prepare entities to shock
         List<Entity> targets = serverWorld.getEntitiesWithinAABB(LivingEntity.class,
                 new AxisAlignedBB(sourcePos.subtract(16, 16, 16), sourcePos.add(16, 16, 16)),
                 entity -> !entity.isSpectator() &&
                         (!(entity instanceof PlayerEntity) || !((PlayerEntity) entity).isCreative()) &&
                         entity.getPositionVec().squareDistanceTo(sourcePos) <= 256);
-        LOGGER.debug(String.format("%d target entities collected: %s", targets.size(), targets.stream().map(entity -> entity.getClass().getSimpleName()).collect(Collectors.toList())));
+        if (targets.isEmpty()) return;
 
-        Map<Entity, List<BlockPos>> target2ConductorsMap = new IdentityHashMap<>();
-        targets.forEach(entity -> {
-            List<BlockPos> nearbyConductors = findNearbyConductors(serverWorld, entity, 0.5, checker);
-            if (!nearbyConductors.isEmpty()) target2ConductorsMap.put(entity, nearbyConductors);
-        });
-        LOGGER.debug(String.format("Conductor blocks near targets collected, %d remaining entities.", target2ConductorsMap.size()));
-        if (target2ConductorsMap.isEmpty()) return;
+        // main logic for A*
+        // can be further improved by rewriting a more suitable priority queue, but the improvement is too limited so I refuse to do this now
+        PriorityQueue<MutablePair<BlockPos, Integer>> frontierQueue = new PriorityQueue<>(Comparator.comparing(Pair::getRight));
+        for (BlockPos blockPos : startSet) frontierQueue.add(new MutablePair<>(blockPos, 0));
+        HashSet<BlockPos> discoveredSet = new HashSet<>(startSet);
 
-        // A* part
-        for (Entity entity : target2ConductorsMap.keySet()) {
-            List<BlockPos> goals = target2ConductorsMap.get(entity);
-            PriorityQueue<ImmutablePair<BlockPos, Integer>> pq = new PriorityQueue<>(Comparator.comparing(Pair::getRight));
-            startSet.forEach(blockPos -> pq.add(new ImmutablePair<>(blockPos, minDistance(blockPos, goals))));
-            Set<BlockPos> openSet = new HashSet<>(startSet);
-            HashSet<BlockPos> closedSet = new HashSet<>(256);
-            boolean success = false;
-            int pass = 0;
+        for (Entity target : targets) {
+            List<BlockPos> goals = findNearbyConductors(serverWorld, target, 0.5, checker);
+            if (goals.isEmpty()) continue;
 
-            while (!openSet.isEmpty()) {
-                pass++;
-                LOGGER.debug("Running A*, pass=" + pass);
-                LOGGER.debug("Priority Queue: " + pq);
-                BlockPos currentPos = pq.remove().left;
-                openSet.remove(currentPos);
-                closedSet.add(currentPos);
-                if (sourcePos.squareDistanceTo(currentPos.getX(), currentPos.getY(), currentPos.getZ()) > 256) continue;
+            // reuse the already discovered connection conductors in the last iteration
+            // so that we do not need to reset the sets to run algorithm from the ground-up
+            if (CollectionHelper.hasAnyOf(discoveredSet, goals)) {
+                target.attackEntityFrom(ModDamageSource.ELECTRICITY, 5F);
+                continue;
+            }
+
+            // since we want to reuse the results in the last iteration
+            // just re-sort the PQ with new distances
+            PriorityQueue<MutablePair<BlockPos, Integer>> newPQ = new PriorityQueue<>(Comparator.comparing(Pair::getRight));
+            for (MutablePair<BlockPos, Integer> pair : frontierQueue) {
+                pair.setRight(minDistance(pair.left, goals));
+                newPQ.add(pair);
+            }
+            frontierQueue = newPQ;
+
+            // main loop of A* searching
+            while (!frontierQueue.isEmpty()) {
+                BlockPos currentPos = frontierQueue.remove().left;
 
                 if (goals.contains(currentPos)) {
-                    success = true;
+                    target.attackEntityFrom(ModDamageSource.ELECTRICITY, 5F);
                     break;
                 }
 
                 BlockPos.Mutable neighborPosMut = new BlockPos.Mutable();
                 for (Direction direction : Direction.values()) {
                     neighborPosMut.setAndMove(currentPos, direction);
-
-                    if (closedSet.contains(neighborPosMut) || openSet.contains(neighborPosMut)) continue;
+                    if (sourcePos.squareDistanceTo(neighborPosMut.getX(), neighborPosMut.getY(), neighborPosMut.getZ()) > 256) continue;
+                    if (discoveredSet.contains(neighborPosMut)) continue;
 
                     BlockState neighborState = world.getBlockState(neighborPosMut);
                     if (checker.contains(neighborState)) {
                         BlockPos immutable = neighborPosMut.toImmutable();
-                        openSet.add(immutable);
-                        pq.add(new ImmutablePair<>(immutable, minDistance(immutable, goals)));
+                        discoveredSet.add(immutable);
+                        frontierQueue.add(new MutablePair<>(immutable, minDistance(immutable, goals)));
                     }
                 }
-            }
-            if (success) {
-                entity.attackEntityFrom(ModDamageSource.ELECTRICITY, 5F);
             }
         }
     }
