@@ -23,6 +23,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -33,12 +34,6 @@ import java.util.Random;
  */
 public class SemisolidLavaBlock extends Block {
     public static final IntegerProperty AGE = BlockStateProperties.AGE_0_3;
-
-    /**
-     * The world event type for playing {@code SoundEvents.BLOCK_LAVA_EXTINGUISH} and
-     * {@code ParticleTypes.LARGE_SMOKE}. Also used when lava fluid block solidifies.
-     */
-    private static final int LAVA_EXTINGUISH_WORLD_EVENT = 1501;
 
     public SemisolidLavaBlock(Properties properties) {
         super(properties);
@@ -181,7 +176,7 @@ public class SemisolidLavaBlock extends Block {
         for (Direction direction : Direction.values()) {
             mutable.setAndMove(pos, direction);
             if (worldIn.getBlockState(mutable).getFluidState().isTagged(FluidTags.WATER)) {
-                worldIn.playEvent(LAVA_EXTINGUISH_WORLD_EVENT, pos, 0);
+                worldIn.playEvent(Constants.WorldEvents.FIRE_EXTINGUISH_SOUND, pos, 0);
                 worldIn.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState());
                 return false;
             }

@@ -12,7 +12,6 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -21,8 +20,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static net.minecraft.entity.Entity.horizontalMag;
@@ -50,7 +47,7 @@ public abstract class ItemRadiative extends ItemBase {
         if (!entityIn.isSpectator() && entityIn instanceof LivingEntity) {
             LivingEntity livingEntity = (LivingEntity) entityIn;
             boolean inMainHand = livingEntity.getHeldItemMainhand() == stack;
-            if (inMainHand && isSelected || livingEntity.getHeldItemOffhand() == stack) {
+            if ((inMainHand && isSelected || livingEntity.getHeldItemOffhand() == stack) && !isInactive(stack)) {
                 this.radiationInHand(stack, worldIn, entityIn, inMainHand);
             }
         }
@@ -60,42 +57,11 @@ public abstract class ItemRadiative extends ItemBase {
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         // make particles
         if (entity.world.isRemote()) {
-            IParticleData particleData = inWorldParticleType(entity);
-            if (particleData != null) {
-                Random random = entity.world.getRandom();
-                if (random.nextFloat() < 0.07) {
-                    double posX = entity.getPosX() - 0.2 + random.nextFloat() * 0.4;
-                    double posY = entity.getPosY() + random.nextFloat() * 0.4;
-                    double posZ = entity.getPosZ() - 0.2 + random.nextFloat() * 0.4;
-                    double xSpeed = random.nextFloat() * 0.02 - 0.01;
-                    double ySpeed = random.nextFloat() * 0.02 + 0.02;
-                    double zSpeed = random.nextFloat() * 0.02 - 0.01;
-
-                    // only runs in client
-                    entity.world.addOptionalParticle(particleData, posX, posY, posZ, xSpeed, ySpeed, zSpeed);
-                }
-            }
+            this.makeParticles(entity);
         }
 
-        this.radiationInWorld(stack, entity);
+        if (!isInactive(stack)) this.radiationInWorld(stack, entity);
         return false;
-    }
-
-    /**
-     * Pick random positions around a position.
-     *
-     * @return a list of random positions, may contain repeated entries.
-     */
-    protected static Iterable<BlockPos> randomBlocksAround(BlockPos blockPos, int trials, int xRadius, int zRadius, int yMax, int yMin, Random random) {
-        List<BlockPos> list = new ArrayList<>(trials);
-        int xRange = xRadius * 2 + 1;
-        int yRange = yMax - yMin + 1;
-        int zRange = zRadius * 2 + 1;
-        for (int i = 0; i < trials; ++i) {
-            list.add(blockPos.add(random.nextInt(xRange) - xRadius,
-                    random.nextInt(yRange) + yMin, random.nextInt(zRange) - zRadius));
-        }
-        return list;
     }
 
     /**
@@ -118,9 +84,9 @@ public abstract class ItemRadiative extends ItemBase {
     public Entity createEntity(World world, Entity oldEntity, ItemStack itemstack) {
         if (oldEntity instanceof ItemEntity) {
             ItemEntity oldItemEntity = (ItemEntity) oldEntity;
-            trySetAge(oldItemEntity, -32768);
             RadiativeItemEntity newItemEntity = new RadiativeItemEntity(oldItemEntity);
             newItemEntity.setPickupDelay(40);
+            trySetAge(newItemEntity, -32768);
             return newItemEntity;
         }
         return null;
@@ -146,6 +112,33 @@ public abstract class ItemRadiative extends ItemBase {
             itemStack.shrink(1);
         }
         return ActionResult.resultSuccess(itemStack);
+    }
+
+    public void setInactive(ItemStack stack, boolean inactive) {
+        stack.getOrCreateTag().putBoolean("Inactive", inactive);
+    }
+
+    @SuppressWarnings({"ConstantConditions", "BooleanMethodIsAlwaysInverted"})
+    public boolean isInactive(ItemStack itemStack) {
+        return itemStack.hasTag() && itemStack.getTag().getBoolean("Inactive");
+    }
+
+    protected void makeParticles(ItemEntity entity) {
+        IParticleData particleData = inWorldParticleType(entity);
+        if (particleData != null) {
+            Random random = entity.world.getRandom();
+            if (random.nextFloat() < 0.07) {
+                double posX = entity.getPosX() - 0.2 + random.nextFloat() * 0.4;
+                double posY = entity.getPosY() + random.nextFloat() * 0.4;
+                double posZ = entity.getPosZ() - 0.2 + random.nextFloat() * 0.4;
+                double xSpeed = random.nextFloat() * 0.02 - 0.01;
+                double ySpeed = random.nextFloat() * 0.02 + 0.02;
+                double zSpeed = random.nextFloat() * 0.02 - 0.01;
+
+                // only runs in client
+                entity.world.addOptionalParticle(particleData, posX, posY, posZ, xSpeed, ySpeed, zSpeed);
+            }
+        }
     }
 
     private static void setDirectionAndMovement(Entity thrown, Entity thrower, float pitch, float yaw, float rotation, float velocity, float inaccuracy) {

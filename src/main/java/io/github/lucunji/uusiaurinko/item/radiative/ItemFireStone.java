@@ -57,7 +57,10 @@ public class ItemFireStone extends ItemRadiative {
     private void igniteBlocks(World worldIn, Entity self) {
         if (!worldIn.isRemote() && worldIn.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
             Random random = worldIn.getRandom();
-            for (BlockPos pos : randomBlocksAround(self.getPosition(), 1, 1, 1, 3, -1, random)) {
+            BlockPos centerPos = self.getPosition();
+            for (BlockPos pos : BlockPos.getRandomPositions(random, 1,
+                    centerPos.getX() - 1, centerPos.getY() - 1, centerPos.getZ() - 1,
+                    centerPos.getX() + 1, centerPos.getY() + 3, centerPos.getZ() + 1)) {
                 BlockState blockState = AbstractFireBlock.getFireForPlacement(worldIn, pos);
                 int chance = 150 + (worldIn.isBlockinHighHumidity(pos) ? 50 : 0);
                 if (worldIn.isAirBlock(pos) && blockState.isValidPosition(worldIn, pos) &&
@@ -72,7 +75,7 @@ public class ItemFireStone extends ItemRadiative {
         if (!worldIn.isRemote()) {
             worldIn.getEntitiesWithinAABB(Entity.class, self.getBoundingBox().grow(0.5), entity -> entity != self)
                     .forEach(entity -> {
-                        if (Item.random.nextFloat() < 0.05)
+                        if (Item.random.nextFloat() < 0.1)
                             entity.setFire(8);
                     });
         }

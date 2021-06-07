@@ -2,6 +2,7 @@ package io.github.lucunji.uusiaurinko.item.radiative;
 
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.CampfireBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -10,6 +11,7 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
@@ -18,6 +20,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nullable;
@@ -41,12 +44,14 @@ public class ItemWaterStone extends ItemRadiative {
     public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
         chillLava(itemEntity.world, itemEntity.world.getRandom(), itemEntity, 2);
         hurtsFireSensitiveCreatures(itemEntity.world, itemEntity, 1);
+        extinguishFire(itemEntity.world, itemEntity, 2);
     }
 
     @Override
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
         chillLava(worldIn, worldIn.getRandom(), entityIn, 2);
         hurtsFireSensitiveCreatures(entityIn.world, entityIn, 1);
+        extinguishFire(worldIn, entityIn, 2);
 
         entityIn.forceFireTicks(0);
         if (entityIn instanceof LivingEntity) {
@@ -88,6 +93,29 @@ public class ItemWaterStone extends ItemRadiative {
                     worldIn.getPendingBlockTicks().scheduleTick(mutableInBox, ModBlocks.SEMISOLID_LAVA.get(), MathHelper.nextInt(random, 60, 120));
                 }
             }
+        }
+    }
+
+    private void extinguishFire(World worldIn, Entity placer, int range) {
+        if (worldIn.isRemote()) return;
+
+        int rangeAdjusted = Math.min(16, range);
+        BlockPos placerBlockPos = placer.getPosition();
+        Vector3d placerDoublePos = placer.getPositionVec();
+        for (BlockPos mutableInBox : BlockPos.getAllInBoxMutable(
+                placerBlockPos.add(-rangeAdjusted, -rangeAdjusted, -rangeAdjusted),
+                placerBlockPos.add(rangeAdjusted, rangeAdjusted, rangeAdjusted))) {
+            if (!mutableInBox.withinDistance(placerDoublePos, rangeAdjusted)) continue;
+            BlockState state = worldIn.getBlockState(mutableInBox);
+            if (state.isIn(BlockTags.FIRE)) {
+                worldIn.playEvent(Constants.WorldEvents.FIRE_EXTINGUISH_SOUND, mutableInBox, 0);
+                worldIn.removeBlock(mutableInBox, false);
+            } else if (CampfireBlock.isLit(state)) {
+                worldIn.playEvent(Constants.WorldEvents.FIRE_EXTINGUISH_SOUND, mutableInBox, 0);
+                CampfireBlock.extinguish(worldIn, mutableInBox, state); // only distinguishes the tile entity
+                worldIn.setBlockState(mutableInBox, state.with(CampfireBlock.LIT, false));
+            }
+
         }
     }
 

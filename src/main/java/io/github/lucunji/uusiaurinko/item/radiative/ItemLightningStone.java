@@ -69,7 +69,17 @@ public class ItemLightningStone extends ItemRadiative {
         return ModParticleTypes.SPARK.get();
     }
 
-    private static void makeParticleEffects(World world, Entity source) {
+    /**
+     * Make more particles than the super method.
+     */
+    @Override
+    protected void makeParticles(ItemEntity entity) {
+        super.makeParticles(entity);
+        super.makeParticles(entity);
+        super.makeParticles(entity);
+    }
+
+    private void makeParticleEffects(World world, Entity source) {
         if (!world.isRemote() || (world.getGameTime() & 31) != 0) return;   // i & 31 == i % 32
 
         BlockFluidCombinedTag checker = new BlockFluidCombinedTag(CONDUCTOR_TAG_LOCATION);
@@ -104,7 +114,7 @@ public class ItemLightningStone extends ItemRadiative {
      * @param number Number of particles to generate
      */
     @OnlyIn(Dist.CLIENT)
-    private static void spreadSpark(World world, BlockPos blockPos, @Nullable Direction direction, int number, Random random) {
+    private void spreadSpark(World world, BlockPos blockPos, @Nullable Direction direction, int number, Random random) {
         int x = blockPos.getX();
         int y = blockPos.getY();
         int z = blockPos.getZ();
@@ -179,7 +189,7 @@ public class ItemLightningStone extends ItemRadiative {
      * {@code null} represents that the block is transparent so particles can be rendered inside.
      */
     @OnlyIn(Dist.CLIENT)
-    private static List<ImmutablePair<BlockPos, Direction>>
+    private List<ImmutablePair<BlockPos, Direction>>
     findExposedConductorsDFS(World world, final ImmutableList<BlockPos> startSet, final Vector3d startPos, int range,
                              BlockFluidCombinedTag checker) {
         int rangeSq = range * range;
@@ -210,7 +220,7 @@ public class ItemLightningStone extends ItemRadiative {
         return exposedList;
     }
 
-    private static ImmutableList<BlockPos> findNearbyConductors(World world, Entity entity, double growAmount,
+    private ImmutableList<BlockPos> findNearbyConductors(World world, Entity entity, double growAmount,
                                                                 BlockFluidCombinedTag checker) {
         return ImmutableList.<BlockPos>builder()
                 .addAll(BlockPos.getAllInBox(entity.getBoundingBox().grow(growAmount))
@@ -219,7 +229,7 @@ public class ItemLightningStone extends ItemRadiative {
                         .iterator()).build();
     }
 
-    private static void causeElectricDamage(World world, Entity source) {
+    private void causeElectricDamage(World world, Entity source) {
         if (source.world.isRemote() || (world.getGameTime() & 31) != 0) return; // i & 31 == i % 32
 
         Vector3d sourcePos = source.getPositionVec();
@@ -290,7 +300,7 @@ public class ItemLightningStone extends ItemRadiative {
         }
     }
 
-    private static int minDistance(BlockPos blockPos, List<BlockPos> targets) {
+    private int minDistance(BlockPos blockPos, List<BlockPos> targets) {
         if (targets.isEmpty()) throw new IllegalArgumentException("the second argument cannot be empty");
         int min = Integer.MAX_VALUE;
         for (BlockPos pos : targets) {
@@ -308,7 +318,7 @@ public class ItemLightningStone extends ItemRadiative {
      *
      * It is only a make-do version. Wait to be improved with custom paralysis effect.
      */
-    private static void shockEntity(Entity entity) {
+    private void shockEntity(Entity entity) {
         if (entity.attackEntityFrom(ModDamageSource.ELECTRICITY, 5.0F) && entity instanceof LivingEntity) {
             ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.SLOWNESS, 30, 255));
             ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.MINING_FATIGUE, 30, 255));
