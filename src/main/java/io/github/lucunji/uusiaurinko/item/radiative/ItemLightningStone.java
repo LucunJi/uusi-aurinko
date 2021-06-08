@@ -92,7 +92,7 @@ public class ItemLightningStone extends ItemRadiative {
         if (exposure.isEmpty()) return;
 
         // volume is the multiplier of spread distance: max distance = 16 * volume
-        world.playSound(source.getPosX(), source.getPosY(), source.getPosZ(), ModSoundEvents.ENTITY_LIGHTNING_STONE_DISCHARGE,
+        world.playSound(source.getPosX(), source.getPosY(), source.getPosZ(), ModSoundEvents.ENTITY_LIGHTNING_STONE_DISCHARGE.get(),
                 SoundCategory.BLOCKS, 1.5F, 1.0F + (world.rand.nextFloat() * 0.1F), false);
 
         if (Minecraft.getInstance().gameSettings.particles == ParticleStatus.MINIMAL) return;

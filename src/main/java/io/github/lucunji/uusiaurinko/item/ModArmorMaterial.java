@@ -25,12 +25,16 @@ public enum ModArmorMaterial implements IArmorMaterial {
     private final int maxDamageFactor;
     private final int[] damageReductionAmountArray;
     private final int enchantability;
-    private final SoundEvent soundEvent;
+
+    /**
+     * Use a supplier to postpone and avoid exceptions since sounds are registered after items
+     */
+    private final Supplier<SoundEvent> soundEvent;
     private final float toughness;
     private final float knockbackResistance;
     private final LazyValue<Ingredient> repairMaterial;
 
-    ModArmorMaterial(String name, int maxDamageFactor, int[] damageReductionAmountArray, int enchantability, SoundEvent soundEvent, float toughness, float knockbackResistance, Supplier<Ingredient> repairMaterial) {
+    ModArmorMaterial(String name, int maxDamageFactor, int[] damageReductionAmountArray, int enchantability, Supplier<SoundEvent> soundEvent, float toughness, float knockbackResistance, Supplier<Ingredient> repairMaterial) {
         this.name = name;
         this.maxDamageFactor = maxDamageFactor;
         this.damageReductionAmountArray = damageReductionAmountArray;
@@ -54,7 +58,7 @@ public enum ModArmorMaterial implements IArmorMaterial {
     }
 
     public SoundEvent getSoundEvent() {
-        return this.soundEvent;
+        return this.soundEvent.get();
     }
 
     public Ingredient getRepairMaterial() {

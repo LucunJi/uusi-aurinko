@@ -2,32 +2,21 @@ package io.github.lucunji.uusiaurinko.util;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
-/**
- * Sound events are registered without {@link net.minecraftforge.registries.DeferredRegister}
- * because {@code ModItems.EVIL_EYE} uses sound effect in its armor material before sound registry.
- */
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModSoundEvents {
-    public static final SoundEvent ENTITY_RADIATIVE_STONE_THROW = register("entity.radiative_stone.throw");
-    public static final SoundEvent ENTITY_LIGHTNING_STONE_DISCHARGE = register("entity.lightning_rock.discharge");
+    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MODID);
 
-    public static final SoundEvent ITEM_EVIL_EYE_EQUIP = register("item.evil_eye.equip");
+    public static final RegistryObject<SoundEvent> ENTITY_RADIATIVE_STONE_THROW = register("entity.radiative_stone.throw");
+    public static final RegistryObject<SoundEvent> ENTITY_LIGHTNING_STONE_DISCHARGE = register("entity.lightning_rock.discharge");
 
-    private static SoundEvent register(String key) {
-        return new SoundEvent(new ResourceLocation(MODID, key)).setRegistryName(MODID, key);
-    }
+    public static final RegistryObject<SoundEvent> ITEM_EVIL_EYE_EQUIP = register("item.evil_eye.equip");
 
-    @SubscribeEvent
-    public static void registerSoundEvents(final RegistryEvent.Register<SoundEvent> registryEvent) {
-        registryEvent.getRegistry().registerAll(
-                ENTITY_RADIATIVE_STONE_THROW,
-                ENTITY_LIGHTNING_STONE_DISCHARGE,
-                ITEM_EVIL_EYE_EQUIP);
+    private static RegistryObject<SoundEvent> register(String key) {
+        return SOUNDS.register(key, () -> new SoundEvent(new ResourceLocation(MODID, key)));
     }
 }

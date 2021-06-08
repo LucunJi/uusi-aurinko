@@ -98,7 +98,7 @@ public abstract class ItemRadiative extends ItemBase {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
         ItemStack itemStack = playerIn.getHeldItem(handIn);
-        worldIn.playSound(null, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(), ModSoundEvents.ENTITY_RADIATIVE_STONE_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+        worldIn.playSound(null, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(), ModSoundEvents.ENTITY_RADIATIVE_STONE_THROW.get(), SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
         if (!worldIn.isRemote()) {
             Vector3d userPosVec = playerIn.getPositionVec();
             ItemEntity itemEntity = new ItemEntity(worldIn, userPosVec.x, playerIn.getPosYEye() - 0.3F, userPosVec.z, itemStack.copy());
