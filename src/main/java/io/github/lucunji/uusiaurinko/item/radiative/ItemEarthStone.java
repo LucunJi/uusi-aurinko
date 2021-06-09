@@ -1,5 +1,7 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
+import io.github.lucunji.uusiaurinko.block.ModBlocks;
+import io.github.lucunji.uusiaurinko.tileentity.TransmutingTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -10,6 +12,7 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -39,11 +42,16 @@ public class ItemEarthStone extends ItemRadiative {
             Vector3d centerPos = source.getPositionVec();
             BlockPos.getAllInBox(new AxisAlignedBB(centerPos.subtract(range, range, range), centerPos.add(range, range, range)))
                     .forEach(pos -> {
-                        if (centerPos.squareDistanceTo(pos.getX(), pos.getY(), pos.getZ()) > range * range) return;
+                        double distanceSq = centerPos.squareDistanceTo(pos.getX(), pos.getY(), pos.getZ());
+                        if (distanceSq > range * range) return;
+
                         BlockState state = worldIn.getBlockState(pos);
-                        if (!state.getFluidState().isEmpty() || worldIn.isAirBlock(pos) ||
+                        if (worldIn.isAirBlock(pos) || state.matchesBlock(Blocks.DIRT) ||
+                                state.hasTileEntity() || !state.getFluidState().isEmpty() ||
                                 state.getCollisionShape(worldIn, pos, ISelectionContext.dummy()).isEmpty()) return;
-                        worldIn.setBlockState(pos, Blocks.DIRT.getDefaultState());
+
+                        worldIn.setBlockState(pos, ModBlocks.TRANSMUTING_BLOCK.get().getDefaultState());
+                        worldIn.setTileEntity(pos, new TransmutingTileEntity(state, Blocks.DIRT.getDefaultState(), -MathHelper.sqrt(distanceSq) / 4));
                     });
         }
     }

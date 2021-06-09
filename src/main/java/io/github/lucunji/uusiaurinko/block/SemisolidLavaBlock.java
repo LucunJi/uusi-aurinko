@@ -77,7 +77,7 @@ public class SemisolidLavaBlock extends Block {
     }
 
     /**
-     * If the block itself melts into lava, schedule all neighbor solidified lava blocks.
+     * If the block itself melts into lava, schedule all neighbor semisolid lava blocks.
      * Otherwise, schedule itself to melt again later.
      */
     @SuppressWarnings("deprecation")
@@ -105,7 +105,7 @@ public class SemisolidLavaBlock extends Block {
     }
 
     /**
-     * Melts the solidified block further.
+     * Melts the semisolid block further.
      * If the block does not melt into a lava fluid, it changes without block updates.
      * If it melt into a lava fluid, it updates.
      * Client is always synced in both case.
@@ -135,13 +135,13 @@ public class SemisolidLavaBlock extends Block {
     }
 
     /**
-     * A solidified lava block further melts if it touches a liquid block hot enough(such as lava)
-     * and is isolated from other solidified lava blocks.
+     * A semisolid lava block further melts if it touches a liquid block hot enough(such as lava)
+     * and is isolated from other semisolid lava blocks.
      */
-    private boolean nearHotLiquidIsolatedEnough(World world, BlockPos blockPos, int maxSolidifiedBlocks) {
+    private boolean nearHotLiquidIsolatedEnough(World world, BlockPos blockPos, int maxSemisolidBlocks) {
         int lavaTemp = Fluids.LAVA.getAttributes().getTemperature();
         BlockPos.Mutable neighborPos = new BlockPos.Mutable();
-        int solidifiedLavaCount = 0;
+        int SemisolidLavaCount = 0;
         boolean nearHotLiquid = false;
         for (Direction direction : Direction.values()) {
             neighborPos.setAndMove(blockPos, direction);
@@ -149,7 +149,7 @@ public class SemisolidLavaBlock extends Block {
             if (!nearHotLiquid && neighborState.getFluidState().getFluid().getAttributes().getTemperature() >= lavaTemp)
                 nearHotLiquid = true;
             if (neighborState.matchesBlock(this)
-                    && ++solidifiedLavaCount >= maxSolidifiedBlocks)
+                    && ++SemisolidLavaCount >= maxSemisolidBlocks)
                 return false;
         }
         return true;

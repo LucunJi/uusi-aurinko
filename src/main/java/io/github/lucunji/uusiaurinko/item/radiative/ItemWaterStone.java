@@ -32,7 +32,7 @@ import java.util.Random;
  * Fire immunity only appears when someone holds the stone. It also distinguishes any fire on body.
  * Fire on body will be distinguished when player goes out of fire source(lava or fire block).
  * Water breathing only appears when someone holds the stone and stand in water.
- * The solidified lava will melt after some time like frosted ice.
+ * The semisolid lava will melt after some time like frosted ice.
  * Water-sensitive mobs includes blazemen and endermen.
  */
 public class ItemWaterStone extends ItemRadiative {
