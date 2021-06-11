@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "minecraft:block/transmuting_block"
+      "model": "uusi-aurinko:block/transmuting_block"
     }
   }
 }

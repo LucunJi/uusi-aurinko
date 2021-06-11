@@ -1,13 +1,16 @@
 package io.github.lucunji.uusiaurinko;
 
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
+import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.entity.ModEntityTypes;
 import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
 import io.github.lucunji.uusiaurinko.tileentity.ModTileEntityTypes;
 import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(UusiAurinko.MODID)
@@ -25,5 +28,8 @@ public class UusiAurinko {
         ModEntityTypes.ENTITY_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModTileEntityTypes.TILE_ENTITY.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModParticleTypes.PARTICLE_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
+
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ServerConfigs.INSTANCE::onConfigLoadOrReload);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfigs.CONFIG_SPEC);
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.util.Random;
@@ -106,12 +107,11 @@ public class TransmutingTileEntityRenderer extends TileEntityRenderer<Transmutin
     private static boolean canGetTransparencyState() {
         RenderState.TransparencyState transparencyState;
         try {
-            Field field = RenderState.class.getDeclaredField("TRANSLUCENT_TRANSPARENCY");
-            field.setAccessible(true);
-            //noinspection ConstantConditions
-            transparencyState = (RenderState.TransparencyState) field.get(
-                    new RenderState.TransparencyState(null, null, null));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            transparencyState = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "TRANSLUCENT_TRANSPARENCY");
+            assert transparencyState != null;
+        } catch (ObfuscationReflectionHelper.UnableToFindFieldException |
+                ObfuscationReflectionHelper.UnableToAccessFieldException |
+                AssertionError e) {
             e.printStackTrace();
             return false;
         }
