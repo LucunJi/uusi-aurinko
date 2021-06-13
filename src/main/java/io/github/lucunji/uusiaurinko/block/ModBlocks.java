@@ -25,7 +25,6 @@ public class ModBlocks {
             () -> new TransmutingBlock(AbstractBlock.Properties
                     .create(Material.ROCK)
                     .zeroHardnessAndResistance()
-                    .doesNotBlockMovement()
                     .noDrops()
                     .notSolid()
                     .setOpaque((a, b, c) -> false)

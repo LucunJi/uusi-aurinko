@@ -16,6 +16,7 @@ import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.*;
@@ -80,6 +81,16 @@ public class TransmutingBlock extends Block {
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         BlockState blockState = getBlockStateFrom(builder.getWorld(), new BlockPos(builder.assertPresent(LootParameters.ORIGIN)));
         return blockState != null ? blockState.getDrops(builder) : Collections.emptyList();
+    }
+
+    /**
+     * This method is used in entity path-finding logic.
+     */
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+        BlockState blockState = getBlockStateFrom(worldIn, new BlockPos(pos));
+        return blockState != null && blockState.allowsMovement(worldIn, pos, type);
     }
 
     @Override

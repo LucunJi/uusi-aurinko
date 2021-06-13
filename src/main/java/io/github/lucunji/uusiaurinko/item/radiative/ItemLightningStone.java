@@ -320,9 +320,8 @@ public class ItemLightningStone extends ItemRadiative {
      */
     private void shockEntity(Entity entity) {
         if (entity.attackEntityFrom(ModDamageSource.ELECTRICITY, 5.0F) && entity instanceof LivingEntity) {
-            ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.SLOWNESS, 30, 255));
-            ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.MINING_FATIGUE, 30, 255));
-            ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.BLINDNESS, 30));
+            ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.SLOWNESS, 30, 127));
+            ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.MINING_FATIGUE, 30, 127));
         }
     }
 }

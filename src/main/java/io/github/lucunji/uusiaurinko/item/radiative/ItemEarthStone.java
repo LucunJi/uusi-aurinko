@@ -5,18 +5,24 @@ import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.tileentity.TransmutingTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FallingBlock;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public class ItemEarthStone extends ItemRadiative {
     public ItemEarthStone(Properties properties) {
@@ -38,26 +44,84 @@ public class ItemEarthStone extends ItemRadiative {
         return new BlockParticleData(ParticleTypes.FALLING_DUST, Blocks.DIRT.getDefaultState());
     }
 
-    private static void soilTransmutation(World worldIn, Entity source) {
-        if (!worldIn.isRemote() && ServerConfigs.INSTANCE.EARTH_STONE_TRANSMUTATION_ENABLED.get()) {
-
-            int range = ServerConfigs.INSTANCE.EARTH_STONE_TRANSMUTATION_RANGE.get();
-            Vector3d centerPos = source.getPositionVec();
-            BlockPos.getAllInBox(new AxisAlignedBB(centerPos.subtract(range, range, range), centerPos.add(range, range, range)))
-                    .forEach(pos -> {
-                        double distanceSq = centerPos.squareDistanceTo(pos.getX(), pos.getY(), pos.getZ());
-                        if (distanceSq > range * range) return;
-
-                        BlockState state = worldIn.getBlockState(pos);
-                        if (ServerConfigs.INSTANCE.EARTH_STONE_TRANSMUTATION_BLACKLIST.contains(state.getBlock()) ||
-                                worldIn.isAirBlock(pos) || state.matchesBlock(Blocks.DIRT) ||
-                                state.hasTileEntity() || !state.getFluidState().isEmpty() ||
-                                state.getCollisionShape(worldIn, pos, ISelectionContext.dummy()).isEmpty()) return;
-
-
-                        worldIn.setBlockState(pos, ModBlocks.TRANSMUTING_BLOCK.get().getDefaultState(), 0b10010);
-                        worldIn.setTileEntity(pos, new TransmutingTileEntity(state, Blocks.DIRT.getDefaultState(), -MathHelper.sqrt(distanceSq) / 4));
-                    });
+    @Override
+    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+        if (entity instanceof PlayerEntity && !entity.world.isRemote) {
+            PlayerEntity player = (PlayerEntity) entity;
+            ServerWorld world = (ServerWorld) player.world;
+            if (player.getCooledAttackStrength(0.5F) >= 1.0F) {
+                earthquake(world, player);
+            }
         }
+        return super.onEntitySwing(stack, entity);
+    }
+
+    private static void earthquake(World world, PlayerEntity player) {
+        int range = ServerConfigs.INSTANCE.EARTH_STONE_EARTHQUAKE_RANGE.get();
+        if (range <= 0) return;
+        int rangeSq = range * range;
+        int particleAmount = ServerConfigs.INSTANCE.EARTH_STONE_EARTHQUAKE_PARTICLE_AMOUNT.get();
+        Vector3d centerPos = player.getPositionVec();
+        BlockPos minPos = player.getPosition().add(-range, -range, -range);
+        BlockPos maxPos = player.getPosition().add(range, range, range);
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+        BlockPos.Mutable mutableBelow = new BlockPos.Mutable();
+        int soundCount = 0;
+        for (int x = minPos.getX(); x <= maxPos.getX(); ++x) {
+            for (int z = minPos.getZ(); z <= maxPos.getZ(); ++z) {
+                boolean foundSpaceFallThrough = false;
+                for (int y = minPos.getY(); y <= maxPos.getY(); ++y) {
+                    if (centerPos.squareDistanceTo(x, y, z) > rangeSq) continue;
+                    mutable.setPos(x, y, z);
+                    mutableBelow.setPos(x, y - 1, z);
+                    BlockState state = world.getBlockState(mutable);
+
+                    if (FallingBlock.canFallThrough(world.getBlockState(mutableBelow)))
+                        foundSpaceFallThrough = true;
+
+                    // negation of all conditions - none of them should be true
+                    if (foundSpaceFallThrough &&
+                            !(ServerConfigs.INSTANCE.EARTH_STONE_EARTHQUAKE_BLACKLIST.contains(state.getBlock()) ||
+                                    world.isAirBlock(mutable) || state.hasTileEntity() || !state.getFluidState().isEmpty())) {
+                        FallingBlockEntity fallingblockentity = new FallingBlockEntity(world, x + 0.5, y, z + 0.5, state);
+                        fallingblockentity.setHurtEntities(true);
+                        world.addEntity(fallingblockentity);
+                        if (++soundCount <= 50) {
+                            world.playSound(null, x, y, z, state.getSoundType().getBreakSound(), SoundCategory.BLOCKS,
+                                    (state.getSoundType().getVolume() + 1.0F) / 2.0F, state.getSoundType().getPitch() * 0.8F);
+                        }
+                        if (particleAmount > 0) {
+                            ((ServerWorld) world).spawnParticle(new BlockParticleData(ParticleTypes.FALLING_DUST, state),
+                                    x + 0.5, y + 0.5, z + 0.5, particleAmount, 0.6, 0.6, 0.6, 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void soilTransmutation(World worldIn, Entity source) {
+        if (worldIn.isRemote()) return;
+
+        int range = ServerConfigs.INSTANCE.EARTH_STONE_TRANSMUTATION_RANGE.get();
+        if (range <= 0) return;
+        int rangeSq = range * range;
+        Vector3d centerPos = source.getPositionVec();
+        BlockPos.getAllInBox(new AxisAlignedBB(centerPos.subtract(range, range, range), centerPos.add(range, range, range)))
+                .forEach(pos -> {
+                    double distanceSq = centerPos.squareDistanceTo(pos.getX(), pos.getY(), pos.getZ());
+                    if (distanceSq > rangeSq) return;
+
+                    BlockState state = worldIn.getBlockState(pos);
+                    if (ServerConfigs.INSTANCE.EARTH_STONE_TRANSMUTATION_BLACKLIST.contains(state.getBlock()) ||
+                            worldIn.isAirBlock(pos) || state.matchesBlock(Blocks.DIRT) ||
+                            state.hasTileEntity() || !state.getFluidState().isEmpty() ||
+                            state.getCollisionShape(worldIn, pos, ISelectionContext.dummy()).isEmpty()) return;
+
+
+                    worldIn.setBlockState(pos, ModBlocks.TRANSMUTING_BLOCK.get().getDefaultState(), 0b10010);
+                    worldIn.setTileEntity(pos, new TransmutingTileEntity(state, Blocks.DIRT.getDefaultState(), -MathHelper.sqrt(distanceSq) / 4));
+                });
+
     }
 }
