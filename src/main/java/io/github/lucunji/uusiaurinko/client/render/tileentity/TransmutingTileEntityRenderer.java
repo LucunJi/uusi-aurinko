@@ -106,7 +106,8 @@ public class TransmutingTileEntityRenderer extends TileEntityRenderer<Transmutin
     private static boolean canGetTransparencyState() {
         RenderState.TransparencyState transparencyState;
         try {
-            transparencyState = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "TRANSLUCENT_TRANSPARENCY");
+            // TRANSLUCENT_TRANSPARENCY
+            transparencyState = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228515_g_");
             assert transparencyState != null;
         } catch (ObfuscationReflectionHelper.UnableToFindFieldException |
                 ObfuscationReflectionHelper.UnableToAccessFieldException |

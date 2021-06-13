@@ -172,7 +172,8 @@ public abstract class ItemRadiative extends ItemBase {
     private void trySetAge(ItemEntity instance, int age) {
         try {
             if (ageFieldCache == null) {
-                Field temp = ObfuscationReflectionHelper.findField(ItemEntity.class, "age");
+                // age
+                Field temp = ObfuscationReflectionHelper.findField(ItemEntity.class, "field_70292_b");
                 temp.setAccessible(true);
                 ageFieldCache = temp;
             }
