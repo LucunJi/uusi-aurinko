@@ -4,6 +4,7 @@ import io.github.lucunji.uusiaurinko.block.ModBlocks;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.entity.ModEntityTypes;
+import io.github.lucunji.uusiaurinko.fluid.ModFluids;
 import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
 import io.github.lucunji.uusiaurinko.tileentity.ModTileEntityTypes;
@@ -22,6 +23,7 @@ public class UusiAurinko {
 
     public UusiAurinko() {
         ModBlocks.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ModFluids.FLUIDS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModItems.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModEffects.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModSoundEvents.SOUNDS.register(FMLJavaModLoadingContext.get().getModEventBus());

@@ -1,7 +1,9 @@
 package io.github.lucunji.uusiaurinko.block;
 
+import io.github.lucunji.uusiaurinko.fluid.ModFluids;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraftforge.fml.RegistryObject;
@@ -27,6 +29,15 @@ public class ModBlocks {
                     .zeroHardnessAndResistance()
                     .noDrops()
                     .notSolid()
-                    .setOpaque((a, b, c) -> false)
+                    .setOpaque(AbstractBlock.AbstractBlockState::isOpaqueCube)
                     .setAllowsSpawn((a, b, c, d) -> false)));
+
+    /*==================== Fluids ====================*/
+    public static final RegistryObject<FlowingFluidBlock> EXCREMENT = BLOCKS.register("excrement",
+            () -> new FlowingFluidBlock(ModFluids.EXCREMENT,
+                    AbstractBlock.Properties
+                            .create(Material.WATER)
+                            .doesNotBlockMovement()
+                            .hardnessAndResistance(100)
+                            .noDrops()));
 }

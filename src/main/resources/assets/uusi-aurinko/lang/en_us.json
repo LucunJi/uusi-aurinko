@@ -11,8 +11,8 @@
   "item.uusi-aurinko.lightning_stone.tooltip": "This small rock makes you feel very charged.\nHolding it can makes you survive from electric shock. Do not throw it away near conductors.",
   "item.uusi-aurinko.earth_stone": "§eTannerkivi§r",
   "item.uusi-aurinko.earth_stone.tooltip": "It looks like it could stand the test of aeons.\nIt quickly turns everything around into soil; with only a slight swing it can make earth collapse.",
-  "item.uusi-aurinko.pop_stone": "§eKakkakikkare§r",
-  "item.uusi-aurinko.pop_stone.tooltip": "This mysterious spiral-shaped artefact smells horrible and feels warm to the touch.\nDisgusting...",
+  "item.uusi-aurinko.poop_stone": "§eKakkakikkare§r",
+  "item.uusi-aurinko.poop_stone.tooltip": "This mysterious spiral-shaped artefact smells horrible and feels warm to the touch.\nDisgusting...",
   "item.uusi-aurinko.sun_seed": "§eAuringonsiemen§r",
   "item.uusi-aurinko.sun_seed.tooltip": "It glows, full of promise.\nDust and dirt around burst into pieces quickly under its tremendous heat.",
   "item.uusi-aurinko.sun_stone": "§eAurinkokivi§r",
@@ -21,8 +21,10 @@
   "item.uusi-aurinko.evil_eye.tooltip": "This eye-shaped artefact projects a malevolent glare.\nPut it on your forehead, it then reveals everything to you.\nExhausting to you is its intense gaze.",
   "item.uusi-aurinko.moon": "§eKuu§r",
   "item.uusi-aurinko.moon.tooltip": "This tiny celestial object has a strong gravitational pull.\nIt attracts everything, especially other stars.",
+  "item.uusi-aurinko.excrement_bucket": "Excrement Bucket",
 
   "block.uusi-aurinko.semisolid_lava": "Semisolid Lava",
+  "block.uusi-aurinko.excrement": "Excrement",
 
   "effect.uusi-aurinko.true_vision": "True Vision",
   "effect.uusi-aurinko.electricity_resistance": "Electricity Resis.",

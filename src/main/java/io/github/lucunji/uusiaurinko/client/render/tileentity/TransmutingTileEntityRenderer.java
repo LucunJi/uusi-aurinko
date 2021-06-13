@@ -16,7 +16,6 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-import java.lang.reflect.Field;
 import java.util.Random;
 
 import static net.minecraft.client.renderer.RenderType.makeType;
@@ -40,7 +39,7 @@ public class TransmutingTileEntityRenderer extends TileEntityRenderer<Transmutin
         matrixStackIn.push();
         matrixStackIn.scale(Z_FIGHTING_SCALE, Z_FIGHTING_SCALE, Z_FIGHTING_SCALE);
         matrixStackIn.translate(Z_FIGHTING_TRANSLATION, Z_FIGHTING_TRANSLATION, Z_FIGHTING_TRANSLATION);
-        for (net.minecraft.client.renderer.RenderType type : net.minecraft.client.renderer.RenderType.getBlockRenderTypes()) {
+        for (RenderType type : RenderType.getBlockRenderTypes()) {
             if (RenderTypeLookup.canRenderInLayer(renderState, type)) {
                 ForgeHooksClient.setRenderLayer(type);
                 BLOCK_RENDERER_DISPATCHER.getBlockModelRenderer().renderModel(

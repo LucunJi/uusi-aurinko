@@ -12,8 +12,8 @@ import net.minecraft.world.World;
 
 import java.util.Random;
 
-public class ItemPopStone extends ItemRadiative {
-    public ItemPopStone(Properties properties) {
+public class ItemPoopStone extends ItemRadiative {
+    public ItemPoopStone(Properties properties) {
         super(properties);
     }
 
