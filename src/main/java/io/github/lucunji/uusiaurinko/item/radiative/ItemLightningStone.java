@@ -77,6 +77,8 @@ public class ItemLightningStone extends ItemRadiative {
         super.makeParticles(entity);
         super.makeParticles(entity);
         super.makeParticles(entity);
+        super.makeParticles(entity);
+        super.makeParticles(entity);
     }
 
     private void makeParticleEffects(World world, Entity source) {
