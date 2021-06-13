@@ -109,7 +109,7 @@ public class ItemEarthStone extends ItemRadiative {
         Vector3d centerPos = source.getPositionVec();
         BlockPos.getAllInBox(new AxisAlignedBB(centerPos.subtract(range, range, range), centerPos.add(range, range, range)))
                 .forEach(pos -> {
-                    double distanceSq = centerPos.squareDistanceTo(pos.getX(), pos.getY(), pos.getZ());
+                    double distanceSq = centerPos.squareDistanceTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
                     if (distanceSq > rangeSq) return;
 
                     BlockState state = worldIn.getBlockState(pos);
@@ -120,7 +120,8 @@ public class ItemEarthStone extends ItemRadiative {
 
 
                     worldIn.setBlockState(pos, ModBlocks.TRANSMUTING_BLOCK.get().getDefaultState(), 0b10010);
-                    worldIn.setTileEntity(pos, new TransmutingTileEntity(state, Blocks.DIRT.getDefaultState(), -MathHelper.sqrt(distanceSq) / 4));
+                    worldIn.setTileEntity(pos, new TransmutingTileEntity(state, Blocks.DIRT.getDefaultState(),
+                            Math.min(0, -(MathHelper.sqrt(distanceSq) + 1F)/8F)));
                 });
 
     }
