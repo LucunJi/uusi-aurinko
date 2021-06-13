@@ -82,7 +82,11 @@ sourceSets.main.resources {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.1.18'
-    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+
+    // credits to https://github.com/TelepathicGrunt/WorldBlender
+    if (System.getProperty("idea.sync.active") != "true") {
+        annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+    }
 }
 
 jar {

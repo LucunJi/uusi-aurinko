@@ -22,6 +22,7 @@ public class ModFluids {
             new ForgeFlowingFluid.Source(EXCREMENT_PROPERTIES));
     public static final RegistryObject<FlowingFluid> FLOWING_EXCREMENT = FLUIDS.register("flowing_excrement", () ->
             new ForgeFlowingFluid.Flowing(EXCREMENT_PROPERTIES));
+    public static final ResourceLocation EXCREMENT_FLUID_TAG_LOCATION = new ResourceLocation(MODID, "excrement");
 
     static {
         EXCREMENT_PROPERTIES = new ForgeFlowingFluid.Properties(

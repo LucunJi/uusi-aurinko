@@ -2,7 +2,7 @@ package io.github.lucunji.uusiaurinko.item.radiative;
 
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
-import io.github.lucunji.uusiaurinko.tileentity.TransmutingTileEntity;
+import io.github.lucunji.uusiaurinko.fluid.ModFluids;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -15,21 +15,15 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import java.util.Random;
 
-import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
-
 public class ItemPoopStone extends ItemRadiative {
-    private static final ResourceLocation EXCREMENT_FLUID_TAG_LOCATION = new ResourceLocation(MODID, "excrement");
-
     public ItemPoopStone(Properties properties) {
         super(properties);
     }
@@ -81,7 +75,7 @@ public class ItemPoopStone extends ItemRadiative {
         int range = ServerConfigs.INSTANCE.POOP_STONE_TRANSMUTATION_RANGE.get();
         if (range <= 0) return;
         int rangeSq = range * range;
-        ITag<Fluid> excrementTag = FluidTags.getCollection().getTagByID(EXCREMENT_FLUID_TAG_LOCATION);
+        ITag<Fluid> excrementTag = FluidTags.getCollection().getTagByID(ModFluids.EXCREMENT_FLUID_TAG_LOCATION);
         Vector3d centerPos = source.getPositionVec();
         BlockPos.getAllInBox(new AxisAlignedBB(centerPos.subtract(range, range, range), centerPos.add(range, range, range)))
                 .forEach(pos -> {
@@ -92,8 +86,7 @@ public class ItemPoopStone extends ItemRadiative {
                     if (!state.isTagged(FluidTags.WATER) || state.isTagged(excrementTag) ||
                             worldIn.getBiome(pos).getCategory() == Biome.Category.OCEAN) return;
 
-                    worldIn.setBlockState(pos, ModBlocks.TRANSMUTING_BLOCK.get().getDefaultState(), 0b10010);
-                    worldIn.setTileEntity(pos, new TransmutingTileEntity(state.getBlockState(), ModBlocks.EXCREMENT.get().getDefaultState(), -MathHelper.sqrt(distanceSq) / 4));
+                    worldIn.setBlockState(pos, ModBlocks.EXCREMENT.get().getDefaultState());
                 });
 
     }

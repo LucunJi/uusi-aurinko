@@ -1,6 +1,5 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "uusi-aurinko:item/excrement_bucket"
-  }
+  "parent": "forge:item/bucket_drip",
+  "loader": "forge:bucket",
+  "fluid": "uusi-aurinko:excrement"
 }
