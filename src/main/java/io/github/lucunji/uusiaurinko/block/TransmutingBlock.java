@@ -11,6 +11,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
@@ -24,10 +25,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
@@ -46,7 +44,7 @@ public class TransmutingBlock extends Block {
     @SuppressWarnings("deprecation")
     @Override
     public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.INVISIBLE;
+        return BlockRenderType.ENTITYBLOCK_ANIMATED;
     }
 
     @Override
@@ -60,6 +58,12 @@ public class TransmutingBlock extends Block {
     public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
         BlockState blockState = getBlockStateFrom(worldIn, pos);
         return blockState != null ? blockState.getPlayerRelativeBlockHardness(player, worldIn, pos) : 0.5F;
+    }
+
+    @Override
+    public boolean shouldDisplayFluidOverlay(BlockState state, IBlockDisplayReader world, BlockPos pos, FluidState fluidState) {
+        BlockState blockState = getBlockStateFrom(world, pos);
+        return true;
     }
 
     @SuppressWarnings("deprecation")

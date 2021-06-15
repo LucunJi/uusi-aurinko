@@ -12,6 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import javax.annotation.Nullable;
 
 public class TransmutingTileEntity extends TileEntity implements ITickableTileEntity {
+    public static final float STEP_SIZE = 0.1F;
     private BlockState blockStateFrom;
     private BlockState blockStateTo;
     private float progress;
@@ -36,7 +37,7 @@ public class TransmutingTileEntity extends TileEntity implements ITickableTileEn
 
     @Override
     public void tick() {
-        this.progress += 0.1f;
+        this.progress += STEP_SIZE;
         if (progress >= 1) {
             //noinspection ConstantConditions
             if (!this.world.isRemote) {
@@ -68,7 +69,7 @@ public class TransmutingTileEntity extends TileEntity implements ITickableTileEn
         CompoundNBT nbt = new CompoundNBT();
         nbt.put("From", NBTUtil.writeBlockState(this.blockStateFrom));
         nbt.put("To", NBTUtil.writeBlockState(this.blockStateTo));
-        nbt.putFloat("Progress", progress - 0.1f);
+        nbt.putFloat("Progress", progress - STEP_SIZE);
         return new SUpdateTileEntityPacket(getPos(), -1, nbt);
     }
 
