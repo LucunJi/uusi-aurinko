@@ -12,6 +12,7 @@ import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import java.util.function.Supplier;
@@ -19,6 +20,15 @@ import java.util.function.Supplier;
 public class ExcrementFluidBlock extends FlowingFluidBlock {
     public ExcrementFluidBlock(Supplier<? extends FlowingFluid> supplier, Properties properties) {
         super(supplier, properties);
+    }
+
+    /**
+     * Decrease light level by 5 each block.
+     */
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        return 5;
     }
 
     @SuppressWarnings("deprecation")

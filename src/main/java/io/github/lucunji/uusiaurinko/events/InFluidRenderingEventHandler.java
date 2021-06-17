@@ -9,8 +9,8 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -24,14 +24,21 @@ import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 public class InFluidRenderingEventHandler {
     private static final ResourceLocation TEXTURE_UNDER_FLUID = new ResourceLocation(MODID, "textures/misc/underfluid.png");
 
+    /**
+     * Override vanilla rendering strategy of screen overlay when player is submerged in fluid.
+     * <p>
+     * Opaque texture and the fluid's alpha value are used in the new strategy,
+     * which allowing player to set all related opacity in one place ({@link net.minecraftforge.fluids.FluidAttributes}),
+     * and the rendered opacity can go beyond vanilla water's opacity.
+     */
     @SubscribeEvent
     public static void onRenderBlockOverlay(final RenderBlockOverlayEvent renderBlockOverlayEvent) {
         Minecraft mc = Minecraft.getInstance();
         //noinspection ConstantConditions
         if (renderBlockOverlayEvent.getOverlayType() == RenderBlockOverlayEvent.OverlayType.WATER &&
-                mc.world.getFluidState(renderBlockOverlayEvent.getBlockPos())
-                        .isTagged(FluidTags.getCollection().getTagByID(ModFluids.EXCREMENT_FLUID_TAG_LOCATION))) {
-            renderUnderExcrement(ModFluids.EXCREMENT.get(), mc, renderBlockOverlayEvent.getMatrixStack());
+                mc.world.getFluidState(renderBlockOverlayEvent.getBlockPos()).getFluid()
+                        .getRegistryName().getNamespace().equals(MODID)) {
+            renderUnderFluid(ModFluids.EXCREMENT.get(), mc, renderBlockOverlayEvent.getMatrixStack());
             renderBlockOverlayEvent.setCanceled(true);
         }
     }
@@ -41,27 +48,31 @@ public class InFluidRenderingEventHandler {
         // TODO: make fog color change based on fluid attributes
     }
 
-    private static void renderUnderExcrement(Fluid fluid, Minecraft minecraftIn, MatrixStack matrixStackIn) {
+    /**
+     * Borrowed from {@code OverlayRenderer.renderUnderwater}
+     */
+    private static void renderUnderFluid(Fluid fluid, Minecraft minecraftIn, MatrixStack matrixStackIn) {
         RenderSystem.enableTexture();
         minecraftIn.getTextureManager().bindTexture(TEXTURE_UNDER_FLUID);
         BufferBuilder bufferbuilder = Tessellator.getInstance().getBuffer();
         //noinspection ConstantConditions
         float brightness = minecraftIn.player.getBrightness();
         int color = fluid.getAttributes().getColor();
+        float alpha = (color >> 24 & 255) / 255F;
+        alpha = MathHelper.clamp(alpha - 0.02F, 0F, 1F); // a slight offset probably makes things better?
         float r = (color >> 16 & 255) / 255F;
         float g = (color >> 8 & 255) / 255F;
         float b = (color & 255) / 255F;
-        float alpha = 1F;
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         float uOffset = -minecraftIn.player.rotationYaw / 64;
         float vOffset = minecraftIn.player.rotationPitch / 64;
         Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR_TEX);
-        bufferbuilder.pos(matrix4f, -1, -1, -0.5F).color(r * brightness, g * brightness, b * brightness, alpha).tex(4 + uOffset, 4+ vOffset).endVertex();
+        bufferbuilder.pos(matrix4f, -1, -1, -0.5F).color(r * brightness, g * brightness, b * brightness, alpha).tex(4 + uOffset, 4 + vOffset).endVertex();
         bufferbuilder.pos(matrix4f, 1, -1, -0.5F).color(r * brightness, g * brightness, b * brightness, alpha).tex(0 + uOffset, 4 + vOffset).endVertex();
         bufferbuilder.pos(matrix4f, 1, 1, -0.5F).color(r * brightness, g * brightness, b * brightness, alpha).tex(0 + uOffset, 0 + vOffset).endVertex();
-        bufferbuilder.pos(matrix4f, -1, 1, -0.5F).color(r * brightness, g * brightness, b * brightness, alpha).tex(4+ uOffset, 0 + vOffset).endVertex();
+        bufferbuilder.pos(matrix4f, -1, 1, -0.5F).color(r * brightness, g * brightness, b * brightness, alpha).tex(4 + uOffset, 0 + vOffset).endVertex();
         bufferbuilder.finishDrawing();
         WorldVertexBufferUploader.draw(bufferbuilder);
         RenderSystem.disableBlend();

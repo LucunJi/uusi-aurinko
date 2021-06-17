@@ -82,6 +82,13 @@ public class TransmutingBlock extends Block {
 
     @SuppressWarnings("deprecation")
     @Override
+    public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        BlockState blockState = getBlockStateFrom(worldIn, pos);
+        return blockState != null ? blockState.getOpacity(worldIn, pos) : 0;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         BlockState blockState = getBlockStateFrom(builder.getWorld(), new BlockPos(builder.assertPresent(LootParameters.ORIGIN)));
         return blockState != null ? blockState.getDrops(builder) : Collections.emptyList();

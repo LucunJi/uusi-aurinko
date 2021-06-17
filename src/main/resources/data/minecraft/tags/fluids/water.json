@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "uusi-aurinko:excrement"
+    "uusi-aurinko:excrement",
+    "uusi-aurinko:flowing_excrement"
   ]
 }

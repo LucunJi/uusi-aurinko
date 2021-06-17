@@ -3,6 +3,7 @@ package io.github.lucunji.uusiaurinko.item.radiative;
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.fluid.ModFluids;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -83,10 +84,11 @@ public class ItemPoopStone extends ItemRadiative {
                     if (distanceSq > rangeSq) return;
 
                     FluidState state = worldIn.getFluidState(pos);
-                    if (!state.isTagged(FluidTags.WATER) || state.isTagged(excrementTag) ||
-                            worldIn.getBiome(pos).getCategory() == Biome.Category.OCEAN) return;
-
-                    worldIn.setBlockState(pos, ModBlocks.EXCREMENT.get().getDefaultState());
+                    // cannot only check fluid state since it might be a waterlogged block
+                    if (state.getFluid().isSource(state) && state.getBlockState().matchesBlock(Blocks.WATER) &&
+                            worldIn.getBiome(pos).getCategory() != Biome.Category.OCEAN) {
+                        worldIn.setBlockState(pos, ModBlocks.EXCREMENT.get().getDefaultState());
+                    }
                 });
 
     }

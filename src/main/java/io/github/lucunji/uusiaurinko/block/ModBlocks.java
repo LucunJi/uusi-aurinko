@@ -29,7 +29,6 @@ public class ModBlocks {
                     .zeroHardnessAndResistance()
                     .noDrops()
                     .notSolid()
-                    .setOpaque(AbstractBlock.AbstractBlockState::isOpaqueCube)
                     .setAllowsSpawn((a, b, c, d) -> false)));
 
     /*==================== Fluids ====================*/
