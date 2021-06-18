@@ -15,6 +15,8 @@ import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Random;
@@ -22,6 +24,7 @@ import java.util.Random;
 import static net.minecraft.client.renderer.RenderType.makeType;
 
 public class TransmutingTileEntityRenderer extends TileEntityRenderer<TransmutingTileEntity> {
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final BlockRendererDispatcher BLOCK_RENDERER_DISPATCHER = Minecraft.getInstance().getBlockRendererDispatcher();
     private static RenderType transparentBox = null;
     private static final float Z_FIGHTING_SCALE = 0.999f;
@@ -107,10 +110,14 @@ public class TransmutingTileEntityRenderer extends TileEntityRenderer<Transmutin
             // TRANSLUCENT_TRANSPARENCY
             transparencyState = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228515_g_");
             assert transparencyState != null;
-        } catch (ObfuscationReflectionHelper.UnableToFindFieldException |
-                ObfuscationReflectionHelper.UnableToAccessFieldException |
-                AssertionError e) {
-            e.printStackTrace();
+        } catch (ObfuscationReflectionHelper.UnableToFindFieldException e) {
+            LOGGER.error("Could not find the obfuscated field 'field_228515_g_'(TRANSLUCENT_TRANSPARENCY) in class 'RenderState'", e);
+            return false;
+        } catch (ObfuscationReflectionHelper.UnableToAccessFieldException e) {
+            LOGGER.error("Could not give access the obfuscated field 'field_228515_g_'(TRANSLUCENT_TRANSPARENCY) in class 'RenderState'", e);
+            return false;
+        } catch (AssertionError e) {
+            LOGGER.error("A null value is fetched for the obfuscated field 'field_228515_g_'(TRANSLUCENT_TRANSPARENCY) in class 'RenderState'", e);
             return false;
         }
         transparentBox = makeType("quads_alpha", DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 256,

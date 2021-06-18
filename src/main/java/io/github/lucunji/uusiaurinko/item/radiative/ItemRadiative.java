@@ -179,11 +179,11 @@ public abstract class ItemRadiative extends ItemBase {
             }
             ageFieldCache.set(instance, age);
         } catch (ObfuscationReflectionHelper.UnableToFindFieldException e) {
-            LOGGER.error("Could not find field 'age' in class 'ItemEntity'", e);
+            LOGGER.error("Could not find the obfuscated field 'field_70292_b'(age) in class 'ItemEntity'", e);
         } catch (SecurityException e) {
-            LOGGER.error("Could not make field 'age' in class 'ItemEntity' accessible", e);
+            LOGGER.error("Could not make the obfuscated field 'field_70292_b'(age) in class 'ItemEntity' accessible", e);
         } catch (IllegalAccessException e) {
-            LOGGER.error("Could not give new value to field 'age' in class 'ItemEntity'", e);
+            LOGGER.error("Could not give new value to the obfuscated field 'field_70292_b'(age) in class 'ItemEntity'", e);
         }
     }
 }

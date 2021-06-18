@@ -24,14 +24,14 @@ public class BlockTagListConfigValue extends TagListConfigValue<Block> {
         if (raw.startsWith("#")) {
             List<Block> list = BlockTags.getCollection().getTagByID(new ResourceLocation(raw.substring(1))).getAllElements();
             if (list.isEmpty()) {
-                LOGGER.warn("could not interpret the block tag '" + raw + "'");
+                LOGGER.error("Could not interpret the block tag '" + raw + "'");
                 return Stream.empty();
             }
             return list.stream();
         } else {
             Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(raw));
             if (!raw.equals("minecraft:air") && (block == null || block == Blocks.AIR)) {
-                LOGGER.warn("could not interpret the block '" + raw + "'");
+                LOGGER.error("Could not interpret the block '" + raw + "'");
                 return Stream.empty();
             }
             return Stream.of(block);

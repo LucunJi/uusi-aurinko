@@ -15,7 +15,7 @@ public class ClientParticleFactories {
 
     @SubscribeEvent
     public static void onEntityRenderersRegistry(final ParticleFactoryRegisterEvent event) {
-        LOGGER.info("Register particle factories");
+        LOGGER.debug("Register particle factories");
         Minecraft.getInstance().particles.registerFactory(ModParticleTypes.SPARK.get(), SparkParticle.Factory::new);
     }
 }

@@ -8,8 +8,10 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraftforge.api.distmarker.Dist;
@@ -34,10 +36,11 @@ public class InFluidRenderingEventHandler {
     @SubscribeEvent
     public static void onRenderBlockOverlay(final RenderBlockOverlayEvent renderBlockOverlayEvent) {
         Minecraft mc = Minecraft.getInstance();
+        PlayerEntity playerEntity = renderBlockOverlayEvent.getPlayer();
+        BlockPos pos = new BlockPos(playerEntity.getPosX(), playerEntity.getPosYEye(), playerEntity.getPosZ());
         //noinspection ConstantConditions
         if (renderBlockOverlayEvent.getOverlayType() == RenderBlockOverlayEvent.OverlayType.WATER &&
-                mc.world.getFluidState(renderBlockOverlayEvent.getBlockPos()).getFluid()
-                        .getRegistryName().getNamespace().equals(MODID)) {
+                mc.world.getFluidState(pos).getFluid().getRegistryName().getNamespace().equals(MODID)) {
             renderUnderFluid(ModFluids.EXCREMENT.get(), mc, renderBlockOverlayEvent.getMatrixStack());
             renderBlockOverlayEvent.setCanceled(true);
         }
