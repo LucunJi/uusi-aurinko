@@ -54,6 +54,11 @@ public abstract class LoadListeningConfigManagerAbstract {
         return builder.comment(comment).translation("config." + MODID + "." + key).defineInRange(key, defaultValue, min, max);
     }
 
+    public static ForgeConfigSpec.ConfigValue<Double> defineDouble(ForgeConfigSpec.Builder builder,
+                                                                     String comment, String key, double defaultValue, double min, double max) {
+        return builder.comment(comment).translation("config." + MODID + "." + key).defineInRange(key, defaultValue, min, max);
+    }
+
     public static <T> ForgeConfigSpec.ConfigValue<List<? extends T>> defineList(ForgeConfigSpec.Builder builder,
                                                                                    String comment, String key,
                                                                                    List<? extends T> defaultValue, Predicate<Object> validator) {

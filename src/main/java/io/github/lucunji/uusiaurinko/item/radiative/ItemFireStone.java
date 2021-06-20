@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
+import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -55,33 +56,38 @@ public class ItemFireStone extends ItemRadiative {
     }
 
     private void igniteBlocks(World worldIn, Entity self) {
-        if (!worldIn.isRemote() && worldIn.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
-            Random random = worldIn.getRandom();
-            BlockPos centerPos = self.getPosition();
-            for (BlockPos pos : BlockPos.getRandomPositions(random, 1,
-                    centerPos.getX() - 1, centerPos.getY() - 1, centerPos.getZ() - 1,
-                    centerPos.getX() + 1, centerPos.getY() + 3, centerPos.getZ() + 1)) {
-                BlockState blockState = AbstractFireBlock.getFireForPlacement(worldIn, pos);
-                int chance = 150 + (worldIn.isBlockinHighHumidity(pos) ? 50 : 0);
-                if (worldIn.isAirBlock(pos) && blockState.isValidPosition(worldIn, pos) &&
-                        (trySpreadFireTo(worldIn, pos, random, chance) || random.nextFloat() < 0.01)) {
-                    worldIn.setBlockState(pos, blockState);
-                }
+        if (worldIn.isRemote() || !worldIn.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) return;
+        int range = ServerConfigs.INSTANCE.FIRE_STONE_IGNITE_BLOCK_RANGE.get();
+        if (range <= 0) return;
+        Random random = worldIn.getRandom();
+        BlockPos centerPos = self.getPosition();
+        int improbability = ServerConfigs.INSTANCE.FIRE_STONE_IGNITE_FLAMMABLE_IMPROBABILITY.get();
+        double baseChange = ServerConfigs.INSTANCE.FIRE_STONE_IGNITE_BLOCK_BASE_CHANCE.get();
+        for (BlockPos pos : BlockPos.getRandomPositions(random, 1,
+                centerPos.getX() - 1, centerPos.getY() - 1, centerPos.getZ() - 1,
+                centerPos.getX() + 1, centerPos.getY() + 3, centerPos.getZ() + 1)) {
+            BlockState blockState = AbstractFireBlock.getFireForPlacement(worldIn, pos);
+            if (worldIn.isAirBlock(pos) && blockState.isValidPosition(worldIn, pos) &&
+                    (random.nextFloat() < baseChange || tryIgniteFlammable(worldIn, pos, random,
+                            improbability + (worldIn.isBlockinHighHumidity(pos) ? 50 : 0)))
+            ) {
+                worldIn.setBlockState(pos, blockState);
             }
         }
     }
 
     private void igniteEntities(World worldIn, Entity self) {
-        if (!worldIn.isRemote()) {
-            worldIn.getEntitiesWithinAABB(Entity.class, self.getBoundingBox().grow(0.5), entity -> entity != self)
-                    .forEach(entity -> {
-                        if (Item.random.nextFloat() < 0.1)
-                            entity.setFire(8);
-                    });
-        }
+        if (worldIn.isRemote()) return;
+        double range = ServerConfigs.INSTANCE.FIRE_STONE_IGNITE_ENTITY_RANGE.get();
+        if (range <= 0) return;
+        worldIn.getEntitiesWithinAABB(Entity.class, self.getBoundingBox().grow(range), entity -> entity != self)
+                .forEach(entity -> {
+                    if (Item.random.nextFloat() < 0.1)
+                        entity.setFire(8);
+                });
     }
 
-    private boolean trySpreadFireTo(World worldIn, BlockPos blockPos, Random random, int chance) {
+    private boolean tryIgniteFlammable(World worldIn, BlockPos blockPos, Random random, int chance) {
         for (Direction direction : Direction.values()) {
             BlockPos posOffset = blockPos.offset(direction);
             int flammability = worldIn.getBlockState(posOffset).getFlammability(worldIn, posOffset, direction.getOpposite());

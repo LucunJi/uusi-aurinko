@@ -1,6 +1,8 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
 import com.google.common.collect.ImmutableList;
+import io.github.lucunji.uusiaurinko.config.ClientConfigs;
+import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
 import io.github.lucunji.uusiaurinko.util.BlockFluidCombinedTag;
@@ -47,21 +49,24 @@ public class ItemLightningStone extends ItemRadiative {
 
     @Override
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
-        makeParticleEffects(worldIn, entityIn);
-
         if (entityIn instanceof LivingEntity) {
             LivingEntity creature = (LivingEntity) entityIn;
             creature.addPotionEffect(new EffectInstance(ModEffects.ELECTRICITY_RESISTANCE.get(),
                     2, 0, true, false, true));
         }
 
+
+        if (worldIn.getGameTime() % ServerConfigs.INSTANCE.LIGHTNING_STONE_ELECTRICITY_INTERVAL.get() != 0) return;
+        makeParticleEffects(worldIn, entityIn);
         causeElectricDamage(worldIn, entityIn);
     }
 
     @Override
     public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
-        makeParticleEffects(itemEntity.world, itemEntity);
-        causeElectricDamage(itemEntity.world, itemEntity);
+        World world = itemEntity.world;
+        if (world.getGameTime() % ServerConfigs.INSTANCE.LIGHTNING_STONE_ELECTRICITY_INTERVAL.get() != 0) return;
+        makeParticleEffects(world, itemEntity);
+        causeElectricDamage(world, itemEntity);
     }
 
     @Override
@@ -82,29 +87,35 @@ public class ItemLightningStone extends ItemRadiative {
     }
 
     private void makeParticleEffects(World world, Entity source) {
-        if (!world.isRemote() || (world.getGameTime() & 31) != 0) return;   // i & 31 == i % 32
+        if (!world.isRemote()) return;
+
+        int range = ServerConfigs.INSTANCE.LIGHTNING_STONE_ELECTRICITY_RANGE.get();
+        if (range <= 0) return;
 
         BlockFluidCombinedTag checker = new BlockFluidCombinedTag(CONDUCTOR_TAG_LOCATION);
         ImmutableList<BlockPos> startSet = findNearbyConductors(world, source, 0.5, checker);
 
         if (startSet.isEmpty()) return;
 
-        Random random = world.getRandom();
-        List<ImmutablePair<BlockPos, Direction>> exposure = findExposedConductorsDFS(world, startSet, source.getPositionVec(), 16, checker);
-        if (exposure.isEmpty()) return;
-
         // volume is the multiplier of spread distance: max distance = 16 * volume
         world.playSound(source.getPosX(), source.getPosY(), source.getPosZ(), ModSoundEvents.ENTITY_LIGHTNING_STONE_DISCHARGE.get(),
                 SoundCategory.BLOCKS, 1.5F, 1.0F + (world.rand.nextFloat() * 0.1F), false);
 
+        double chance = ClientConfigs.INSTANCE.LIGHTNING_STONE_SPARK_PARTICLE_AMOUNT.get();
+        if (chance <= 0) return;
+
+        List<ImmutablePair<BlockPos, Direction>> exposure = findExposedConductorsDFS(world, startSet, source.getPositionVec(), range, checker);
+        if (exposure.isEmpty()) return;
+
+        Random random = world.getRandom();
         if (Minecraft.getInstance().gameSettings.particles == ParticleStatus.MINIMAL) return;
-        if (exposure.size() <= 32) {
-            exposure.forEach(pair -> spreadSpark(world, pair.left, pair.right, 10, random));
-        } else {
+//        if (exposure.size() <= 32) {
+//            exposure.forEach(pair -> spreadSpark(world, pair.left, pair.right, 10, random));
+//        } else {
             exposure.forEach(pair -> {
-                if (random.nextFloat() < 0.4) spreadSpark(world, pair.left, pair.right, 10, random);
+                if (random.nextFloat() < chance) spreadSpark(world, pair.left, pair.right, 10, random);
             });
-        }
+//        }
     }
 
     /**
@@ -232,7 +243,13 @@ public class ItemLightningStone extends ItemRadiative {
     }
 
     private void causeElectricDamage(World world, Entity source) {
-        if (source.world.isRemote() || (world.getGameTime() & 31) != 0) return; // i & 31 == i % 32
+        if (source.world.isRemote()) return;
+
+        double shookChance = ServerConfigs.INSTANCE.LIGHTNING_STONE_ELECTRICITY_SHOOK_CHANCE.get();
+        int range = ServerConfigs.INSTANCE.LIGHTNING_STONE_ELECTRICITY_RANGE.get();
+        if (shookChance <= 0 || range <= 0) return;
+
+        int rangeSq = range * range;
 
         Vector3d sourcePos = source.getPositionVec();
         ServerWorld serverWorld = (ServerWorld) source.world;
@@ -244,10 +261,11 @@ public class ItemLightningStone extends ItemRadiative {
 
         // prepare entities to shock
         List<Entity> targets = serverWorld.getEntitiesWithinAABB(LivingEntity.class,
-                new AxisAlignedBB(sourcePos.subtract(16, 16, 16), sourcePos.add(16, 16, 16)),
+                new AxisAlignedBB(sourcePos.subtract(range, range, range), sourcePos.add(range, range, range)),
                 entity -> !entity.isSpectator() &&
-                        (!(entity instanceof PlayerEntity) || !((PlayerEntity) entity).isCreative()) &&
-                        entity.getPositionVec().squareDistanceTo(sourcePos) <= 256);
+                        Math.random() < shookChance &&
+                        !(entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) &&
+                        entity.getPositionVec().squareDistanceTo(sourcePos) <= rangeSq);
         if (targets.isEmpty()) return;
 
         // main logic for A*
@@ -288,7 +306,7 @@ public class ItemLightningStone extends ItemRadiative {
                 BlockPos.Mutable neighborPosMut = new BlockPos.Mutable();
                 for (Direction direction : Direction.values()) {
                     neighborPosMut.setAndMove(currentPos, direction);
-                    if (sourcePos.squareDistanceTo(neighborPosMut.getX(), neighborPosMut.getY(), neighborPosMut.getZ()) > 256) continue;
+                    if (sourcePos.squareDistanceTo(neighborPosMut.getX(), neighborPosMut.getY(), neighborPosMut.getZ()) > rangeSq) continue;
                     if (discoveredSet.contains(neighborPosMut)) continue;
 
                     BlockState neighborState = world.getBlockState(neighborPosMut);

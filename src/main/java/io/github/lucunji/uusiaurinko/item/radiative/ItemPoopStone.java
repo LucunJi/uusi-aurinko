@@ -35,7 +35,7 @@ public class ItemPoopStone extends ItemRadiative {
         if (!worldIn.isRemote && entityIn instanceof LivingEntity) {
             Random random = worldIn.getRandom();
             LivingEntity creature = (LivingEntity) entityIn;
-            if (random.nextFloat() < 0.01) {
+            if (random.nextFloat() < ServerConfigs.INSTANCE.POOP_STONE_DEBUFF_CHANCE.get()) {
                 creature.addPotionEffect(new EffectInstance(Effects.POISON, 25, 0, true, true, true));
                 creature.addPotionEffect(new EffectInstance(Effects.NAUSEA, 120, 0, true, true, true));
             }

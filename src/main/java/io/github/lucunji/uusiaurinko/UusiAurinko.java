@@ -34,7 +34,7 @@ public class UusiAurinko {
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ServerConfigs.INSTANCE::onConfigLoadOrReload);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientConfigs.INSTANCE::onConfigLoadOrReload);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfigs.CONFIG_SPEC);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigs.CONFIG_SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfigs.INSTANCE.getSpec());
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigs.INSTANCE.getSpec());
     }
 }
