@@ -36,5 +36,7 @@
   "death.attack.uusi-aurinko.electricity": "%1$s感受到了贯穿身体的高压电流",
   "death.attack.uusi-aurinko.electricity.player": "%1$s在与%2$s的战斗中感受到了贯穿身体的高压电流",
 
-  "entity.uusi-aurinko.radiative_item": "放射性魔法石"
+  "entity.uusi-aurinko.radiative_item": "放射性魔法石",
+
+  "config.uusi-aurinko.change_fluid_rendering": "流体方块的渲染效果改变了。按下 F3+T 使其生效。"
 }

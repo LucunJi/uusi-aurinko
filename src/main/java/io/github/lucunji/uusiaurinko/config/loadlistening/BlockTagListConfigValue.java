@@ -1,4 +1,4 @@
-package io.github.lucunji.uusiaurinko.config.taglist;
+package io.github.lucunji.uusiaurinko.config.loadlistening;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class BlockTagListConfigValue extends TagListConfigValue<Block> {
-    private static Logger LOGGER = LogManager.getLogger(BlockTagListConfigValue.class);
+    private static final Logger LOGGER = LogManager.getLogger(BlockTagListConfigValue.class);
 
-    public BlockTagListConfigValue(ForgeConfigSpec.ConfigValue<List<? extends String>> configValue, TagListConfigManagerAbstract manager) {
+    public BlockTagListConfigValue(ForgeConfigSpec.ConfigValue<List<? extends String>> configValue, LoadListeningConfigManagerAbstract manager) {
         super(configValue, manager);
     }
 

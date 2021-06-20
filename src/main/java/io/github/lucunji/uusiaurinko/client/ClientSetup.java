@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.client;
 
+import io.github.lucunji.uusiaurinko.config.ClientConfigs;
 import io.github.lucunji.uusiaurinko.entity.ModEntityTypes;
 import io.github.lucunji.uusiaurinko.fluid.ModFluids;
 import io.github.lucunji.uusiaurinko.tileentity.ModTileEntityTypes;
@@ -17,11 +18,14 @@ public class ClientSetup {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @SubscribeEvent
-    public static void onEntityRenderersRegistry(final FMLClientSetupEvent event) {
+    public static void onClientSetup(final FMLClientSetupEvent event) {
         LOGGER.debug("Register renderers");
         ModEntityTypes.RENDERER_BINDERS.forEach(Runnable::run);
         ModTileEntityTypes.RENDERER_BINDERS.forEach(Runnable::run);
-        ModFluids.FLUIDS.getEntries().forEach(registryObject ->
-                RenderTypeLookup.setRenderLayer(registryObject.get(), RenderType.getTranslucent()));
+
+        if (ClientConfigs.INSTANCE.TRANSPARENT_FLUID.get()) {
+            ModFluids.FLUIDS.getEntries().forEach(registryObject ->
+                    RenderTypeLookup.setRenderLayer(registryObject.get(), RenderType.getTranslucent()));
+        }
     }
 }

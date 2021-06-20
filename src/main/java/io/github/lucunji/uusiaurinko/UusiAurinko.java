@@ -1,6 +1,7 @@
 package io.github.lucunji.uusiaurinko;
 
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
+import io.github.lucunji.uusiaurinko.config.ClientConfigs;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.entity.ModEntityTypes;
@@ -32,6 +33,8 @@ public class UusiAurinko {
         ModParticleTypes.PARTICLE_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ServerConfigs.INSTANCE::onConfigLoadOrReload);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientConfigs.INSTANCE::onConfigLoadOrReload);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfigs.CONFIG_SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigs.CONFIG_SPEC);
     }
 }

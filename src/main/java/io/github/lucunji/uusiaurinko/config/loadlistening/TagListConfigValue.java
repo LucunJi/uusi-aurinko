@@ -1,4 +1,4 @@
-package io.github.lucunji.uusiaurinko.config.taglist;
+package io.github.lucunji.uusiaurinko.config.loadlistening;
 
 import com.google.common.collect.Sets;
 import io.github.lucunji.uusiaurinko.util.IdentitySetCollector;
@@ -10,28 +10,36 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * A wrapper for {@code ForgeConfigSpec.ConfigValue<List<? extends String>>}, allowing normal registry name and tags.
+ * A wrapper for {@code ForgeConfigSpec.ConfigValue<List<? extends String>>},
+ * allowing normal registry name and tags as entries of the string list.
  * The registry names and tags are interpreted into a set for quick finding.
- * It is updated by an instance of {@link TagListConfigManagerAbstract}.
  *
  * @param <T> the type of tag
  */
-public abstract class TagListConfigValue<T> {
-    private final ForgeConfigSpec.ConfigValue<List<? extends String>> configValue;
+public abstract class TagListConfigValue<T> extends WrappedConfigValue<List<? extends String>> {
     private Set<T> set;
 
-    protected TagListConfigValue(ForgeConfigSpec.ConfigValue<List<? extends String>> configValue, TagListConfigManagerAbstract manager) {
-        this.configValue = configValue;
+    protected TagListConfigValue(ForgeConfigSpec.ConfigValue<List<? extends String>> configValue, LoadListeningConfigManagerAbstract manager) {
+        super(configValue, manager);
         this.set = Sets.newIdentityHashSet();
-        manager.register(this);
+    }
+
+    @Override
+    public final void onLoad() {
+        this.onLoadOrReload();
+    }
+
+    @Override
+    public final void onReload() {
+        this.onLoadOrReload();
     }
 
     /**
-     * Parse the wrapped {@link net.minecraftforge.common.ForgeConfigSpec.ConfigValue} into a set to allow fast search.
+     * Parse the wrapped {@link ForgeConfigSpec.ConfigValue} into a set to allow fast search.
      * The values are checked.
      */
-    protected final void parseSet() {
-        this.set = configValue
+    private void onLoadOrReload() {
+        this.set = this.getConfigValue()
                 .get()
                 .stream()
                 .flatMap(this::flatMapString2StreamAndValidate)
@@ -49,13 +57,5 @@ public abstract class TagListConfigValue<T> {
 
     public final boolean contains(T val) {
         return set.contains(val);
-    }
-
-    public final ForgeConfigSpec.ConfigValue<List<? extends String>> getConfigValue() {
-        return configValue;
-    }
-
-    public final List<? extends String> get() {
-        return configValue.get();
     }
 }

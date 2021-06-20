@@ -1,4 +1,4 @@
-package io.github.lucunji.uusiaurinko.config.taglist;
+package io.github.lucunji.uusiaurinko.config.loadlistening;
 
 import com.google.common.collect.Lists;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -10,14 +10,14 @@ import java.util.function.Predicate;
 import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
 /**
- * The manager of {@link TagListConfigValue}.
- * It updates each registered {@link TagListConfigValue} when game loads or reloads the corresponding config file.
+ * The manager of {@link WrappedConfigValue}.
+ * It updates each registered {@link WrappedConfigValue} when game loads or reloads the corresponding config file.
  */
-public abstract class TagListConfigManagerAbstract {
-    private final List<TagListConfigValue<?>> tagConfigs = Lists.newArrayList();
+public abstract class LoadListeningConfigManagerAbstract {
+    private final List<ILoadListeningConfigValue> listeningConfigs = Lists.newArrayList();
 
-    final <T extends TagListConfigValue<?>> T register(T value) {
-        tagConfigs.add(value);
+    final <T extends ILoadListeningConfigValue> T register(T value) {
+        listeningConfigs.add(value);
         return value;
     }
 
@@ -31,11 +31,14 @@ public abstract class TagListConfigManagerAbstract {
 
     /**
      * This method must be registered in {@code net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD}
-     * to update the registered {@link TagListConfigValue} when game loads or reloads the config file
+     * to update the registered {@link ILoadListeningConfigValue} when game loads or reloads the config file
      */
     public final void onConfigLoadOrReload(ModConfig.ModConfigEvent configEvent) {
         if (configEvent.getConfig().getSpec() == this.getSpec()) {
-            tagConfigs.forEach(TagListConfigValue::parseSet);
+            if (configEvent instanceof ModConfig.Loading)
+                listeningConfigs.forEach(ILoadListeningConfigValue::onLoad);
+            if (configEvent instanceof ModConfig.Reloading)
+                listeningConfigs.forEach(ILoadListeningConfigValue::onReload);
         }
     }
 

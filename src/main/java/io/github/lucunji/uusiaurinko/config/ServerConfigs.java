@@ -1,12 +1,12 @@
 package io.github.lucunji.uusiaurinko.config;
 
 import com.google.common.collect.Lists;
-import io.github.lucunji.uusiaurinko.config.taglist.BlockTagListConfigValue;
-import io.github.lucunji.uusiaurinko.config.taglist.TagListConfigManagerAbstract;
+import io.github.lucunji.uusiaurinko.config.loadlistening.BlockTagListConfigValue;
+import io.github.lucunji.uusiaurinko.config.loadlistening.LoadListeningConfigManagerAbstract;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class ServerConfigs extends TagListConfigManagerAbstract {
+public class ServerConfigs extends LoadListeningConfigManagerAbstract {
     public static final ForgeConfigSpec CONFIG_SPEC;
     public static final ServerConfigs INSTANCE;
 
