@@ -1,16 +1,18 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "item": "minecraft:fermented_spider_eye"
-    },
-    {
-      "item": "minecraft:ender_eye"
-    },
-    {
-      "item": "minecraft:oxeye_daisy"
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX",
+    "XOX",
+    "XXX"
   ],
+  "key": {
+    "X": {
+      "item": "minecraft:ghast_tear"
+    },
+    "O": {
+      "item": "minecraft:ender_eye"
+    }
+  },
   "result": {
     "item": "uusi-aurinko:evil_eye"
   }
