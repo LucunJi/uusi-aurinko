@@ -20,8 +20,8 @@ public class ClientSetup {
     @SubscribeEvent
     public static void onClientSetup(final FMLClientSetupEvent event) {
         LOGGER.debug("Register renderers");
-        ModEntityTypes.RENDERER_BINDERS.forEach(Runnable::run);
-        ModTileEntityTypes.RENDERER_BINDERS.forEach(Runnable::run);
+        ModEntityTypes.ClientRenderer.RENDERER_BINDERS.forEach(Runnable::run);
+        ModTileEntityTypes.ClientRenderer.RENDERER_BINDERS.forEach(Runnable::run);
 
         if (ClientConfigs.INSTANCE.TRANSPARENT_FLUID.get()) {
             ModFluids.FLUIDS.getEntries().forEach(registryObject ->
