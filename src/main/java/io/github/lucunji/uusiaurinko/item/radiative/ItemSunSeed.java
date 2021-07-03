@@ -4,7 +4,6 @@ import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.util.SearchUtil;
 import io.github.lucunji.uusiaurinko.util.ServerUtil;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.entity.Entity;
@@ -15,8 +14,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.util.Map;
 
@@ -40,9 +37,9 @@ public class ItemSunSeed extends ItemRadiative {
     private void boom(World worldIn, Entity entityIn) {
         if (!worldIn.isRemote) {
             if (ServerUtil.getServerTick() % 20 == 0) {
-                int searchRange = ServerConfigs.INSTANCE.SUN_SEED_SEARCH_RANGE.get();
-                int boomChance = ServerConfigs.INSTANCE.SUN_SEED_BOOM_CHANCE.get();
-                float boomRange = ServerConfigs.INSTANCE.SUN_SEED_BOOM_RANGE.get().floatValue();
+                int searchRange = ServerConfigs.INSTANCE.SUN_SEED_TRANSMUTATION_RANGE.get();
+                int boomChance = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_CHANCE.get();
+                float boomRange = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_RANGE.get().floatValue();
 
                 if (searchRange == 0 || boomChance == 0 || boomRange == 0) {
                     return;

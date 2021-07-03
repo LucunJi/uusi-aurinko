@@ -42,57 +42,56 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
     public final ForgeConfigSpec.ConfigValue<Integer> EXCREMENT_DEBUFF_DURATION;
 
-    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_SEARCH_RANGE;
-    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_BOOM_CHANCE;
-    public final ForgeConfigSpec.ConfigValue<Double> SUN_SEED_BOOM_RANGE;
+    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_TRANSMUTATION_RANGE;
+    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_EXPLOSION_CHANCE;
+    public final ForgeConfigSpec.ConfigValue<Double> SUN_SEED_EXPLOSION_RANGE;
 
     public ServerConfigs(ForgeConfigSpec.Builder builder) {
         // TODO: TEST ALL OF THEM!!!
         FIRE_STONE_IGNITE_BLOCK_RANGE = defineInteger(builder,
-                "The size of the cuboid which goes from (-range, -range, -range) to (range, range + 2, range) " +
-                        "in which Kiuaskivi may ignite blocks. Set this value to 0 to disable.",
+                "Kiuaskivi may ignite blocks in the cuboid which goes from (-range, -range, -range) to (range, range + 2, range)\n" +
+                        "Set this value to 0 to disable.",
                         "fire_stone_ignite_block_range", 1, 0, 64);
         FIRE_STONE_IGNITE_BLOCK_BASE_CHANCE = defineDouble(builder,
-                "The base probability that any block in range may be ignited by Kiuaskivi in every tick." +
+                "The base probability of creating fire blocks near Kiuaskivi in each tick.\n" +
                         "Set this value to 0 to prevent inflammable blocks from fire.",
                 "fire_stone_ignite_block_base_chance", 0.01, 0, 1);
         FIRE_STONE_IGNITE_FLAMMABLE_IMPROBABILITY = defineInteger(builder,
-                "How unlikely a flammable block in range may be ignited by Kiuaskivi in every tick." +
-                        "How unlikely a flammable block in range may be ignited by Kiuaskivi in every tick." +
-                        "The ignition chance per tick is (flammability / improbability + base chance). " +
+                        "How unlikely a flammable block in range may be ignited by Kiuaskivi in every tick.\n" +
+                        "The ignition chance per tick is (flammability / improbability + base chance).\n" +
                         "Flammability is 0 for inflammable blocks, with a maximum of 300, and 20 for a typical wooden block.",
                 "fire_stone_ignite_flammable_improbability", 50, 1, Integer.MAX_VALUE);
         FIRE_STONE_IGNITE_ENTITY_RANGE = defineDouble(builder,
-                "The distance by which the hitbox of Kiuaskivi's holder/item entity will grow in each direction. " +
-                        "All entities in this expanded box will be ignited." +
+                "The hitbox of Kiuaskivi's holder/item entity will grow in each direction by this value, \n" +
+                        "and all entities in this expanded box will be ignited quickly.\n" +
                         "Set this value to 0 to disable.",
                 "fire_stone_ignite_entity_range", 0.5, 0, 64);
 
 
         WATER_STONE_SOLIDIFY_LAVA_RANGE = defineInteger(builder,
-                "The radius in which Vuoksikivi solidifies lava source blocks into semisolid lava. " +
+                "Vuoksikivi solidifies all lava source blocks within this distance into semisolid lava.\n" +
                         "Set this value to 0 to disable.",
                 "water_stone_solidify_lava_range", 2, 0, 64);
         WATER_STONE_DAMAGE_RANGE = defineDouble(builder,
-                "The distance by which the hitbox of Vuoksikivi's holder/item entity will grow in each direction. " +
-                        "Fire-sensitive entities, such as blazeman, in this expanded box takes drown damage. " +
+                "The hitbox of Vuoksikivi's holder/item entity will grow in each direction by this value, \n" +
+                        "and fire-sensitive entities, such as blazeman, in this expanded box takes drown damage.\n" +
                         "Set this value to 0 to disable.",
                 "water_stone_damage_range", 1, 0, 64);
         WATER_STONE_EXTINGUISH_FIRE_RANGE = defineInteger(builder,
-                "The radius in which Vuoksikivi extinguishes fire and campfire blocks. " +
+                "Vuoksikivi extinguishes fire and campfire blocks within this distance.\n" +
                         "Set this value to 0 to disable.",
                 "water_stone_extinguish_fire_range", 2, 0, 64);
 
 
         LIGHTNING_STONE_ELECTRICITY_RANGE = defineInteger(builder,
-                "The radius in which the electricity Ukkoskivi may spread. " +
+                "Ukkoskivi may electrify connected conductor blocks within this distance.\n" +
                         "Set this value to 0 to disable.",
                 "lightning_stone_electricity_range", 16, 0, 64);
         LIGHTNING_STONE_ELECTRICITY_INTERVAL = defineInteger(builder,
-                "The interval for Ukkoskivi to discharge electricity.",
+                "The interval for Ukkoskivi to make electrical discharges.",
                 "lightning_stone_electricity_interval", 30, 0, Integer.MAX_VALUE);
         LIGHTNING_STONE_ELECTRICITY_SHOOK_CHANCE = defineDouble(builder,
-                "The probability that a creature in range may take damage and receive debuff from the electricity of Ukkoskivi. " +
+                "The probability of receiving damage and debuff by a creature connected to Ukkoskivi through conductors.\n" +
                         "Set this value to 0 to disable.",
                 "lightning_stone_electricity_shook_chance", 1, 0, 1);
         LIGHTNING_STONE_ELECTRICITY_IMMUNE_ENTITY_TYPES = new EntityTypeTaggedListConfigValue(defineList(builder,
@@ -102,56 +101,57 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
 
         EARTH_STONE_TRANSMUTATION_RANGE = defineInteger(builder,
-                "The radius in which Tannerkivi transmutes blocks into dirt. " +
+                "Tannerkivi transmutes blocks in this range into dirt.\n" +
                         "Set this value to 0 to disable.",
                 "earth_stone_transmutation_range", 2, 0, 64);
         EARTH_STONE_TRANSMUTATION_BLACKLIST = new BlockTaggedListConfigValue(defineList(builder,
-                "Blocks in this blacklist won't be transmuted by Tannerkivi. " +
+                "Blocks in this blacklist won't be transmuted by Tannerkivi.\n" +
                         "Also accept block tags starting with #",
                 "earth_stone_transmutation_blacklist",
                 Lists.newArrayList("#uusi-aurinko:transmutation_immune")
         ), this);
         EARTH_STONE_EARTHQUAKE_RANGE = defineInteger(builder,
-                "The radius in which the earthquake of Tannerkivi shakes blocks off. " +
+                "The earthquake of Tannerkivi collapses blocks in this range.\n" +
                         "Set this value to 0 to disable.",
                 "earth_stone_earthquake_range", 6, 0, 64);
         EARTH_STONE_EARTHQUAKE_BLACKLIST = new BlockTaggedListConfigValue(defineList(builder,
-                "Blocks in this blacklist won't be affect by the earthquake of Tannerkivi." +
+                "Blocks in this blacklist won't be affect by the earthquake of Tannerkivi.\n" +
                         " Also accept block tags starting with #",
                 "earth_stone_earthquake_blacklist",
                 Lists.newArrayList("#uusi-aurinko:earthquake_immune")
         ), this);
         EARTH_STONE_EARTHQUAKE_PARTICLE_AMOUNT = defineInteger(builder,
-                "The per block amount of particle made by the earthquake of Tannerkivi. " +
+                "The per block amount of particle made by the earthquake of Tannerkivi.\n" +
+                        "Changing this value has no effects on server; it affects client performance instead.\n" +
                         "Set this value to 0 to disable.",
                 "earth_stone_earthquake_particle_amount", 7, 0, 64);
 
 
         POOP_STONE_TRANSMUTATION_RANGE = defineInteger(builder,
-                "The radius in which Kakkakikkare transmutes fluids into excrement.json. " +
+                "Kakkakikkare transmutes fluid blocks within this distance into excrement.\n" +
                         "Set this value to 0 to disable.",
                 "poop_stone_transmutation_range", 2, 0, 64);
         POOP_STONE_DEBUFF_CHANCE = defineDouble(builder,
-                "The chance that Kakkakikkare may cause various debuff to its holder in every tick. " +
+                "The chance of receiving various debuff by the holder of Kakkakikkare in each tick.\n" +
                         "Set this value to 0 to disable debuff.",
                 "poop_stone_debuff_chance", 0.01, 0, 1);
 
         EXCREMENT_DEBUFF_DURATION = defineInteger(builder,
-                "The duration of debuff in ticks that the excrement fluid block may cast on creatures inside. " +
+                "The duration of debuff in ticks that the excrement fluid block may give to the creatures inside.\n" +
                         "Set this value to 0 to disable.",
                 "excrement_debuff_duration", 200, 0, 1000000);
 
-        SUN_SEED_SEARCH_RANGE = defineInteger(builder,
-                "Increasing this value will increase the search range of Sun Seed \n" +
-                "Set 0 to DISABLE.",
+        SUN_SEED_TRANSMUTATION_RANGE = defineInteger(builder,
+                "The sun seed creates explosion at powder-like blocks within this distance.\n" +
+                "Set this value to 0 to disable.",
                 "sun_seed_search_range", 5, 0, 64);
-        SUN_SEED_BOOM_CHANCE = defineInteger(builder,
-                "For each increase of one, the probability of a dust explosion near the player increases by 1%. \n" +
-                "Set 0 to DISABLE.",
+        SUN_SEED_EXPLOSION_CHANCE = defineInteger(builder,
+                "The probability of explosion at a dust block within the transmutation range of a sun seed.\n" +
+                "Set this value to 0 to disable.",
                 "sun_seed_boom_chance", 5, 0, 100);
-        SUN_SEED_BOOM_RANGE = defineDouble(builder,
-                "Explosion radius. \n" +
-                "Set 0 to DISABLE.",
+        SUN_SEED_EXPLOSION_RANGE = defineDouble(builder,
+                "The radius of explosions created by a sun stone. Determines how powerful the explosion is.\n" +
+                "Set this value to 0 to disable.",
                 "sun_seed_boom_range", 1.5F, 0, 64);
     }
 
