@@ -42,6 +42,10 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
     public final ForgeConfigSpec.ConfigValue<Integer> EXCREMENT_DEBUFF_DURATION;
 
+    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_SEARCH_RANGE;
+    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_BOOM_CHANCE;
+    public final ForgeConfigSpec.ConfigValue<Double> SUN_SEED_BOOM_RANGE;
+
     public ServerConfigs(ForgeConfigSpec.Builder builder) {
         // TODO: TEST ALL OF THEM!!!
         FIRE_STONE_IGNITE_BLOCK_RANGE = defineInteger(builder,
@@ -136,6 +140,19 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                 "The duration of debuff in ticks that the excrement fluid block may cast on creatures inside. " +
                         "Set this value to 0 to disable.",
                 "excrement_debuff_duration", 200, 0, 1000000);
+
+        SUN_SEED_SEARCH_RANGE = defineInteger(builder,
+                "Increasing this value will increase the search range of Sun Seed \n" +
+                "Set 0 to DISABLE.",
+                "sun_seed_search_range", 5, 0, 64);
+        SUN_SEED_BOOM_CHANCE = defineInteger(builder,
+                "For each increase of one, the probability of a dust explosion near the player increases by 1%. \n" +
+                "Set 0 to DISABLE.",
+                "sun_seed_boom_chance", 5, 0, 100);
+        SUN_SEED_BOOM_RANGE = defineDouble(builder,
+                "Explosion radius. \n" +
+                "Set 0 to DISABLE.",
+                "sun_seed_boom_range", 1.5F, 0, 64);
     }
 
     @Override
