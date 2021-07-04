@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW;
  */
 @OnlyIn(Dist.CLIENT)
 public class ClientUtil {
-    public static boolean isPressShift() {
+    public static boolean isShiftDown() {
         long windowHandle = Minecraft.getInstance().getMainWindow().getHandle();
         return InputMappings.isKeyDown(windowHandle, GLFW.GLFW_KEY_LEFT_SHIFT) ||
                 InputMappings.isKeyDown(windowHandle, GLFW.GLFW_KEY_RIGHT_SHIFT);

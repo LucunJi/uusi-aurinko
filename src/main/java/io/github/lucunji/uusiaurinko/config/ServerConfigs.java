@@ -42,13 +42,13 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
     public final ForgeConfigSpec.ConfigValue<Integer> EXCREMENT_DEBUFF_DURATION;
 
-    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_TRANSMUTATION_RANGE;
-    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_EXPLOSION_CHANCE;
-    public final ForgeConfigSpec.ConfigValue<Double> SUN_SEED_EXPLOSION_RANGE;
-    public final ForgeConfigSpec.ConfigValue<Integer> SUN_STONE_EXPLOSION_FREQUENCY;
+    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_EXPLOSION_RANGE;
+    public final ForgeConfigSpec.ConfigValue<Double> SUN_SEED_EXPLOSION_CHANCE;
+    public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_EXPLOSION_INTERVAL;
 
     public final ForgeConfigSpec.ConfigValue<Integer> SUN_STONE_FIRE_RANGE;
-    public final ForgeConfigSpec.ConfigValue<Integer> SUN_STONE_FIRE_CHANCE;
+    public final ForgeConfigSpec.ConfigValue<Double> SUN_STONE_FIRE_CHANCE;
+    public final ForgeConfigSpec.ConfigValue<Integer> SUN_STONE_FIRE_INTERVAL;
 
     public ServerConfigs(ForgeConfigSpec.Builder builder) {
         // TODO: TEST ALL OF THEM!!!
@@ -145,29 +145,29 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                         "Set this value to 0 to disable.",
                 "excrement_debuff_duration", 200, 0, 1000000);
 
-        SUN_SEED_TRANSMUTATION_RANGE = defineInteger(builder,
-                "The sun seed creates explosion at powder-like blocks within this distance.\n" +
+        SUN_SEED_EXPLOSION_RANGE = defineInteger(builder,
+                "Auringonsiemen creates explosion at powdery blocks within this distance.\n" +
                 "Set this value to 0 to disable.",
-                "sun_seed_transmutation_range", 5, 0, 64);
-        SUN_SEED_EXPLOSION_CHANCE = defineInteger(builder,
-                "The probability of explosion at a dust block within the transmutation range of a sun seed.\n" +
+                "sun_seed_explosion_range", 2, 0, 64);
+        SUN_SEED_EXPLOSION_CHANCE = defineDouble(builder,
+                "The probability of explosion at a powdery block within the explosion range of Auringonsiemen.\n" +
                 "Set this value to 0 to disable.",
-                "sun_seed_boom_chance", 5, 0, 100);
-        SUN_SEED_EXPLOSION_RANGE = defineDouble(builder,
-                "The radius of explosions created by a sun stone. Determines how powerful the explosion is.\n" +
-                "Set this value to 0 to disable.",
-                "sun_seed_boom_range", 1.5F, 0, 64);
-        SUN_STONE_EXPLOSION_FREQUENCY = defineInteger(builder,
-                "How many ticks to make an explosion attempt. \n" +
-                "Set this value to 0 to DISABLE.",
-                "sun_seed_explosion_frequency", 2, 0, 40);
+                "sun_seed_explosion_chance", 0.5, 0, 1);
+        SUN_SEED_EXPLOSION_INTERVAL = defineInteger(builder,
+                "The interval for Auringonsiemen to make an exploding attempt.",
+                "sun_seed_explosion_frequency", 2, 1, Integer.MAX_VALUE);
 
         SUN_STONE_FIRE_RANGE = defineInteger(builder,
-                "Set this value to 0 to DISABLE",
-                "sun_stone_fire_range", 5, 0, 64);
-        SUN_STONE_FIRE_CHANCE = defineInteger(builder,
-                "Set this value to 0 to DISABLE",
-                "sun_stone_fire_chance", 5, 0, 100);
+                "Aurinkokivi transmutes powdery blocks within this distance into fire.\n" +
+                        "Set this value to 0 to disable.",
+                "sun_stone_fire_range", 2, 0, 64);
+        SUN_STONE_FIRE_CHANCE = defineDouble(builder,
+                "The probability of transmuting a powdery block into fire within the fire range of Aurinkokivi.\n" +
+                        "Set this value to 0 to disable.",
+                "sun_stone_fire_chance", 0.5, 0, 1);
+        SUN_STONE_FIRE_INTERVAL = defineInteger(builder,
+                "The interval for Aurinkokivi to make a transmuting attempt.",
+                "sun_stone_fire_interval", 2, 1, Integer.MAX_VALUE);
     }
 
     @Override

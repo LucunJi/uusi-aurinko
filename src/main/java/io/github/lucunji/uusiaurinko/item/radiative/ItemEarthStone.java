@@ -107,7 +107,10 @@ public class ItemEarthStone extends ItemRadiative {
         if (range <= 0) return;
         int rangeSq = range * range;
         Vector3d centerPos = source.getPositionVec();
-        BlockPos.getAllInBox(new AxisAlignedBB(centerPos.subtract(range, range, range), centerPos.add(range, range, range)))
+        BlockPos.getAllInBox(new AxisAlignedBB(
+                centerPos.subtract(range, range, range),
+                centerPos.add(range, range, range)
+        ))
                 .forEach(pos -> {
                     double distanceSq = centerPos.squareDistanceTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
                     if (distanceSq > rangeSq) return;

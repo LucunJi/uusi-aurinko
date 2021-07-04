@@ -1,9 +1,6 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
-import io.github.lucunji.uusiaurinko.util.SearchUtil;
-import io.github.lucunji.uusiaurinko.util.ServerUtil;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.entity.Entity;
@@ -12,10 +9,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ItemSunSeed extends ItemRadiative {
     public ItemSunSeed(Properties properties) {
@@ -24,44 +24,30 @@ public class ItemSunSeed extends ItemRadiative {
 
     @Override
     public void radiationInHand(ItemStack stack, World worldIn, Entity entityIn, boolean isMainHand) {
-        //TODO 看见遗忘者
-        boom(worldIn, entityIn);
+        doExplosion(worldIn, entityIn);
     }
 
     @Override
     public void radiationInWorld(ItemStack stack, ItemEntity itemEntity) {
-        boom(itemEntity.world, itemEntity);
+        doExplosion(itemEntity.world, itemEntity);
     }
 
-    private void boom(World worldIn, Entity entityIn) {
+    private void doExplosion(World worldIn, Entity entityIn) {
         if (!worldIn.isRemote) {
-            int explosionFrequency = ServerConfigs.INSTANCE.SUN_STONE_EXPLOSION_FREQUENCY.get();
+            int interval = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_INTERVAL.get();
 
-            if (explosionFrequency != 0 && worldIn.getDayTime() % explosionFrequency == 0) {
-                int searchRange = ServerConfigs.INSTANCE.SUN_SEED_TRANSMUTATION_RANGE.get();
-                int boomChance = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_CHANCE.get();
-                float boomRange = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_RANGE.get().floatValue();
+            if (worldIn.getGameTime() % interval == 0) {
+                int searchRange = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_RANGE.get();
+                double explosionChance = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_CHANCE.get();
 
-                if (searchRange == 0 || boomChance == 0 || boomRange == 0) {
-                    return;
-                }
+                if (searchRange == 0) return;
 
-                Map<BlockPos, Block> blockList = SearchUtil.searchBlockWithAABB(worldIn, new AxisAlignedBB(
-                        entityIn.getPosX() + searchRange,
-                        entityIn.getPosY() + searchRange,
-                        entityIn.getPosZ() + searchRange,
-                        entityIn.getPosX() - searchRange,
-                        entityIn.getPosY() - searchRange,
-                        entityIn.getPosZ() - searchRange
-                ), (block -> block instanceof FallingBlock), (pos) -> SearchUtil.inSphereRange(entityIn.getPositionVec(), searchRange, pos));
+                BlockPos randomPos = findRandomPowderyBlock(worldIn, entityIn.getPositionVec(), searchRange);
 
-                if (blockList.isEmpty()) return;
-
-                BlockPos randomPos = blockList.keySet().toArray(new BlockPos[0])[worldIn.getRandom().nextInt(blockList.size())];
-
-                if (worldIn.getRandom().nextInt(100) <= boomChance) {
+                if (randomPos != null && worldIn.getRandom().nextFloat() < explosionChance) {
                     worldIn.setBlockState(randomPos, Blocks.AIR.getDefaultState());
-                    worldIn.createExplosion(null, randomPos.getX(), randomPos.getY(), randomPos.getZ(), boomRange, Explosion.Mode.NONE);
+                    worldIn.createExplosion(null, randomPos.getX(), randomPos.getY(), randomPos.getZ(),
+                            0.5f, Explosion.Mode.DESTROY);
                 }
             }
         }
@@ -75,5 +61,19 @@ public class ItemSunSeed extends ItemRadiative {
     @Override
     public IParticleData inWorldParticleType(ItemEntity itemEntity) {
         return null;
+    }
+
+    @Nullable
+    static BlockPos findRandomPowderyBlock(World world, Vector3d center, int searchRange) {
+        List<BlockPos> blockList = BlockPos.getAllInBox(new AxisAlignedBB(
+                center.subtract(searchRange, searchRange, searchRange),
+                center.add(searchRange, searchRange, searchRange)
+        ))
+                .filter(pos -> pos.withinDistance(center, searchRange))
+                .filter(pos -> world.getBlockState(pos).getBlock() instanceof FallingBlock)
+                .map(BlockPos::toImmutable)
+                .collect(Collectors.toList());
+        if (blockList.isEmpty()) return null;
+        return blockList.get(world.getRandom().nextInt(blockList.size()));
     }
 }

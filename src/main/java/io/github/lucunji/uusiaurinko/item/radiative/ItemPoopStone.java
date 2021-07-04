@@ -78,7 +78,10 @@ public class ItemPoopStone extends ItemRadiative {
         int rangeSq = range * range;
         ITag<Fluid> excrementTag = FluidTags.getCollection().getTagByID(ModFluids.EXCREMENT_FLUID_TAG_LOCATION);
         Vector3d centerPos = source.getPositionVec();
-        BlockPos.getAllInBox(new AxisAlignedBB(centerPos.subtract(range, range, range), centerPos.add(range, range, range)))
+        BlockPos.getAllInBox(new AxisAlignedBB(
+                centerPos.subtract(range, range, range),
+                centerPos.add(range, range, range)
+        ))
                 .forEach(pos -> {
                     double distanceSq = centerPos.squareDistanceTo(pos.getX(), pos.getY(), pos.getZ());
                     if (distanceSq > rangeSq) return;

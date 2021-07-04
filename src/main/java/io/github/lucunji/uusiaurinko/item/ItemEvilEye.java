@@ -2,9 +2,7 @@ package io.github.lucunji.uusiaurinko.item;
 
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.util.ClientUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -18,7 +16,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -32,7 +29,7 @@ public class ItemEvilEye extends ArmorItem {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        if (ClientUtil.isPressShift()) {
+        if (ClientUtil.isShiftDown()) {
             addTranslationAsLines(tooltip, this.getTranslationKey() + ".tooltip");
             addTranslationAsLines(tooltip, "tooltip.uusi-aurinko.shift_less");
         } else {
