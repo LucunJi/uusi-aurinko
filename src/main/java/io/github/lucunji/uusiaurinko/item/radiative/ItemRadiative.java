@@ -75,6 +75,14 @@ public abstract class ItemRadiative extends ItemBase {
     }
 
     /**
+     * 改成true防爆
+     * @return false
+     */
+    public boolean isImmuneToExplosions() {
+        return false;
+    }
+
+    /**
      * Make the item entity immortal.
      * Returns {@code null} to keep using the modified the {@code oldEntity}.
      *

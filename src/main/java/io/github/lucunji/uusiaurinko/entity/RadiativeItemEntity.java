@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.entity;
 
+import io.github.lucunji.uusiaurinko.item.radiative.ItemRadiative;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
@@ -33,6 +34,11 @@ public class RadiativeItemEntity extends ItemEntity {
         this.setMotion(itemEntity.getMotion());
         this.setOwnerId(itemEntity.getOwnerId());
         this.setThrowerId(itemEntity.getThrowerId());
+    }
+
+    @Override
+    public boolean isImmuneToExplosions() {
+        return ((ItemRadiative) getItem().getItem()).isImmuneToExplosions();
     }
 
     /**

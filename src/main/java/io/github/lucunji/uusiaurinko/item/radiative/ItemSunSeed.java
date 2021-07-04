@@ -17,7 +17,6 @@ import net.minecraft.world.World;
 
 import java.util.Map;
 
-//TODO 掉落物防爆
 public class ItemSunSeed extends ItemRadiative {
     public ItemSunSeed(Properties properties) {
         super(properties);
@@ -62,6 +61,11 @@ public class ItemSunSeed extends ItemRadiative {
                 });
             }
         }
+    }
+
+    @Override
+    public boolean isImmuneToExplosions() {
+        return true;
     }
 
     @Override

@@ -17,7 +17,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 
 import java.util.Map;
 
-//TODO 凋零效果 ItemEntity防爆
+//TODO 凋零效果
 public class ItemSunStone extends ItemRadiative {
     public ItemSunStone(Properties properties) {
         super(properties);
@@ -61,6 +61,11 @@ public class ItemSunStone extends ItemRadiative {
                 });
             }
         }
+    }
+
+    @Override
+    public boolean isImmuneToExplosions() {
+        return true;
     }
 
     @Override
