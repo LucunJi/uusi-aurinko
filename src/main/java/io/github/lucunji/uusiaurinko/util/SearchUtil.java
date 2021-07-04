@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.function.Predicate;
  * @author DustW
  */
 public class SearchUtil {
-    public static Map<BlockPos, Block> searchBlockWithAABB(World world, AxisAlignedBB axisAlignedBB, Predicate<Block> filter) {
+    public static Map<BlockPos, Block> searchBlockWithAABB(World world, AxisAlignedBB axisAlignedBB, Predicate<Block> filterBlock, Predicate<BlockPos> filterPos) {
         Map<BlockPos, Block> result = new HashMap<>();
 
         for (int i = (int) axisAlignedBB.minX; i <= axisAlignedBB.maxX; i++) {
@@ -24,13 +25,19 @@ public class SearchUtil {
                     BlockPos pos = new BlockPos(i, j, k);
                     Block block = world.getBlockState(pos).getBlock();
 
-                    if (filter.test(block)) {
-                        result.put(pos, block);
+                    if (filterBlock == null || filterBlock.test(block)) {
+                        if (filterPos == null || filterPos.test(pos)) {
+                            result.put(pos, block);
+                        }
                     }
                 }
             }
         }
 
         return result;
+    }
+
+    public static boolean canBurn(IWorldReader worldIn, BlockPos pos) {
+        return (pos.getY() < 0 || pos.getY() >= 256 || worldIn.isBlockLoaded(pos)) && worldIn.getBlockState(pos).getMaterial().isFlammable();
     }
 }

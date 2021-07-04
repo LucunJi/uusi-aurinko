@@ -10,8 +10,4 @@ public class ServerUtil {
     public static MinecraftServer getServer() {
         return ServerLifecycleHooks.getCurrentServer();
     }
-
-    public static int getServerTick() {
-        return getServer().getTickCounter();
-    }
 }
