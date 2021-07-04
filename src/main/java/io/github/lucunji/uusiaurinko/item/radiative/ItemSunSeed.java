@@ -17,7 +17,6 @@ import net.minecraft.world.World;
 
 import java.util.Map;
 
-//TODO 掉落物防爆
 public class ItemSunSeed extends ItemRadiative {
     public ItemSunSeed(Properties properties) {
         super(properties);
@@ -36,7 +35,7 @@ public class ItemSunSeed extends ItemRadiative {
 
     private void boom(World worldIn, Entity entityIn) {
         if (!worldIn.isRemote) {
-            if (ServerUtil.getServerTick() % 20 == 0) {
+            if (worldIn.getDayTime() % 2 == 0) {
                 int searchRange = ServerConfigs.INSTANCE.SUN_SEED_TRANSMUTATION_RANGE.get();
                 int boomChance = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_CHANCE.get();
                 float boomRange = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_RANGE.get().floatValue();
@@ -52,16 +51,21 @@ public class ItemSunSeed extends ItemRadiative {
                         entityIn.getPosX() - searchRange,
                         entityIn.getPosY() - 1,
                         entityIn.getPosZ() - searchRange
-                ), (block -> block instanceof FallingBlock));
+                ), (block -> block instanceof FallingBlock), null);
 
-                blockList.keySet().forEach(pos -> {
-                    if (worldIn.getRandom().nextInt(100) <= boomChance) {
-                        worldIn.setBlockState(pos, Blocks.AIR.getDefaultState());
-                        worldIn.createExplosion(null, pos.getX(), pos.getY(), pos.getZ(), boomRange, Explosion.Mode.NONE);
-                    }
-                });
+                BlockPos randomPos = blockList.keySet().toArray(new BlockPos[0])[worldIn.getRandom().nextInt(blockList.size())];
+
+                if (worldIn.getRandom().nextInt(100) <= boomChance) {
+                    worldIn.setBlockState(randomPos, Blocks.AIR.getDefaultState());
+                    worldIn.createExplosion(null, randomPos.getX(), randomPos.getY(), randomPos.getZ(), boomRange, Explosion.Mode.NONE);
+                }
             }
         }
+    }
+
+    @Override
+    public boolean isImmuneToExplosions() {
+        return true;
     }
 
     @Override
