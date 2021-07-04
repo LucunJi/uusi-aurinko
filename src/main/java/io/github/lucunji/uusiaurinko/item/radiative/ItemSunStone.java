@@ -65,7 +65,7 @@ public class ItemSunStone extends ItemRadiative {
 
     @Override
     public boolean isImmuneToExplosions() {
-        return true;
+        return false;
     }
 
     @Override

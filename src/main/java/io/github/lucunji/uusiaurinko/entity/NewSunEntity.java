@@ -54,15 +54,6 @@ public class NewSunEntity extends Entity {
 
     @Override
     protected void readAdditional(CompoundNBT compound) {
-        readFromNBT(compound);
-    }
-
-    @Override
-    protected void writeAdditional(CompoundNBT compound) {
-        writeToNBT(compound);
-    }
-
-    private void readFromNBT(CompoundNBT compound) {
         int state = compound.getInt("SunState");
         this.sunState = SunState.values()[state >= 0 && state < SunState.values().length ? state : 0];
         this.hasWaterStone = compound.getBoolean("Water");
@@ -72,18 +63,14 @@ public class NewSunEntity extends Entity {
         this.hasPoopStone = compound.getBoolean("Poop");
     }
 
-    private void writeToNBT(CompoundNBT compound) {
+    @Override
+    protected void writeAdditional(CompoundNBT compound) {
         compound.putInt("SunState", sunState.ordinal());
         compound.putBoolean("Water", hasWaterStone);
         compound.putBoolean("Fire", hasFireStone);
         compound.putBoolean("Earth", hasEarthStone);
         compound.putBoolean("Lightning", hasLightningStone);
         compound.putBoolean("Poop", hasPoopStone);
-    }
-
-    @Override
-    public void handleStatusUpdate(byte id) {
-        super.handleStatusUpdate(id);
     }
 
     @Override
