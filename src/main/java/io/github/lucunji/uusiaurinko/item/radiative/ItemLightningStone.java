@@ -5,7 +5,6 @@ import io.github.lucunji.uusiaurinko.config.ClientConfigs;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
-import io.github.lucunji.uusiaurinko.util.BlockFluidCombinedTag;
 import io.github.lucunji.uusiaurinko.util.CollectionHelper;
 import io.github.lucunji.uusiaurinko.util.ModDamageSource;
 import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
@@ -22,7 +21,6 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -38,10 +36,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
-
 public class ItemLightningStone extends ItemRadiative {
-    private static final ResourceLocation CONDUCTOR_TAG_LOCATION = new ResourceLocation(MODID, "conductor");
 
     public ItemLightningStone(Properties properties) {
         super(properties);
@@ -92,8 +87,7 @@ public class ItemLightningStone extends ItemRadiative {
         int range = ServerConfigs.INSTANCE.LIGHTNING_STONE_ELECTRICITY_RANGE.get();
         if (range <= 0) return;
 
-        BlockFluidCombinedTag checker = new BlockFluidCombinedTag(CONDUCTOR_TAG_LOCATION);
-        ImmutableList<BlockPos> startSet = findNearbyConductors(world, source, 0.5, checker);
+        ImmutableList<BlockPos> startSet = findNearbyConductors(world, source, 0.5);
 
         if (startSet.isEmpty()) return;
 
@@ -104,7 +98,7 @@ public class ItemLightningStone extends ItemRadiative {
         double chance = ClientConfigs.INSTANCE.LIGHTNING_STONE_SPARK_PARTICLE_AMOUNT.get();
         if (chance <= 0) return;
 
-        List<ImmutablePair<BlockPos, Direction>> exposure = findExposedConductorsDFS(world, startSet, source.getPositionVec(), range, checker);
+        List<ImmutablePair<BlockPos, Direction>> exposure = findExposedConductorsDFS(world, startSet, source.getPositionVec(), range);
         if (exposure.isEmpty()) return;
 
         Random random = world.getRandom();
@@ -197,14 +191,12 @@ public class ItemLightningStone extends ItemRadiative {
      * @param startSet A set of blocks to begin with, usually conductors. It has to be immutable to prevent modification.
      * @param startPos The position of entity. It will be the center of search range.
      * @param range    The range of search. Any block outside is ignored.
-     * @param checker  A checker for conductivity.
      * @return A list of Block-Direction pairs. Direction represents the visible face of block, might be {@code null}.
      * {@code null} represents that the block is transparent so particles can be rendered inside.
      */
     @OnlyIn(Dist.CLIENT)
     private List<ImmutablePair<BlockPos, Direction>>
-    findExposedConductorsDFS(World world, final ImmutableList<BlockPos> startSet, final Vector3d startPos, int range,
-                             BlockFluidCombinedTag checker) {
+    findExposedConductorsDFS(World world, final ImmutableList<BlockPos> startSet, final Vector3d startPos, int range) {
         int rangeSq = range * range;
         List<ImmutablePair<BlockPos, Direction>> exposedList = new ArrayList<>(256);
         Queue<BlockPos> frontierQueue = new LinkedList<>(startSet);
@@ -218,7 +210,7 @@ public class ItemLightningStone extends ItemRadiative {
                 if (discoveredSet.contains(neighborPosMut)) continue;
 
                 BlockState neighborState = world.getBlockState(neighborPosMut);
-                if (checker.contains(neighborState)) {
+                if (ServerConfigs.INSTANCE.CONDUCTORS.contains(neighborState)) {
                     BlockPos immutable = neighborPosMut.toImmutable();
                     frontierQueue.add(immutable);
                     discoveredSet.add(immutable);
@@ -233,11 +225,10 @@ public class ItemLightningStone extends ItemRadiative {
         return exposedList;
     }
 
-    private ImmutableList<BlockPos> findNearbyConductors(World world, Entity entity, double growAmount,
-                                                                BlockFluidCombinedTag checker) {
+    private ImmutableList<BlockPos> findNearbyConductors(World world, Entity entity, double growAmount) {
         return ImmutableList.<BlockPos>builder()
                 .addAll(BlockPos.getAllInBox(entity.getBoundingBox().grow(growAmount))
-                        .filter(pos -> checker.contains(world.getBlockState(pos)))
+                        .filter(pos -> ServerConfigs.INSTANCE.CONDUCTORS.contains(world.getBlockState(pos)))
                         .map(BlockPos::toImmutable)
                         .iterator()).build();
     }
@@ -253,10 +244,9 @@ public class ItemLightningStone extends ItemRadiative {
 
         Vector3d sourcePos = source.getPositionVec();
         ServerWorld serverWorld = (ServerWorld) source.world;
-        BlockFluidCombinedTag checker = new BlockFluidCombinedTag(CONDUCTOR_TAG_LOCATION);
 
         // prepare blocks to start with
-        ImmutableList<BlockPos> startSet = findNearbyConductors(serverWorld, source, 0.5, checker);
+        ImmutableList<BlockPos> startSet = findNearbyConductors(serverWorld, source, 0.5);
         if (startSet.isEmpty()) return;
 
         // prepare entities to shock
@@ -269,6 +259,8 @@ public class ItemLightningStone extends ItemRadiative {
                         entity.getPositionVec().squareDistanceTo(sourcePos) <= rangeSq);
         if (targets.isEmpty()) return;
 
+        float shockDamage = ServerConfigs.INSTANCE.LIGHTNING_STONE_ELECTRICITY_SHOOK_DAMAGE.get().floatValue();
+
         // main logic for A*
         // can be further improved by rewriting a more suitable priority queue, but the improvement is too limited so I refuse to do this now
         PriorityQueue<MutablePair<BlockPos, Integer>> frontierQueue = new PriorityQueue<>(Comparator.comparing(Pair::getRight));
@@ -276,13 +268,13 @@ public class ItemLightningStone extends ItemRadiative {
         HashSet<BlockPos> discoveredSet = new HashSet<>(startSet);
 
         for (Entity target : targets) {
-            List<BlockPos> goals = findNearbyConductors(serverWorld, target, 0.5, checker);
+            List<BlockPos> goals = findNearbyConductors(serverWorld, target, 0.5);
             if (goals.isEmpty()) continue;
 
             // reuse the already discovered connection conductors in the last iteration
             // so that we do not need to reset the sets to run algorithm from the ground-up
             if (CollectionHelper.hasAnyOf(discoveredSet, goals)) {
-                shockEntity(target);
+                shockEntity(target, shockDamage);
                 continue;
             }
 
@@ -300,7 +292,7 @@ public class ItemLightningStone extends ItemRadiative {
                 BlockPos currentPos = frontierQueue.remove().left;
 
                 if (goals.contains(currentPos)) {
-                    shockEntity(target);
+                    shockEntity(target, shockDamage);
                     break;
                 }
 
@@ -311,7 +303,7 @@ public class ItemLightningStone extends ItemRadiative {
                     if (discoveredSet.contains(neighborPosMut)) continue;
 
                     BlockState neighborState = world.getBlockState(neighborPosMut);
-                    if (checker.contains(neighborState)) {
+                    if (ServerConfigs.INSTANCE.CONDUCTORS.contains(neighborState)) {
                         BlockPos immutable = neighborPosMut.toImmutable();
                         discoveredSet.add(immutable);
                         frontierQueue.add(new MutablePair<>(immutable, minDistance(immutable, goals)));
@@ -339,8 +331,8 @@ public class ItemLightningStone extends ItemRadiative {
      *
      * It is only a make-do version. Wait to be improved with custom paralysis effect.
      */
-    private void shockEntity(Entity entity) {
-        if (entity.attackEntityFrom(ModDamageSource.ELECTRICITY, 5.0F) && entity instanceof LivingEntity) {
+    private void shockEntity(Entity entity, float damage) {
+        if (entity.attackEntityFrom(ModDamageSource.ELECTRICITY, damage) && entity instanceof LivingEntity) {
             ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.SLOWNESS, 30, 127));
             ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.MINING_FATIGUE, 30, 127));
         }

@@ -1,9 +1,7 @@
 package io.github.lucunji.uusiaurinko.config;
 
 import com.google.common.collect.Lists;
-import io.github.lucunji.uusiaurinko.config.loadlistening.BlockTaggedListConfigValue;
-import io.github.lucunji.uusiaurinko.config.loadlistening.EntityTypeTaggedListConfigValue;
-import io.github.lucunji.uusiaurinko.config.loadlistening.LoadListeningConfigManagerAbstract;
+import io.github.lucunji.uusiaurinko.config.loadlistening.*;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -29,7 +27,10 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
     public final ForgeConfigSpec.ConfigValue<Integer> LIGHTNING_STONE_ELECTRICITY_RANGE;
     public final ForgeConfigSpec.ConfigValue<Integer> LIGHTNING_STONE_ELECTRICITY_INTERVAL;
     public final ForgeConfigSpec.ConfigValue<Double> LIGHTNING_STONE_ELECTRICITY_SHOOK_CHANCE;
+    public final ForgeConfigSpec.ConfigValue<Double> LIGHTNING_STONE_ELECTRICITY_SHOOK_DAMAGE;
     public final EntityTypeTaggedListConfigValue LIGHTNING_STONE_ELECTRICITY_IMMUNE_ENTITY_TYPES;
+
+    public final BlockFluidCompositeConfigWrapper CONDUCTORS;
 
     public final BlockTaggedListConfigValue EARTH_STONE_TRANSMUTATION_BLACKLIST;
     public final ForgeConfigSpec.ConfigValue<Integer> EARTH_STONE_TRANSMUTATION_RANGE;
@@ -50,18 +51,19 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
     public final ForgeConfigSpec.ConfigValue<Double> SUN_STONE_FIRE_CHANCE;
     public final ForgeConfigSpec.ConfigValue<Integer> SUN_STONE_FIRE_INTERVAL;
 
+    public final BlockTaggedListConfigValue POWDERY_BLOCK;
+
     public ServerConfigs(ForgeConfigSpec.Builder builder) {
-        // TODO: TEST ALL OF THEM!!!
         FIRE_STONE_IGNITE_BLOCK_RANGE = defineInteger(builder,
                 "Kiuaskivi may ignite blocks in the cuboid which goes from (-range, -range, -range) to (range, range + 2, range)\n" +
                         "Set this value to 0 to disable.",
-                        "fire_stone_ignite_block_range", 1, 0, 64);
+                "fire_stone_ignite_block_range", 1, 0, 64);
         FIRE_STONE_IGNITE_BLOCK_BASE_CHANCE = defineDouble(builder,
                 "The base probability of creating fire blocks near Kiuaskivi in each tick.\n" +
                         "Set this value to 0 to prevent inflammable blocks from fire.",
                 "fire_stone_ignite_block_base_chance", 0.01, 0, 1);
         FIRE_STONE_IGNITE_FLAMMABLE_IMPROBABILITY = defineInteger(builder,
-                        "How unlikely a flammable block in range may be ignited by Kiuaskivi in every tick.\n" +
+                "How unlikely a flammable block in range may be ignited by Kiuaskivi in every tick.\n" +
                         "The ignition chance per tick is (flammability / improbability + base chance).\n" +
                         "Flammability is 0 for inflammable blocks, with a maximum of 300, and 20 for a typical wooden block.",
                 "fire_stone_ignite_flammable_improbability", 50, 1, Integer.MAX_VALUE);
@@ -93,15 +95,35 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                 "lightning_stone_electricity_range", 10, 0, 64);
         LIGHTNING_STONE_ELECTRICITY_INTERVAL = defineInteger(builder,
                 "The interval for Ukkoskivi to make electrical discharges.",
-                "lightning_stone_electricity_interval", 30, 1, Integer.MAX_VALUE);
+                "lightning_stone_electricity_interval", 40, 1, Integer.MAX_VALUE);
         LIGHTNING_STONE_ELECTRICITY_SHOOK_CHANCE = defineDouble(builder,
                 "The probability of receiving damage and debuff by a creature connected to Ukkoskivi through conductors.\n" +
                         "Set this value to 0 to disable.",
                 "lightning_stone_electricity_shook_chance", 1, 0, 1);
+        LIGHTNING_STONE_ELECTRICITY_SHOOK_DAMAGE = defineDouble(builder,
+                "The damage received by a creature connected to Ukkoskivi through conductors when Ukkoskivi discharges.",
+                "lightning_stone_electricity_shook_damage", 2.5, 0, Float.MAX_VALUE);
         LIGHTNING_STONE_ELECTRICITY_IMMUNE_ENTITY_TYPES = new EntityTypeTaggedListConfigValue(defineList(builder,
-                "The types of creatures immune to the electricity from Ukkoskivi. (non-creatures are already excluded)",
+                "The types of creatures immune to the electricity from Ukkoskivi. (non-creatures are already excluded)\n" +
+                        "Also accept entity type tags starting with #",
                 "lightning_stone_electricity_immune_entity_types",
-                Lists.newArrayList("#uusi-aurinko:electric_immune")), this);
+                Lists.newArrayList("#uusi-aurinko:electric_immune")
+        ), this);
+
+        CONDUCTORS = new BlockFluidCompositeConfigWrapper(
+                new BlockTaggedListConfigValue(defineList(builder,
+                        "Blocks in this list can conduct electricity.\n" +
+                                "Also accept block tags starting with #",
+                        "conductive_blocks",
+                        Lists.newArrayList("#uusi-aurinko:conductor")
+                ), this),
+                new FluidTaggedListConfigValue(defineList(builder,
+                        "Fluids in this list can conduct electricity.\n" +
+                                "Also accept fluid tags starting with #",
+                        "conductive_fluids",
+                        Lists.newArrayList("#uusi-aurinko:conductor")
+                ), this)
+        );
 
 
         EARTH_STONE_TRANSMUTATION_RANGE = defineInteger(builder,
@@ -120,7 +142,7 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                 "earth_stone_earthquake_range", 6, 0, 64);
         EARTH_STONE_EARTHQUAKE_BLACKLIST = new BlockTaggedListConfigValue(defineList(builder,
                 "Blocks in this blacklist won't be affect by the earthquake of Tannerkivi.\n" +
-                        " Also accept block tags starting with #",
+                        "Also accept block tags starting with #",
                 "earth_stone_earthquake_blacklist",
                 Lists.newArrayList("#uusi-aurinko:earthquake_immune")
         ), this);
@@ -145,17 +167,19 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                         "Set this value to 0 to disable.",
                 "excrement_debuff_duration", 200, 0, 1000000);
 
+
         SUN_SEED_EXPLOSION_RANGE = defineInteger(builder,
                 "Auringonsiemen creates explosion at powdery blocks within this distance.\n" +
-                "Set this value to 0 to disable.",
+                        "Set this value to 0 to disable.",
                 "sun_seed_explosion_range", 2, 0, 64);
         SUN_SEED_EXPLOSION_CHANCE = defineDouble(builder,
                 "The probability of explosion at a powdery block within the explosion range of Auringonsiemen.\n" +
-                "Set this value to 0 to disable.",
+                        "Set this value to 0 to disable.",
                 "sun_seed_explosion_chance", 0.5, 0, 1);
         SUN_SEED_EXPLOSION_INTERVAL = defineInteger(builder,
                 "The interval for Auringonsiemen to make an exploding attempt.",
                 "sun_seed_explosion_frequency", 2, 1, Integer.MAX_VALUE);
+
 
         SUN_STONE_FIRE_RANGE = defineInteger(builder,
                 "Aurinkokivi transmutes powdery blocks within this distance into fire.\n" +
@@ -164,10 +188,17 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
         SUN_STONE_FIRE_CHANCE = defineDouble(builder,
                 "The probability of transmuting a powdery block into fire within the fire range of Aurinkokivi.\n" +
                         "Set this value to 0 to disable.",
-                "sun_stone_fire_chance", 0.5, 0, 1);
+                "sun_stone_fire_chance", 0.75, 0, 1);
         SUN_STONE_FIRE_INTERVAL = defineInteger(builder,
                 "The interval for Aurinkokivi to make a transmuting attempt.",
                 "sun_stone_fire_interval", 2, 1, Integer.MAX_VALUE);
+
+        POWDERY_BLOCK = new BlockTaggedListConfigValue(defineList(builder,
+                "Blocks in this list will be transmuted into explosion or fire by Auringonsiemen or Aurinkokivi.\n" +
+                        "Also accept block tags starting with #",
+                "powdery_blocks",
+                Lists.newArrayList("#uusi-aurinko:powdery")
+        ), this);
     }
 
     @Override

@@ -1,12 +1,11 @@
 package io.github.lucunji.uusiaurinko.config.loadlistening;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.BlockState;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,5 +39,9 @@ public class BlockTaggedListConfigValue extends TaggedListConfigValue<Block> {
                 getTags().stream()
                         .map(BlockTags.getCollection()::getTagByID)
                         .anyMatch(tag -> tag.contains(val));
+    }
+
+    public boolean contains(BlockState val) {
+        return contains(val.getBlock());
     }
 }

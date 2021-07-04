@@ -2,7 +2,6 @@ package io.github.lucunji.uusiaurinko.item.radiative;
 
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.FallingBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
@@ -70,7 +69,7 @@ public class ItemSunSeed extends ItemRadiative {
                 center.add(searchRange, searchRange, searchRange)
         ))
                 .filter(pos -> pos.withinDistance(center, searchRange))
-                .filter(pos -> world.getBlockState(pos).getBlock() instanceof FallingBlock)
+                .filter(pos -> ServerConfigs.INSTANCE.POWDERY_BLOCK.contains(world.getBlockState(pos).getBlock()))
                 .map(BlockPos::toImmutable)
                 .collect(Collectors.toList());
         if (blockList.isEmpty()) return null;
