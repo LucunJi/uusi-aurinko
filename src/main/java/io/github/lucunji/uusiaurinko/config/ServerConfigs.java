@@ -71,7 +71,7 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
         WATER_STONE_SOLIDIFY_LAVA_RANGE = defineInteger(builder,
                 "Vuoksikivi solidifies all lava source blocks within this distance into semisolid lava.\n" +
                         "Set this value to 0 to disable.",
-                "water_stone_solidify_lava_range", 2, 0, 64);
+                "water_stone_solidify_lava_range", 1, 0, 64);
         WATER_STONE_DAMAGE_RANGE = defineDouble(builder,
                 "The hitbox of Vuoksikivi's holder/item entity will grow in each direction by this value, \n" +
                         "and fire-sensitive entities, such as blazeman, in this expanded box takes drown damage.\n" +
@@ -86,10 +86,10 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
         LIGHTNING_STONE_ELECTRICITY_RANGE = defineInteger(builder,
                 "Ukkoskivi may electrify connected conductor blocks within this distance.\n" +
                         "Set this value to 0 to disable.",
-                "lightning_stone_electricity_range", 16, 0, 64);
+                "lightning_stone_electricity_range", 10, 0, 64);
         LIGHTNING_STONE_ELECTRICITY_INTERVAL = defineInteger(builder,
                 "The interval for Ukkoskivi to make electrical discharges.",
-                "lightning_stone_electricity_interval", 30, 0, Integer.MAX_VALUE);
+                "lightning_stone_electricity_interval", 30, 1, Integer.MAX_VALUE);
         LIGHTNING_STONE_ELECTRICITY_SHOOK_CHANCE = defineDouble(builder,
                 "The probability of receiving damage and debuff by a creature connected to Ukkoskivi through conductors.\n" +
                         "Set this value to 0 to disable.",
@@ -132,7 +132,7 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                         "Set this value to 0 to disable.",
                 "poop_stone_transmutation_range", 2, 0, 64);
         POOP_STONE_DEBUFF_CHANCE = defineDouble(builder,
-                "The chance of receiving various debuff by the holder of Kakkakikkare in each tick.\n" +
+                "The chance of receiving various debuff (other than hunger) by the holder of Kakkakikkare in each tick.\n" +
                         "Set this value to 0 to disable debuff.",
                 "poop_stone_debuff_chance", 0.01, 0, 1);
 
@@ -144,7 +144,7 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
         SUN_SEED_TRANSMUTATION_RANGE = defineInteger(builder,
                 "The sun seed creates explosion at powder-like blocks within this distance.\n" +
                 "Set this value to 0 to disable.",
-                "sun_seed_search_range", 5, 0, 64);
+                "sun_seed_transmutation_range", 5, 0, 64);
         SUN_SEED_EXPLOSION_CHANCE = defineInteger(builder,
                 "The probability of explosion at a dust block within the transmutation range of a sun seed.\n" +
                 "Set this value to 0 to disable.",
