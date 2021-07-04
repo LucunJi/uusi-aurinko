@@ -45,6 +45,7 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
     public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_TRANSMUTATION_RANGE;
     public final ForgeConfigSpec.ConfigValue<Integer> SUN_SEED_EXPLOSION_CHANCE;
     public final ForgeConfigSpec.ConfigValue<Double> SUN_SEED_EXPLOSION_RANGE;
+    public final ForgeConfigSpec.ConfigValue<Integer> SUN_STONE_EXPLOSION_FREQUENCY;
 
     public final ForgeConfigSpec.ConfigValue<Integer> SUN_STONE_FIRE_RANGE;
     public final ForgeConfigSpec.ConfigValue<Integer> SUN_STONE_FIRE_CHANCE;
@@ -156,6 +157,10 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                 "The radius of explosions created by a sun stone. Determines how powerful the explosion is.\n" +
                 "Set this value to 0 to disable.",
                 "sun_seed_boom_range", 1.5F, 0, 64);
+        SUN_STONE_EXPLOSION_FREQUENCY = defineInteger(builder,
+                "How many ticks to make an explosion attempt. \n" +
+                "Set this value to 0 to DISABLE.",
+                "sun_seed_explosion_frequency", 2, 0, 40);
 
         SUN_STONE_FIRE_RANGE = defineInteger(builder,
                 "Set this value to 0 to DISABLE",

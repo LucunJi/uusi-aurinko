@@ -35,7 +35,9 @@ public class ItemSunSeed extends ItemRadiative {
 
     private void boom(World worldIn, Entity entityIn) {
         if (!worldIn.isRemote) {
-            if (worldIn.getDayTime() % 2 == 0) {
+            int explosionFrequency = ServerConfigs.INSTANCE.SUN_STONE_EXPLOSION_FREQUENCY.get();
+
+            if (explosionFrequency != 0 && worldIn.getDayTime() % explosionFrequency == 0) {
                 int searchRange = ServerConfigs.INSTANCE.SUN_SEED_TRANSMUTATION_RANGE.get();
                 int boomChance = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_CHANCE.get();
                 float boomRange = ServerConfigs.INSTANCE.SUN_SEED_EXPLOSION_RANGE.get().floatValue();
@@ -46,12 +48,12 @@ public class ItemSunSeed extends ItemRadiative {
 
                 Map<BlockPos, Block> blockList = SearchUtil.searchBlockWithAABB(worldIn, new AxisAlignedBB(
                         entityIn.getPosX() + searchRange,
-                        entityIn.getPosY() + 2,
+                        entityIn.getPosY() + searchRange,
                         entityIn.getPosZ() + searchRange,
                         entityIn.getPosX() - searchRange,
-                        entityIn.getPosY() - 1,
+                        entityIn.getPosY() - searchRange,
                         entityIn.getPosZ() - searchRange
-                ), (block -> block instanceof FallingBlock), null);
+                ), (block -> block instanceof FallingBlock), (pos) -> SearchUtil.inSphereRange(entityIn.getPositionVec(), searchRange, pos));
 
                 if (blockList.isEmpty()) return;
 

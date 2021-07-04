@@ -1,9 +1,12 @@
 package io.github.lucunji.uusiaurinko.util;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
@@ -38,6 +41,21 @@ public class SearchUtil {
     }
 
     public static boolean canBurn(IWorldReader worldIn, BlockPos pos) {
-        return (pos.getY() < 0 || pos.getY() >= 256 || worldIn.isBlockLoaded(pos)) && worldIn.getBlockState(pos).getMaterial().isFlammable();
+        return pos.getY() >= 0 && pos.getY() < 256 && worldIn.isBlockLoaded(pos) && worldIn.getBlockState(pos).getMaterial().isFlammable();
+    }
+
+    public static boolean inSphereRange(double centerX, double centerY, double centerZ, double range, double x, double y, double z) {
+        double f = centerX - x;
+        double f1 = centerY - y;
+        double f2 = centerZ - z;
+        return (f * f + f1 * f1 + f2 * f2) < (range * range);
+    }
+
+    public static boolean inSphereRange(BlockPos center, double range, BlockPos target) {
+        return inSphereRange(center.getX(), center.getY(), center.getZ(), range, target.getX(), target.getY(), target.getZ());
+    }
+
+    public static boolean inSphereRange(Vector3d center, double range, BlockPos target) {
+        return inSphereRange(center.getX(), center.getY(), center.getZ(), range, target.getX(), target.getY(), target.getZ());
     }
 }

@@ -45,18 +45,18 @@ public class ItemSunStone extends ItemRadiative {
 
                 Map<BlockPos, Block> blockList = SearchUtil.searchBlockWithAABB(worldIn, new AxisAlignedBB(
                         entityIn.getPosX() + searchRange,
-                        entityIn.getPosY() + 2,
+                        entityIn.getPosY() + searchRange,
                         entityIn.getPosZ() + searchRange,
                         entityIn.getPosX() - searchRange,
-                        entityIn.getPosY() - 1,
+                        entityIn.getPosY() - searchRange,
                         entityIn.getPosZ() - searchRange
-                ), null, (pos -> SearchUtil.canBurn(worldIn, pos)));
+                ), (block -> block instanceof FallingBlock), (pos ->
+                                                SearchUtil.inSphereRange(entityIn.getPositionVec(), searchRange, pos) &&
+                                                worldIn.getBlockState(pos).getBlock() != Blocks.AIR));
 
                 blockList.keySet().forEach(pos -> {
-                    if (worldIn.isAirBlock(pos.up())) {
-                        if (worldIn.getRandom().nextInt(100) <= fireChance) {
-                            worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState());
-                        }
+                    if (worldIn.getRandom().nextInt(100) <= fireChance) {
+                        worldIn.setBlockState(pos, Blocks.FIRE.getDefaultState());
                     }
                 });
             }
