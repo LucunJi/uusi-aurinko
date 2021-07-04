@@ -52,7 +52,7 @@ public class ItemSunStone extends ItemRadiative {
                         entityIn.getPosZ() - searchRange
                 ), (block -> block instanceof FallingBlock), (pos ->
                                                 SearchUtil.inSphereRange(entityIn.getPositionVec(), searchRange, pos) &&
-                                                SearchUtil.canBurn(worldIn, pos.down())));
+                                                worldIn.getBlockState(pos).getBlock() != Blocks.AIR));
 
                 blockList.keySet().forEach(pos -> {
                     if (worldIn.getRandom().nextInt(100) <= fireChance) {
@@ -65,7 +65,7 @@ public class ItemSunStone extends ItemRadiative {
 
     @Override
     public boolean isImmuneToExplosions() {
-        return true;
+        return false;
     }
 
     @Override

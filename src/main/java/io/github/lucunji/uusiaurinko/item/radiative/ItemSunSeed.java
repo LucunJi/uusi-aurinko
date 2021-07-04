@@ -55,13 +55,13 @@ public class ItemSunSeed extends ItemRadiative {
                         entityIn.getPosZ() - searchRange
                 ), (block -> block instanceof FallingBlock), (pos) -> SearchUtil.inSphereRange(entityIn.getPositionVec(), searchRange, pos));
 
-                if (blockList.size() > 0) {
-                    BlockPos randomPos = blockList.keySet().toArray(new BlockPos[0])[worldIn.getRandom().nextInt(blockList.size())];
+                if (blockList.isEmpty()) return;
 
-                    if (worldIn.getRandom().nextInt(100) <= boomChance) {
-                        worldIn.setBlockState(randomPos, Blocks.AIR.getDefaultState());
-                        worldIn.createExplosion(null, randomPos.getX(), randomPos.getY(), randomPos.getZ(), boomRange, Explosion.Mode.NONE);
-                    }
+                BlockPos randomPos = blockList.keySet().toArray(new BlockPos[0])[worldIn.getRandom().nextInt(blockList.size())];
+
+                if (worldIn.getRandom().nextInt(100) <= boomChance) {
+                    worldIn.setBlockState(randomPos, Blocks.AIR.getDefaultState());
+                    worldIn.createExplosion(null, randomPos.getX(), randomPos.getY(), randomPos.getZ(), boomRange, Explosion.Mode.NONE);
                 }
             }
         }

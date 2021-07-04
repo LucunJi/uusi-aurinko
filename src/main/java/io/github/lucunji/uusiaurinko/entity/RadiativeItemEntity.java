@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.entity;
 
+import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.item.radiative.ItemRadiative;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
@@ -44,12 +45,33 @@ public class RadiativeItemEntity extends ItemEntity {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        if (this.countdownSinceExplosion > 0) {
+            if (--this.countdownSinceExplosion == 0) {
+                this.explosionCount = 0;
+            }
+        }
+    }
+
+    @Override
     public boolean isImmuneToExplosions() {
         return ((ItemRadiative) getItem().getItem()).isImmuneToExplosions();
     }
 
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
+        if (!this.world.isRemote && this.getItem().getItem() == ModItems.SUN_STONE.get() && source.isExplosion()) {
+            this.countdownSinceExplosion = 10;
+            this.explosionCount++;
+            if (explosionCount >= 6) {
+                NewSunEntity newSunEntity = new NewSunEntity(ModEntityTypes.NEW_SUN.get(), this.world);
+                newSunEntity.setPosition(this.getPosX(), this.getPosY() - newSunEntity.getActualSize() / 2f , this.getPosZ());
+                this.world.addEntity(newSunEntity);
+                this.remove();
+            }
+            return false;
+        }
         return super.attackEntityFrom(source, amount);
     }
 
