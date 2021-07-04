@@ -265,6 +265,7 @@ public class ItemLightningStone extends ItemRadiative {
                 entity -> !entity.isSpectator() &&
                         Math.random() < shookChance &&
                         !(entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) &&
+                        !ServerConfigs.INSTANCE.LIGHTNING_STONE_ELECTRICITY_IMMUNE_ENTITY_TYPES.contains(entity.getType()) &&
                         entity.getPositionVec().squareDistanceTo(sourcePos) <= rangeSq);
         if (targets.isEmpty()) return;
 

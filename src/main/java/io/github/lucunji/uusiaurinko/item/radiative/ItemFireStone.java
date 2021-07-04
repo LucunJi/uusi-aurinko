@@ -64,8 +64,8 @@ public class ItemFireStone extends ItemRadiative {
         int improbability = ServerConfigs.INSTANCE.FIRE_STONE_IGNITE_FLAMMABLE_IMPROBABILITY.get();
         double baseChange = ServerConfigs.INSTANCE.FIRE_STONE_IGNITE_BLOCK_BASE_CHANCE.get();
         for (BlockPos pos : BlockPos.getRandomPositions(random, 1,
-                centerPos.getX() - 1, centerPos.getY() - 1, centerPos.getZ() - 1,
-                centerPos.getX() + 1, centerPos.getY() + 3, centerPos.getZ() + 1)) {
+                centerPos.getX() - range, centerPos.getY() - range, centerPos.getZ() - range,
+                centerPos.getX() + range, centerPos.getY() + range + 2, centerPos.getZ() + range)) {
             BlockState blockState = AbstractFireBlock.getFireForPlacement(worldIn, pos);
             if (worldIn.isAirBlock(pos) && blockState.isValidPosition(worldIn, pos) &&
                     (random.nextFloat() < baseChange || tryIgniteFlammable(worldIn, pos, random,
