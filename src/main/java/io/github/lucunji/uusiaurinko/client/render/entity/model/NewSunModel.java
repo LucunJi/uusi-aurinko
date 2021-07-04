@@ -13,13 +13,11 @@ public class NewSunModel extends Model {
         super(RenderType::getEntitySolid);
         this.renderer = new ModelRenderer(this);
         this.renderer.setTextureOffset(0, 0);
-        this.renderer.addBox(-5, -5, -5, 5, 5, 5);
+        this.renderer.addBox(-8, 0, -8, 16, 16, 16);
     }
 
     @Override
     public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         renderer.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
     }
-
-
 }

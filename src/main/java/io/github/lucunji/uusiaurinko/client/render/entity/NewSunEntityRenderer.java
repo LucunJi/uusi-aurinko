@@ -23,8 +23,13 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
     @Override
     public void render(NewSunEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
         super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
+        System.out.println(entityIn.getActualSize());
+        matrixStackIn.push();
+        float size = entityIn.getActualSize();
+        matrixStackIn.scale(size, size, size);
         model.render(matrixStackIn, bufferIn.getBuffer(RenderType.getEntitySolid(this.getEntityTexture(entityIn))),
                 packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
+        matrixStackIn.pop();
     }
 
     @Override

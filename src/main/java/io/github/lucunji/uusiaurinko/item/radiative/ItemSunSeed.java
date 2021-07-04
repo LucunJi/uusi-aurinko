@@ -53,6 +53,8 @@ public class ItemSunSeed extends ItemRadiative {
                         entityIn.getPosZ() - searchRange
                 ), (block -> block instanceof FallingBlock), null);
 
+                if (blockList.isEmpty()) return;
+
                 BlockPos randomPos = blockList.keySet().toArray(new BlockPos[0])[worldIn.getRandom().nextInt(blockList.size())];
 
                 if (worldIn.getRandom().nextInt(100) <= boomChance) {
