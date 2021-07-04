@@ -3,15 +3,22 @@ package io.github.lucunji.uusiaurinko.entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 public class RadiativeItemEntity extends ItemEntity {
-    public RadiativeItemEntity(EntityType<? extends RadiativeItemEntity> p_i50217_1_, World world) {
-        super(p_i50217_1_, world);
+    private int countdownSinceExplosion;
+    private int explosionCount;
+
+    public RadiativeItemEntity(EntityType<? extends RadiativeItemEntity> entityType, World world) {
+        super(entityType, world);
+        this.countdownSinceExplosion = 0;
+        this.explosionCount = 0;
     }
 
     public RadiativeItemEntity(World worldIn, double x, double y, double z) {
@@ -35,6 +42,11 @@ public class RadiativeItemEntity extends ItemEntity {
         this.setThrowerId(itemEntity.getThrowerId());
     }
 
+    @Override
+    public boolean attackEntityFrom(DamageSource source, float amount) {
+        return super.attackEntityFrom(source, amount);
+    }
+
     /**
      * The vanilla render distance for {@link ItemEntity} is too short.
      */
@@ -42,6 +54,20 @@ public class RadiativeItemEntity extends ItemEntity {
     public boolean isInRangeToRenderDist(double distanceSq) {
         double d = 96 * getRenderDistanceWeight();
         return distanceSq < d * d;
+    }
+
+    @Override
+    public void writeAdditional(CompoundNBT compound) {
+        super.writeAdditional(compound);
+        compound.putInt("CountdownSinceExplosion", countdownSinceExplosion);
+        compound.putInt("ExplosionCount", explosionCount);
+    }
+
+    @Override
+    public void readAdditional(CompoundNBT compound) {
+        super.readAdditional(compound);
+        this.countdownSinceExplosion = compound.getInt("CountdownSinceExplosion");
+        this.explosionCount = compound.getInt("ExplosionCount");
     }
 
     @Override
