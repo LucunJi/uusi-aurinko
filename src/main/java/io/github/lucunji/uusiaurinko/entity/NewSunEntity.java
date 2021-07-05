@@ -1,33 +1,51 @@
 package io.github.lucunji.uusiaurinko.entity;
 
+import com.google.common.collect.Sets;
+import io.github.lucunji.uusiaurinko.network.ModDataSerializers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import java.util.Set;
+
 public class NewSunEntity extends Entity {
-    private SunState sunState;
-    private boolean hasWaterStone, hasFireStone, hasEarthStone, hasLightningStone, hasPoopStone;
+    private static final DataParameter<SunState> SUN_STATE = EntityDataManager.createKey(NewSunEntity.class, ModDataSerializers.SUN_STATE);
+    private static final DataParameter<Boolean> HAS_WATER_STONE = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> HAS_FIRE_STONE = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> HAS_EARTH_STONE = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> HAS_LIGHTNING_STONE = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> HAS_POOP_STONE = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BOOLEAN);
+    private static final Set<DataParameter<?>> SIZE_PARAMETERS = Sets.newHashSet(
+            SUN_STATE, HAS_WATER_STONE, HAS_FIRE_STONE, HAS_EARTH_STONE, HAS_LIGHTNING_STONE, HAS_POOP_STONE
+    );
     private static final int SIZE_INCREMENT_PER_STONE = 1;
 
     public NewSunEntity(EntityType<?> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
-        this.sunState = SunState.NEW_BORN;
     }
 
-    public int getActualSize() {
-        if (this.sunState == SunState.GROWING) {
-            int baseSize = this.sunState.size;
-            if (hasWaterStone) baseSize += SIZE_INCREMENT_PER_STONE;
-            if (hasFireStone) baseSize += SIZE_INCREMENT_PER_STONE;
-            if (hasEarthStone) baseSize += SIZE_INCREMENT_PER_STONE;
-            if (hasLightningStone) baseSize += SIZE_INCREMENT_PER_STONE;
-            if (hasPoopStone) baseSize += SIZE_INCREMENT_PER_STONE;
+    /*
+    /data merge entity @e[type=uusi-aurinko:new_sun, limit=1] {SunState:"GROWING"}
+     */
+
+    public float getActualSize() {
+        SunState sunState = this.getSunState();
+        if (sunState == SunState.GROWING) {
+            float baseSize = sunState.size;
+            if (this.getHasWaterStone()) baseSize += SIZE_INCREMENT_PER_STONE;
+            if (this.getHasFireStone()) baseSize += SIZE_INCREMENT_PER_STONE;
+            if (this.getHasEarthStone()) baseSize += SIZE_INCREMENT_PER_STONE;
+            if (this.getHasLightningStone()) baseSize += SIZE_INCREMENT_PER_STONE;
+            if (this.getHasPoopStone()) baseSize += SIZE_INCREMENT_PER_STONE;
             return baseSize;
         } else {
-            return this.sunState.size;
+            return sunState.size;
         }
     }
 
@@ -36,41 +54,39 @@ public class NewSunEntity extends Entity {
      */
     @Override
     protected void registerData() {
-
-    }
-
-    @Override
-    public void deserializeNBT(CompoundNBT compound) {
-        super.deserializeNBT(compound);
-        readAdditional(compound);
-    }
-
-    @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT compound = super.serializeNBT();
-        writeAdditional(compound);
-        return compound;
+        this.dataManager.register(SUN_STATE, SunState.NEW_BORN);
+        this.dataManager.register(HAS_WATER_STONE, false);
+        this.dataManager.register(HAS_FIRE_STONE, false);
+        this.dataManager.register(HAS_EARTH_STONE, false);
+        this.dataManager.register(HAS_LIGHTNING_STONE, false);
+        this.dataManager.register(HAS_POOP_STONE, false);
     }
 
     @Override
     protected void readAdditional(CompoundNBT compound) {
-        int state = compound.getInt("SunState");
-        this.sunState = SunState.values()[state >= 0 && state < SunState.values().length ? state : 0];
-        this.hasWaterStone = compound.getBoolean("Water");
-        this.hasFireStone = compound.getBoolean("Fire");
-        this.hasEarthStone = compound.getBoolean("Earth");
-        this.hasLightningStone = compound.getBoolean("Lightning");
-        this.hasPoopStone = compound.getBoolean("Poop");
+        if (compound.contains("SunState")) {
+            try {
+                this.setSunState(SunState.valueOf(compound.getString("SunState")));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(e);
+                this.setSunState(SunState.NEW_BORN);
+            }
+        }
+        this.setHasWaterStone(compound.getBoolean("Water"));
+        this.setHasFireStone(compound.getBoolean("Fire"));
+        this.setHasEarthStone(compound.getBoolean("Earth"));
+        this.setHasLightningStone(compound.getBoolean("Lightning"));
+        this.setHasPoopStone(compound.getBoolean("Poop"));
     }
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
-        compound.putInt("SunState", sunState.ordinal());
-        compound.putBoolean("Water", hasWaterStone);
-        compound.putBoolean("Fire", hasFireStone);
-        compound.putBoolean("Earth", hasEarthStone);
-        compound.putBoolean("Lightning", hasLightningStone);
-        compound.putBoolean("Poop", hasPoopStone);
+        compound.putString("SunState", this.getSunState().name());
+        compound.putBoolean("Water", this.getHasWaterStone());
+        compound.putBoolean("Fire", this.getHasFireStone());
+        compound.putBoolean("Earth", this.getHasEarthStone());
+        compound.putBoolean("Lightning", this.getHasLightningStone());
+        compound.putBoolean("Poop", this.getHasPoopStone());
     }
 
     @Override
@@ -83,15 +99,63 @@ public class NewSunEntity extends Entity {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
-    private enum SunState {
-        NEW_BORN(10),
-        GROWING(20),
-        FULL_YELLOW(30),
-        FULL_BLACK(60);
+    public SunState getSunState() {
+        return this.dataManager.get(SUN_STATE);
+    }
 
-        private final int size;
+    public void setSunState(SunState sunState) {
+        this.dataManager.set(SUN_STATE, sunState);
+    }
 
-        SunState(int size) {
+    public boolean getHasWaterStone() {
+        return this.dataManager.get(HAS_WATER_STONE);
+    }
+
+    public void setHasWaterStone(boolean newVal) {
+        this.dataManager.set(HAS_WATER_STONE, newVal);
+    }
+
+    public boolean getHasFireStone() {
+        return this.dataManager.get(HAS_FIRE_STONE);
+    }
+
+    public void setHasFireStone(boolean newVal) {
+        this.dataManager.set(HAS_FIRE_STONE, newVal);
+    }
+
+    public boolean getHasEarthStone() {
+        return this.dataManager.get(HAS_EARTH_STONE);
+    }
+
+    public void setHasEarthStone(boolean newVal) {
+        this.dataManager.set(HAS_EARTH_STONE, newVal);
+    }
+
+    public boolean getHasLightningStone() {
+        return this.dataManager.get(HAS_LIGHTNING_STONE);
+    }
+
+    public void setHasLightningStone(boolean newVal) {
+        this.dataManager.set(HAS_LIGHTNING_STONE, newVal);
+    }
+
+    public boolean getHasPoopStone() {
+        return this.dataManager.get(HAS_POOP_STONE);
+    }
+
+    public void setHasPoopStone(boolean newVal) {
+        this.dataManager.set(HAS_POOP_STONE, newVal);
+    }
+
+    public enum SunState {
+        NEW_BORN(8F),
+        GROWING(16F),
+        FULL_YELLOW(24F),
+        FULL_BLACK(48F);
+
+        public final float size;
+
+        SunState(float size) {
             this.size = size;
         }
     }

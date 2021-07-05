@@ -46,7 +46,7 @@ public class ItemSunSeed extends ItemRadiative {
                 if (randomPos != null && worldIn.getRandom().nextFloat() < explosionChance) {
                     worldIn.setBlockState(randomPos, Blocks.AIR.getDefaultState());
                     worldIn.createExplosion(null, randomPos.getX(), randomPos.getY(), randomPos.getZ(),
-                            0.5f, Explosion.Mode.DESTROY);
+                            0.25f, Explosion.Mode.DESTROY);
                 }
             }
         }

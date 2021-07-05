@@ -28,7 +28,7 @@ public class ModEntityTypes {
 
     public static final RegistryObject<EntityType<NewSunEntity>> NEW_SUN = ENTITY_TYPES.register("new_sun",
             () -> EntityType.Builder.create(NewSunEntity::new, EntityClassification.MISC)
-                    .size(10f, 10f).trackingRange(16).build("new_sun"));
+                    .size(0.25f, 0.25f).trackingRange(16).build("new_sun"));
 
     @OnlyIn(Dist.CLIENT)
     public static class ClientRenderer {
