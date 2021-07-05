@@ -31,7 +31,8 @@
 
   "subtitles.uusi-aurinko.entity.radiative_stone.throw": "魔法石：飞出",
   "subtitles.uusi-aurinko.entity.lightning_rock.discharge": "§oUkkoskivi§r：放电",
-  "subtitles.uusi-aurinko.item.evil_eye.equip": "§oPaha Silmä§r：嵌入",
+  "subtitles.uusi-aurinko.item.evil_eye.equip": "§oPaha Silmä§r：佩戴",
+  "subtitles.uusi-aurinko.item.sun_stone.ambient": "§oAurinkokivi§r：嗡嗡作响",
 
   "death.attack.uusi-aurinko.electricity": "%1$s感受到了贯穿身体的高压电流",
   "death.attack.uusi-aurinko.electricity.player": "%1$s在与%2$s的战斗中感受到了贯穿身体的高压电流",

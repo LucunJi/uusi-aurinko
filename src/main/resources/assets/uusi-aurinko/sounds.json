@@ -18,5 +18,11 @@
       "block/end_portal/eyeplace2",
       "block/end_portal/eyeplace3"
     ]
+  },
+  "item.sun_stone.ambient": {
+    "subtitle": "subtitles.uusi-aurinko.item.sun_stone.ambient",
+    "sounds": [
+      "block/beacon/ambient"
+    ]
   }
 }
