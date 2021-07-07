@@ -7,7 +7,9 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber
+import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
+
+@Mod.EventBusSubscriber(modid = MODID)
 public class EntityOnAttackEventHandler {
     /**
      * Main logic of electricity resistance potion effect.

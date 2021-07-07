@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "uusi-aurinko:block/temple_stone",
+    "side": "uusi-aurinko:block/rune_temple_bricks_2"
+  }
+}

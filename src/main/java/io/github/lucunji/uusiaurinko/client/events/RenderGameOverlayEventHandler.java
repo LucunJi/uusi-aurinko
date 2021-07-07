@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
 public class RenderGameOverlayEventHandler {
     private static final ResourceLocation ELECTRIC_TEX_PATH = new ResourceLocation(MODID, "textures/misc/electric.png");
 

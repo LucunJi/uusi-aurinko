@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "uusi-aurinko:block/rune_temple_bricks_1"
+      },
+      {
+        "model": "uusi-aurinko:block/rune_temple_bricks_2"
+      }
+    ]
+  }
+}

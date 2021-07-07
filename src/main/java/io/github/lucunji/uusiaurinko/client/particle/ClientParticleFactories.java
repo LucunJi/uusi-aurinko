@@ -9,7 +9,9 @@ import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
+
+@Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientParticleFactories {
     private static final Logger LOGGER = LogManager.getLogger();
 

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "uusi-aurinko:block/temple_stone_bricks_slab"
+    },
+    "type=double": {
+      "model": "uusi-aurinko:block/temple_stone_bricks"
+    },
+    "type=top": {
+      "model": "uusi-aurinko:block/temple_stone_bricks_slab_top"
+    }
+  }
+}

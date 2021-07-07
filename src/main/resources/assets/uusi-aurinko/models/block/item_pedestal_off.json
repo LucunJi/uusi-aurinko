@@ -1,0 +1,46 @@
+{
+	"credit": "Made by XeKr with Blockbench",
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "uusi-aurinko:block/item_pedestal_off_1",
+		"side1": "uusi-aurinko:block/item_pedestal_off_1",
+		"side2": "uusi-aurinko:block/item_pedestal_off_2",
+		"end": "uusi-aurinko:block/temple_stone"
+	},
+	"elements": [
+		{
+			"from": [2, 0, 2],
+			"to": [14, 3, 14],
+			"faces": {
+				"north": {"uv": [2, 13, 14, 16], "texture": "#side1"},
+				"east": {"uv": [2, 13, 14, 16], "texture": "#side1"},
+				"south": {"uv": [2, 13, 14, 16], "texture": "#side1"},
+				"west": {"uv": [2, 13, 14, 16], "texture": "#side1"},
+				"up": {"uv": [2, 2, 14, 14], "texture": "#end"},
+				"down": {"uv": [2, 2, 14, 14], "texture": "#end"}
+			}
+		},
+		{
+			"from": [2, 14, 2],
+			"to": [14, 16, 14],
+			"faces": {
+				"north": {"uv": [2, 0, 14, 2], "texture": "#side1"},
+				"east": {"uv": [2, 0, 14, 2], "texture": "#side1"},
+				"south": {"uv": [2, 0, 14, 2], "texture": "#side1"},
+				"west": {"uv": [2, 0, 14, 2], "texture": "#side1"},
+				"up": {"uv": [2, 2, 14, 14], "texture": "#end"},
+				"down": {"uv": [2, 2, 14, 14], "texture": "#end"}
+			}
+		},
+		{
+			"from": [4, 3, 4],
+			"to": [12, 14, 12],
+			"faces": {
+				"north": {"uv": [4, 2, 12, 13], "texture": "#side1"},
+				"east": {"uv": [4, 2, 12, 13], "texture": "#side2"},
+				"south": {"uv": [4, 2, 12, 13], "texture": "#side1"},
+				"west": {"uv": [4, 2, 12, 13], "texture": "#side2"}
+			}
+		}
+	]
+}

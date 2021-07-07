@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "powered=false,facing=east": {
+      "model": "uusi-aurinko:block/item_pedestal_off",
+      "y": 270
+    },
+    "powered=false,facing=north": {
+      "model": "uusi-aurinko:block/item_pedestal_off",
+      "y": 180
+    },
+    "powered=false,facing=south": {
+      "model": "uusi-aurinko:block/item_pedestal_off"
+    },
+    "powered=false,facing=west": {
+      "model": "uusi-aurinko:block/item_pedestal_off",
+      "y": 90
+    },
+    "powered=true,facing=east": {
+      "model": "uusi-aurinko:block/item_pedestal_on",
+      "y": 270
+    },
+    "powered=true,facing=north": {
+      "model": "uusi-aurinko:block/item_pedestal_on",
+      "y": 180
+    },
+    "powered=true,facing=south": {
+      "model": "uusi-aurinko:block/item_pedestal_on"
+    },
+    "powered=true,facing=west": {
+      "model": "uusi-aurinko:block/item_pedestal_on",
+      "y": 90
+    }
+  }
+}
