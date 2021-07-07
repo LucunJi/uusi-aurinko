@@ -1,12 +1,9 @@
 package io.github.lucunji.uusiaurinko.entity;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.network.ModDataSerializers;
 import io.github.lucunji.uusiaurinko.util.ModDamageSource;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowingFluidBlock;
@@ -16,7 +13,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
@@ -28,10 +24,8 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class NewSunEntity extends Entity {
     private static final DataParameter<SunState> SUN_STATE = EntityDataManager.createKey(NewSunEntity.class, ModDataSerializers.SUN_STATE);
@@ -40,12 +34,9 @@ public class NewSunEntity extends Entity {
     private static final DataParameter<Boolean> HAS_EARTH_STONE = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> HAS_LIGHTNING_STONE = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> HAS_POOP_STONE = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BOOLEAN);
-    private static final Set<DataParameter<?>> SIZE_PARAMETERS = Sets.newHashSet(
-            SUN_STATE, HAS_WATER_STONE, HAS_FIRE_STONE, HAS_EARTH_STONE, HAS_LIGHTNING_STONE, HAS_POOP_STONE
-    );
+
     private static final int SIZE_INCREMENT_PER_STONE = 1;
 
-    private int killCount = 0;
     private static final Item[] STONES = new Item[]{
             ModItems.FIRE_STONE.get(),
             ModItems.WATER_STONE.get(),
@@ -53,6 +44,8 @@ public class NewSunEntity extends Entity {
             ModItems.LIGHTNING_STONE.get(),
             ModItems.POOP_STONE.get()
     };
+
+    private int killCount = 0;
 
     public NewSunEntity(EntityType<?> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
@@ -236,6 +229,7 @@ public class NewSunEntity extends Entity {
         this.setHasEarthStone(compound.getBoolean("Earth"));
         this.setHasLightningStone(compound.getBoolean("Lightning"));
         this.setHasPoopStone(compound.getBoolean("Poop"));
+        this.killCount = compound.getInt("KillCount");
     }
 
     @Override
@@ -246,6 +240,7 @@ public class NewSunEntity extends Entity {
         compound.putBoolean("Earth", this.getHasEarthStone());
         compound.putBoolean("Lightning", this.getHasLightningStone());
         compound.putBoolean("Poop", this.getHasPoopStone());
+        compound.putInt("KillCount", this.killCount);
     }
 
     @Override

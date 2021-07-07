@@ -104,15 +104,15 @@ public class ModBlocks {
                     AbstractBlock.Properties.from(SHATTERED_TEMPLE_BRICKS.get())
             ));
 
-    @Itemize
+    @Itemize(parentModel = MODID + ":block/rune_temple_bricks_1")
     public static final RegistryObject<Block> RUNE_TEMPLE_BRICKS = BLOCKS.register("rune_temple_bricks",
             () -> new Block(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
 
-    @Itemize
+    @Itemize(parentModel = MODID + ":block/chiseled_temple_bricks_1")
     public static final RegistryObject<Block> CHISELED_TEMPLE_BRICKS = BLOCKS.register("chiseled_temple_bricks",
             () -> new Block(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
 
-    @Itemize(maxStackSize = 16)
+    @Itemize(maxStackSize = 16, parentModel = MODID + ":block/item_pedestal_off")
     public static final RegistryObject<PedestalBlock> ITEM_PEDESTAL = BLOCKS.register("item_pedestal",
             () -> new PedestalBlock(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
 
