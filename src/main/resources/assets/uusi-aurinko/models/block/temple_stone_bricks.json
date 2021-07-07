@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "uusi-aurinko:block/temple_stone_bricks"
+  }
+}

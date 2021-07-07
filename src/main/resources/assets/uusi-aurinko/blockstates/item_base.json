@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "uusi-aurinko:block/item_base_off"
+    },
+    "powered=true": {
+      "model": "uusi-aurinko:block/item_base_on"
+    }
+  }
+}

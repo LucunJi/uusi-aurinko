@@ -31,6 +31,46 @@ public class ModBlocks {
                     .notSolid()
                     .setAllowsSpawn((a, b, c, d) -> false)));
 
+    public static final RegistryObject<Block> CHISELED_TEMPLE_BRICKS = BLOCKS.register("chiseled_temple_bricks",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> ITEM_BASE = BLOCKS.register("item_base",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+
+    public static final RegistryObject<Block> TEMPLE_BRICKS = BLOCKS.register("temple_bricks",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> TEMPLE_BRICKS_SLAB = BLOCKS.register("temple_bricks_slab",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> TEMPLE_BRICKS_STAIRS = BLOCKS.register("temple_bricks_stairs",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> SHATTERED_TEMPLE_BRICKS = BLOCKS.register("shattered_temple_bricks",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> SHATTERED_TEMPLE_BRICKS_SLAB = BLOCKS.register("shattered_temple_bricks_slab",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> SHATTERED_TEMPLE_BRICKS_STAIRS = BLOCKS.register("shattered_temple_bricks_stairs",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> RUNE_TEMPLE_BRICKS = BLOCKS.register("rune_temple_bricks",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+
+    public static final RegistryObject<Block> TEMPLE_STONE = BLOCKS.register("temple_stone",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> TEMPLE_STONE_BRICKS = BLOCKS.register("temple_stone_bricks",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> TEMPLE_STONE_BRICKS_SLAB = BLOCKS.register("temple_stone_bricks_slab",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> TEMPLE_STONE_BRICKS_STAIRS = BLOCKS.register("temple_stone_bricks_stairs",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> TEMPLE_STONE_SLAB = BLOCKS.register("temple_stone_slab",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> TEMPLE_STONE_STAIRS = BLOCKS.register("temple_stone_stairs",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> POLISHED_TEMPLE_STONE = BLOCKS.register("polished_temple_stone",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> POLISHED_TEMPLE_STONE_SLAB = BLOCKS.register("polished_temple_stone_slab",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+    public static final RegistryObject<Block> POLISHED_TEMPLE_STONE_STAIRS = BLOCKS.register("polished_temple_stone_stairs",
+            () -> new Block(AbstractBlock.Properties.create(Material.ROCK, MaterialColor.SAND).setRequiresTool().hardnessAndResistance(50F, 1200F)));
+
+
     /*==================== Fluids ====================*/
     public static final RegistryObject<FlowingFluidBlock> EXCREMENT = BLOCKS.register("excrement",
             () -> new ExcrementFluidBlock(ModFluids.EXCREMENT,

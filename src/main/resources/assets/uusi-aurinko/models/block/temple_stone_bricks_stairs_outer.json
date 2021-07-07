@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs_outer",
+  "textures": {
+    "bottom": "uusi-aurinko:block/temple_stone_bricks",
+    "top": "uusi-aurinko:block/temple_stone_bricks",
+    "side": "uusi-aurinko:block/temple_stone_bricks"
+  }
+}
