@@ -2,9 +2,9 @@
 	"credit": "Made by XeKr with Blockbench",
 	"parent": "minecraft:block/block",
 	"textures": {
-		"particle": "uusi-aurinko:block/item_base_on_1",
-		"side1": "uusi-aurinko:block/item_base_on_1",
-		"side2": "uusi-aurinko:block/item_base_on_2",
+		"particle": "uusi-aurinko:block/item_pedestal_off_1",
+		"side1": "uusi-aurinko:block/item_pedestal_off_1",
+		"side2": "uusi-aurinko:block/item_pedestal_off_2",
 		"end": "uusi-aurinko:block/temple_stone"
 	},
 	"elements": [

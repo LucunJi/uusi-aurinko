@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/stairs_inner",
+  "parent": "minecraft:block/inner_stairs",
   "textures": {
     "bottom": "uusi-aurinko:block/shattered_temple_bricks",
     "top": "uusi-aurinko:block/shattered_temple_bricks",

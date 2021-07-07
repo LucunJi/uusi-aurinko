@@ -113,8 +113,8 @@ public class ModBlocks {
             () -> new Block(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
 
     @Itemize(maxStackSize = 16)
-    public static final RegistryObject<Block> ITEM_BASE = BLOCKS.register("item_base",
-            () -> new Block(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
+    public static final RegistryObject<PedestalBlock> ITEM_PEDESTAL = BLOCKS.register("item_pedestal",
+            () -> new PedestalBlock(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
 
     /*==================== Fluids ====================*/
     public static final RegistryObject<FlowingFluidBlock> EXCREMENT = BLOCKS.register("excrement",
