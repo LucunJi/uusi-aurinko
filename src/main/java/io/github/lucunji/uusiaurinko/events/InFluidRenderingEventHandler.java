@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
 public class InFluidRenderingEventHandler {
     private static final ResourceLocation TEXTURE_UNDER_FLUID = new ResourceLocation(MODID, "textures/misc/underfluid.png");
 

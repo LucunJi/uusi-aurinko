@@ -1,6 +1,7 @@
 package io.github.lucunji.uusiaurinko;
 
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
+import io.github.lucunji.uusiaurinko.datagen.ModDataGenerators;
 import io.github.lucunji.uusiaurinko.config.ClientConfigs;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
@@ -25,6 +26,8 @@ public class UusiAurinko {
     public static final String VERSION = "0.1.0";
 
     public UusiAurinko() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModDataGenerators::onGatherData);
+
         ModBlocks.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModFluids.FLUIDS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModItems.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());

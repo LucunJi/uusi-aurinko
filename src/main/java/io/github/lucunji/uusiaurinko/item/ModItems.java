@@ -1,13 +1,12 @@
 package io.github.lucunji.uusiaurinko.item;
 
+import io.github.lucunji.uusiaurinko.block.ModBlocks;
 import io.github.lucunji.uusiaurinko.fluid.ModFluids;
 import io.github.lucunji.uusiaurinko.item.radiative.*;
+import net.minecraft.block.Block;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.Item;
+import net.minecraft.item.*;
 import net.minecraft.item.Item.Properties;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.Items;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -18,7 +17,6 @@ public class ModItems {
     private static final ItemGroup DEFAULT_GROUP = new ModItemGroupDefault(MODID + ".defaults");
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-
 
     public static final RegistryObject<ItemFireStone> FIRE_STONE = ITEMS.register("fire_stone",
             () -> new ItemFireStone(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
@@ -44,4 +42,15 @@ public class ModItems {
 
     public static final RegistryObject<BucketItem> EXCREMENT_BUCKET = ITEMS.register("excrement_bucket",
             () -> new BucketItem(ModFluids.EXCREMENT, new Item.Properties().containerItem(Items.BUCKET).maxStackSize(1).group(ItemGroup.MISC)));
+
+    static {
+        ModBlocks.itemizedBlocks().forEach(pair -> {
+            RegistryObject<Block> blockRegistryObject = pair.getLeft();
+            ITEMS.register(blockRegistryObject.getId().getPath(),
+                    () -> new BlockItem(blockRegistryObject.get(),
+                            new Item.Properties()
+                                    .group(DEFAULT_GROUP)
+                                    .maxStackSize(pair.getRight().maxStackSize())));
+        });
+    }
 }
