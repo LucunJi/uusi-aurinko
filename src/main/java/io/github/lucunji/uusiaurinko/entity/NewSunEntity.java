@@ -1,18 +1,37 @@
 package io.github.lucunji.uusiaurinko.entity;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import io.github.lucunji.uusiaurinko.config.ServerConfigs;
+import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.network.ModDataSerializers;
+import io.github.lucunji.uusiaurinko.util.ModDamageSource;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class NewSunEntity extends Entity {
     private static final DataParameter<SunState> SUN_STATE = EntityDataManager.createKey(NewSunEntity.class, ModDataSerializers.SUN_STATE);
@@ -26,8 +45,148 @@ public class NewSunEntity extends Entity {
     );
     private static final int SIZE_INCREMENT_PER_STONE = 1;
 
+    private int killCount = 0;
+    private static final Item[] STONES = new Item[]{
+            ModItems.FIRE_STONE.get(),
+            ModItems.WATER_STONE.get(),
+            ModItems.EARTH_STONE.get(),
+            ModItems.LIGHTNING_STONE.get(),
+            ModItems.POOP_STONE.get()
+    };
+
     public NewSunEntity(EntityType<?> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        entityPart(getAttractRange());
+
+        if (!world.isRemote) {
+            blockPart((int) getAttractRange());
+
+            if (getDataManager().get(SUN_STATE) != SunState.NEW_BORN) {
+                Vector3d add = new Vector3d(0, 200, 0).subtract(getPositionVec()).normalize().scale(0.05);
+                Vector3d a = getPositionVec().add(add);
+                setPosition(a.x, a.y, a.z);
+            }
+        }
+    }
+
+    void entityPart(float range) {
+        List<Entity> entityList = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(
+                getPosX() + range,
+                getPosY() + range,
+                getPosZ() + range,
+                getPosX() - range,
+                getPosY() - range,
+                getPosZ() - range
+        ), (entity) -> entity.getDistanceSq(getPositionVec()) <= range * range);
+
+        attractEntity(entityList, 0.1F);
+        hitEntity(entityList);
+    }
+
+    void hitEntity(List<Entity> entityList) {
+        if (world.getGameTime() % 10 != 0) return;
+
+        entityList.forEach(entity -> {
+            entity.setFire(1);
+            entity.attackEntityFrom(ModDamageSource.SUN_HEAT, 4);
+
+            if (getDataManager().get(SUN_STATE) == SunState.GROWING && entity instanceof ItemEntity) {
+                Item item = ((ItemEntity) entity).getItem().getItem();
+
+                if (item == STONES[0]) {
+                    getDataManager().set(HAS_FIRE_STONE, true);
+                }
+                else if (item == STONES[1]) {
+                    getDataManager().set(HAS_WATER_STONE, true);
+                }
+                else if (item == STONES[2]) {
+                    getDataManager().set(HAS_EARTH_STONE, true);
+                }
+                else if (item == STONES[3]) {
+                    getDataManager().set(HAS_LIGHTNING_STONE, true);
+                }
+                else if (item == STONES[4]) {
+                    getDataManager().set(HAS_POOP_STONE, true);
+                }
+
+                if (getHasFireStone() && getHasEarthStone() && getHasWaterStone() && getHasLightningStone()) {
+                    if (getHasPoopStone()) {
+                        getDataManager().set(SUN_STATE, SunState.FULL_BLACK);
+                    }
+                    else {
+                        getDataManager().set(SUN_STATE, SunState.FULL_YELLOW);
+                    }
+                }
+            }
+        });
+
+        entityList.stream().filter(entity ->
+                        entity instanceof LivingEntity &&
+                        entity.getDistanceSq(this) < (getAttractRangeSq() / 4F)
+        ).forEach(entity -> {
+            entity.attackEntityFrom(ModDamageSource.SUN_NUCLEAR, 6);
+
+            if (getDataManager().get(SUN_STATE) == SunState.NEW_BORN && ((LivingEntity) entity).getHealth() <= 0 && killCount <= 100) {
+                killCount++;
+
+                if (killCount == 100) {
+                    getDataManager().set(SUN_STATE, SunState.GROWING);
+                }
+            }
+        });
+    }
+
+    void attractEntity(List<Entity> entityList, float attractSpeedBase) {
+        entityList.forEach(entity -> {
+            Vector3d toSun = getVectorToTarget(this, entity);
+            Vector3d toEntity = getVectorToTarget(entity, this);
+            Vector3d c1 = toSun.subtract(toEntity);
+            Vector3d d1 = c1.scale(1 / c1.length());
+            float realSpeed = Math.min(attractSpeedBase * (getAttractRange() / entity.getDistance(this)), attractSpeedBase * 2);
+            Vector3d e1 = d1.scale(realSpeed);
+            entity.setMotion(entity.getMotion().add(e1));
+        });
+    }
+
+    private Vector3d getVectorToTarget(Entity a, Entity b) {
+        return a.getPositionVec().subtract(b.getPositionVec()).normalize();
+    }
+
+    void blockPart(int range) {
+        findCanDestroyBlocks(range).forEach(pos -> {
+            world.destroyBlock(pos, false);
+            world.setBlockState(pos, Fluids.FLOWING_LAVA.getDefaultState().getBlockState().with(FlowingFluidBlock.LEVEL, 2));
+        });
+    }
+
+    List<BlockPos> findCanDestroyBlocks(int searchRange) {
+        return BlockPos.getAllInBox(new AxisAlignedBB(
+                        getPositionVec().subtract(searchRange, searchRange, searchRange),
+                        getPositionVec().add(searchRange, searchRange, searchRange)))
+                .filter((pos) -> {
+                    BlockState blockState = world.getBlockState(pos);
+                    return !blockState.isAir() &&
+                            blockState.getBlock() != Blocks.BEDROCK &&
+                            blockState.getFluidState().getFluid() != Fluids.LAVA &&
+                            blockState.getFluidState().getFluid() != Fluids.FLOWING_LAVA &&
+                            pos.distanceSq(getPosition()) <= searchRange * searchRange &&
+                            !ServerConfigs.INSTANCE.NEW_SUN_DESTROY_BLACKLIST.contains(world.getBlockState(pos));
+                }
+        ).map(BlockPos::toImmutable).collect(Collectors.toList());
+    }
+
+    float getAttractRange() {
+        return (getActualSize() * 1.6F) / 2F;
+    }
+
+    float getAttractRangeSq() {
+        return getAttractRange() * getAttractRange();
     }
 
     /*

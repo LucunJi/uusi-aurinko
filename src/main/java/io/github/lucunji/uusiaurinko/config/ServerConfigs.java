@@ -53,6 +53,8 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
     public final BlockTaggedListConfigValue POWDERY_BLOCK;
 
+    public final BlockTaggedListConfigValue NEW_SUN_DESTROY_BLACKLIST;
+
     public ServerConfigs(ForgeConfigSpec.Builder builder) {
         FIRE_STONE_IGNITE_BLOCK_RANGE = defineInteger(builder,
                 "Kiuaskivi may ignite blocks in the cuboid which goes from (-range, -range, -range) to (range, range + 2, range)\n" +
@@ -198,6 +200,11 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                         "Also accept block tags starting with #",
                 "powdery_blocks",
                 Lists.newArrayList("#uusi-aurinko:powdery")
+        ), this);
+
+        NEW_SUN_DESTROY_BLACKLIST = new BlockTaggedListConfigValue(defineList(builder,
+                "????????????",
+                "new_sun_destroy_blacklist", Lists.newArrayList("#")
         ), this);
     }
 
