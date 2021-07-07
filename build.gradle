@@ -64,8 +64,7 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'uusiaurinko', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'),
-                    '-mixin.config=' + archivesBaseName + '.mixins.json'
+            args '--mod', archivesBaseName, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
                 uusiaurinko {

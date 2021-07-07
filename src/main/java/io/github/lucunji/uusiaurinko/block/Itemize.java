@@ -10,4 +10,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Itemize {
     int maxStackSize() default 64;
+
+    boolean genItemModel() default true;
+    /**
+     * You may need to add "modid:block/" before referenced model name.
+     */
+    String parentModel() default "";
 }

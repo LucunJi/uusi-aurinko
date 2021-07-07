@@ -47,10 +47,11 @@ public class ModItems {
         ModBlocks.itemizedBlocks().forEach(pair -> {
             RegistryObject<Block> blockRegistryObject = pair.getLeft();
             ITEMS.register(blockRegistryObject.getId().getPath(),
-                    () -> new BlockItem(blockRegistryObject.get(),
-                            new Item.Properties()
-                                    .group(DEFAULT_GROUP)
-                                    .maxStackSize(pair.getRight().maxStackSize())));
+                    () -> new BlockItem(
+                            blockRegistryObject.get(),
+                            new Item.Properties().group(DEFAULT_GROUP).maxStackSize(pair.getRight().maxStackSize())
+                    )
+            );
         });
     }
 }
