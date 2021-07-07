@@ -26,7 +26,7 @@ public class UusiAurinko {
     public static final String VERSION = "0.1.0";
 
     public UusiAurinko() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModDataGenerators::onGatherData);
+        // FMLJavaModLoadingContext.get().getModEventBus().addListener(ModDataGenerators::onGatherData);
 
         ModBlocks.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModFluids.FLUIDS.register(FMLJavaModLoadingContext.get().getModEventBus());

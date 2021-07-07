@@ -2,7 +2,10 @@ package io.github.lucunji.uusiaurinko.datagen.client;
 
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.item.BlockItem;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ModItemModelProvider extends ItemModelProvider {
@@ -13,8 +16,16 @@ public class ModItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         ModBlocks.itemizedBlocks().forEach(pair -> {
-            String name = pair.getLeft().getId().getPath();
-            withExistingParent(name, modLoc("block/" + name));
+            simpleBlockItem(((BlockItem) pair.getLeft().get().asItem()));
         });
+    }
+
+    protected void simpleBlockItem(BlockItem blockItem) {
+        getBuilder(blockItem.getRegistryName().getPath())
+                .parent(getModel("block/" + blockItem.getRegistryName().getPath()));
+    }
+
+    private ModelFile getModel(String loc) {
+        return new ModelFile.UncheckedModelFile(new ResourceLocation(modid, loc));
     }
 }
