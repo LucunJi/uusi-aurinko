@@ -3,8 +3,8 @@
   "values": [
     "uusi-aurinko:temple_stone_stairs",
     "uusi-aurinko:polished_temple_stone_stairs",
-    "uusi-aurinko:temple_stone_bricks_stairs",
-    "uusi-aurinko:temple_bricks_stairs",
-    "uusi-aurinko:shattered_temple_bricks_stairs"
+    "uusi-aurinko:temple_stone_brick_stairs",
+    "uusi-aurinko:temple_brick_stairs",
+    "uusi-aurinko:shattered_temple_brick_stairs"
   ]
 }
