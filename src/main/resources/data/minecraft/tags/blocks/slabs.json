@@ -3,8 +3,8 @@
   "values": [
     "uusi-aurinko:temple_stone_slab",
     "uusi-aurinko:polished_temple_stone_slab",
-    "uusi-aurinko:temple_stone_bricks_slab",
-    "uusi-aurinko:temple_bricks_slab",
-    "uusi-aurinko:shattered_temple_bricks_slab"
+    "uusi-aurinko:temple_stone_brick_slab",
+    "uusi-aurinko:temple_brick_slab",
+    "uusi-aurinko:shattered_temple_brick_slab"
   ]
 }
