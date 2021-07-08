@@ -53,10 +53,7 @@ public class ModBlocks {
     @Itemize
     @Localize(locales = "zh_cn", translations = "神殿石楼梯")
     public static final RegistryObject<StairsBlock> TEMPLE_STONE_STAIRS = BLOCKS.register("temple_stone_stairs",
-            () -> new StairsBlock(
-                    () -> TEMPLE_STONE_SLAB.get().getDefaultState(),
-                    AbstractBlock.Properties.from(TEMPLE_STONE.get())
-            ));
+            () -> makeStair(TEMPLE_STONE.get()));
 
     @Itemize
     @Localize(locales = "zh_cn", translations = "磨制神殿石砖")
@@ -69,10 +66,7 @@ public class ModBlocks {
     @Itemize
     @Localize(locales = "zh_cn", translations = "磨制神殿石砖楼梯")
     public static final RegistryObject<StairsBlock> POLISHED_TEMPLE_STONE_STAIRS = BLOCKS.register("polished_temple_stone_stairs",
-            () -> new StairsBlock(
-                    () -> POLISHED_TEMPLE_STONE.get().getDefaultState(),
-                    AbstractBlock.Properties.from(POLISHED_TEMPLE_STONE.get())
-            ));
+            () -> makeStair(POLISHED_TEMPLE_STONE.get()));
 
     @Itemize
     @Localize(locales = "zh_cn", translations = "神殿石砖")
@@ -85,10 +79,7 @@ public class ModBlocks {
     @Itemize
     @Localize(locales = "zh_cn", translations = "神殿石砖楼梯")
     public static final RegistryObject<StairsBlock> TEMPLE_STONE_BRICK_STAIRS = BLOCKS.register("temple_stone_brick_stairs",
-            () -> new StairsBlock(
-                    () -> TEMPLE_STONE_BRICKS.get().getDefaultState(),
-                    AbstractBlock.Properties.from(TEMPLE_STONE_BRICKS.get())
-            ));
+            () -> makeStair(TEMPLE_STONE_BRICKS.get()));
 
     @Itemize
     @Localize(locales = "zh_cn", translations = "神殿砖")
@@ -101,10 +92,7 @@ public class ModBlocks {
     @Itemize
     @Localize(locales = "zh_cn", translations = "神殿砖楼梯")
     public static final RegistryObject<StairsBlock> TEMPLE_BRICK_STAIRS = BLOCKS.register("temple_brick_stairs",
-            () -> new StairsBlock(
-                    () -> TEMPLE_STONE_BRICKS.get().getDefaultState(),
-                    AbstractBlock.Properties.from(TEMPLE_BRICKS.get())
-            ));
+            () -> makeStair(TEMPLE_BRICKS.get()));
 
     @Itemize
     @Localize(locales = "zh_cn", translations = "碎裂神殿石")
@@ -117,10 +105,7 @@ public class ModBlocks {
     @Itemize
     @Localize(locales = "zh_cn", translations = "碎裂神殿石楼梯")
     public static final RegistryObject<StairsBlock> SHATTERED_TEMPLE_BRICK_STAIRS = BLOCKS.register("shattered_temple_brick_stairs",
-            () -> new StairsBlock(
-                    () -> SHATTERED_TEMPLE_BRICKS.get().getDefaultState(),
-                    AbstractBlock.Properties.from(SHATTERED_TEMPLE_BRICKS.get())
-            ));
+            () -> makeStair(SHATTERED_TEMPLE_BRICKS.get()));
 
     @Itemize(parentModel = MODID + ":block/rune_temple_bricks_1")
     @Localize(locales = "zh_cn", translations = "符文神殿砖")
@@ -162,5 +147,9 @@ public class ModBlocks {
                     Itemize annotation = field.getAnnotation(Itemize.class);
                     return Pair.of(blockRegistryObject, annotation);
                 });
+    }
+
+    private static StairsBlock makeStair(Block block) {
+        return new StairsBlock(block::getDefaultState, AbstractBlock.Properties.from(block));
     }
 }
