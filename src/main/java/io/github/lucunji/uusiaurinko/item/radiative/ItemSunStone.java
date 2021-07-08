@@ -11,7 +11,6 @@ import net.minecraft.world.World;
 
 import static io.github.lucunji.uusiaurinko.item.radiative.ItemSunSeed.findRandomPowderyBlock;
 
-//TODO 凋零效果
 public class ItemSunStone extends ItemRadiative {
     public ItemSunStone(Properties properties) {
         super(properties);

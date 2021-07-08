@@ -35,16 +35,15 @@ public class PedestalTileEntityRenderer extends TileEntityRenderer<PedestalTileE
     @Override
     public void render(PedestalTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
         matrixStackIn.push();
-        ItemStack itemstack = ModItems.SUN_STONE.get().getDefaultInstance();
+
+        ItemStack itemstack = tileEntityIn.getContent();
+
         int i = itemstack.isEmpty() ? 187 : Item.getIdFromItem(itemstack.getItem()) + itemstack.getDamage();
         this.random.setSeed(i);
         IBakedModel ibakedmodel = this.itemRenderer.getItemModelWithOverrides(itemstack, tileEntityIn.getWorld(), null);
         boolean flag = ibakedmodel.isGui3d();
         int j = this.getModelCount(itemstack);
-        float f = 0.25F;
         float f1 = MathHelper.sin(((float)tileEntityIn.getWorld().getGameTime() + partialTicks) / 10.0F + this.hoverStart) * 0.1F + 0.1F;
-        // bobbing effect
-        //noinspection deprecation
         float f2 = ibakedmodel.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.getY();
 
         matrixStackIn.translate(0.5, 1 + f1 + 0.25 * f2, 0.5);
