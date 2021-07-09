@@ -31,14 +31,15 @@ public class ModDataGenerators {
 
         if (gatherDataEvent.includeClient()) {
             dataGenerator.addProvider(new ModItemModelProvider(dataGenerator, MODID, existingFileHelper));
-            makeLanguageProviders(dataGenerator, MODID,
+            makeLanguageProviders(dataGenerator, existingFileHelper, MODID,
                     ModBlocks.class, ModItems.class, ModEntityTypes.class, ModEffects.class, ModSoundEvents.class
             ).forEach(dataGenerator::addProvider);
         }
     }
 
-    private static Collection<? extends LanguageProvider> makeLanguageProviders(DataGenerator gen, String modid,
-                                                                                Class<?>... searchTargets) {
+    private static Collection<? extends LanguageProvider>
+    makeLanguageProviders(DataGenerator gen, ExistingFileHelper existingFileHelper, String modid, Class<?>... searchTargets) {
+
         Map<String, ModLanguageProvider> locale2Provider = new HashMap<>();
         Arrays.stream(searchTargets)
                 .flatMap(aClass -> Arrays.stream(aClass.getDeclaredFields()))
@@ -65,9 +66,9 @@ public class ModDataGenerators {
                     for (int i = 0; i < locales.size(); i++) {
                         String locale = locales.get(i);
                         if (!locale2Provider.containsKey(locale)) {
-                            locale2Provider.put(locale, new ModLanguageProvider(gen, modid, locale));
+                            locale2Provider.put(locale, new ModLanguageProvider(gen, existingFileHelper, modid, locale));
                         }
-                        locale2Provider.get(locale).addTranslation(annotation.key(), translations.get(i), registryObject);
+                        locale2Provider.get(locale).addEntry(annotation.key(), translations.get(i), registryObject);
                     }
                 });
         return locale2Provider.values();
