@@ -1,8 +1,11 @@
 package io.github.lucunji.uusiaurinko.datagen.client;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.DirectoryCache;
+import net.minecraft.data.IDataProvider;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
@@ -19,6 +22,8 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class ModLanguageProvider extends LanguageProvider {
@@ -27,6 +32,7 @@ public class ModLanguageProvider extends LanguageProvider {
     private final ExistingFileHelper existingFileHelper;
     private final ResourceLocation existingLang;
 
+    private final Map<String, String> existingKeys;
     private final List<String> keys;
     private final List<String> translations;
     private final List<RegistryObject<?>> objects;
@@ -36,9 +42,14 @@ public class ModLanguageProvider extends LanguageProvider {
         this.existingFileHelper = existingFileHelper;
         this.existingLang = new ResourceLocation(modid + ":lang/" + locale + ".json");
 
+        this.existingKeys = new HashMap<>();
         this.keys = new ArrayList<>();
         this.translations = new ArrayList<>();
         this.objects = new ArrayList<>();
+
+        this.gen = gen;
+        this.modid = modid;
+        this.locale = locale;
     }
 
     public void addEntry(String key, String translation, RegistryObject<?> object) {
@@ -49,83 +60,101 @@ public class ModLanguageProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        LOGGER.debug("Trying to merge existing language file " + existingLang.toString());
-        Map<String, String> existingKeys = addExisting();
-        if (existingKeys == null) {
-            LOGGER.info("There is no existing language file " + existingLang);
-        } else {
-            LOGGER.debug(existingKeys.size() + " entries loaded from " + existingLang);
-        }
+        addExisting();
 
         for (int i = 0; i < objects.size(); i++) {
             String key = keys.get(i);
             String translation = translations.get(i);
             RegistryObject<?> obj = objects.get(i);
             IForgeRegistryEntry<?> entry = obj.get();
-            try {
-                if (!key.isEmpty()) {
-                    add(key, translation);
-                } else if (entry instanceof Block) {
-                    add((Block) entry, translation);
-                } else if (entry instanceof Item) {
-                    add((Item) entry, translation);
-                } else if (entry instanceof Enchantment) {
-                    add((Enchantment) entry, translation);
-                } else if (entry instanceof Effect) {
-                    add((Effect) entry, translation);
-                } else if (entry instanceof EntityType) {
-                    add((EntityType<?>) entry, translation);
-                } else if (entry instanceof SoundEvent) {
-                    add("subtitles." + obj.getId().getNamespace() + "." + obj.getId().getPath(), translation);
-                } else {
-                    throw new RuntimeException("Unsupported registry object type '" + entry.getClass() + "'");
-                }
-            } catch (IllegalStateException ise) {
-                if (existingKeys != null && ise.getMessage().startsWith("Duplicate translation key ")) {
-                    String dupKey = ise.getMessage().substring("Duplicate translation key ".length());
-                    String dupVal = existingKeys.get(dupKey);
-                    if (translation.equals(dupVal)) {
-                        LOGGER.warn("The generated translation for key '" + dupKey + "' is the same in the existing language file "
-                                + existingLang);
-                        continue;
-                    } else if (dupVal != null) {
-                        LOGGER.warn("The generated translation for key '" + dupKey + "' is different in the existing language file "
-                                + existingLang);
-                        continue;
-                    }
-                }
-                throw ise;
+
+            if (!key.isEmpty()) {
+                add(key, translation);
+            } else if (entry instanceof Block) {
+                add((Block) entry, translation);
+            } else if (entry instanceof Item) {
+                add((Item) entry, translation);
+            } else if (entry instanceof Enchantment) {
+                add((Enchantment) entry, translation);
+            } else if (entry instanceof Effect) {
+                add((Effect) entry, translation);
+            } else if (entry instanceof EntityType) {
+                add((EntityType<?>) entry, translation);
+            } else if (entry instanceof SoundEvent) {
+                add("subtitles." + obj.getId().getNamespace() + "." + obj.getId().getPath(), translation);
+            } else {
+                throw new RuntimeException("Unsupported registry object type '" + entry.getClass() + "'");
             }
         }
     }
 
     @Nullable
-    private Map<String, String> addExisting() {
-        Map<String, String> ret = new HashMap<>();
+    private void addExisting() {
+        LOGGER.debug("Trying to load existing language file " + existingLang.toString());
         try (InputStream inputStream = existingFileHelper
                 .getResource(existingLang, ResourcePackType.CLIENT_RESOURCES).getInputStream();
              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
             Map<?, ?> langMap = new Gson().fromJson(reader, Map.class);
             langMap.forEach((key, val) -> {
-                if (key instanceof CharSequence && val instanceof CharSequence) {
-                    add(key.toString(), val.toString());
-                    ret.put(key.toString(), val.toString());
-                } else {
-                    if (key instanceof CharSequence) {
-                        LOGGER.throwing(new IllegalArgumentException("Unexpected key which is not a CharSequence."));
-                    } else {
-                        LOGGER.throwing(new IllegalArgumentException("Unexpected value which is not a CharSequence " +
-                                "for key '" + key.toString() + "'."));
-                    }
-                }
+                add(key.toString(), val.toString());
+                existingKeys.put(key.toString(), val.toString());
             });
 
-        } catch (FileNotFoundException nfe) {
-            return null;
+        } catch (FileNotFoundException ignored) {
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
-        return ret;
+
+        if (existingKeys.isEmpty()) {
+            LOGGER.info("There is no existing language file " + existingLang);
+        } else {
+            LOGGER.debug(existingKeys.size() + " entries loaded from " + existingLang);
+        }
+    }
+
+
+    /* -------------------- Code Borrowed From LanguageProvider To Remove Escaping -------------------- */
+    private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
+    private final DataGenerator gen;
+    private final String modid;
+    private final String locale;
+    private final Map<String, String> data = new TreeMap<>();
+
+    @Override
+    public void act(DirectoryCache cache) throws IOException {
+        addTranslations();
+        if (!data.isEmpty())
+            save(cache, data, this.gen.getOutputFolder().resolve("assets/" + modid + "/lang/" + locale + ".json"));
+    }
+
+    private void save(DirectoryCache cache, Object object, Path target) throws IOException {
+        String data = GSON.toJson(object);
+        //noinspection UnstableApiUsage
+        String hash = IDataProvider.HASH_FUNCTION.hashUnencodedChars(data).toString();
+        if (!Objects.equals(cache.getPreviousHash(target), hash) || !Files.exists(target)) {
+            Files.createDirectories(target.getParent());
+
+            try (BufferedWriter bufferedwriter = Files.newBufferedWriter(target)) {
+                bufferedwriter.write(data);
+            }
+        }
+
+        cache.recordHash(target, hash);
+    }
+
+    @Override
+    public void add(String key, String value) {
+        String oldVal = data.put(key, value);
+        if (oldVal != null) {
+            if (value.equals(oldVal)) {
+                LOGGER.warn("The generated translation for key '" + key
+                        + "' is the same in the existing language file " + existingLang);
+            } else {
+                LOGGER.warn("The generated translation for key '" + key
+                        + "' is different in the existing language file " + existingLang);
+            }
+            throw new IllegalStateException("Duplicate translation key " + key);
+        }
     }
 }
