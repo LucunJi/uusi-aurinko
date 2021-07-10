@@ -16,5 +16,7 @@
   "death.attack.uusi-aurinko.electricity": "%1$s experienced high voltage pass through the body",
   "death.attack.uusi-aurinko.electricity.player": "%1$s experienced high voltage pass through the body whilst fighting %2$s",
 
-  "config.uusi-aurinko.change_fluid_rendering": "The rendering effect of fluid blocks is changed. Press F3+T to take effect."
+  "config.uusi-aurinko.change_fluid_rendering": "The rendering effect of fluid blocks is changed. Press F3+T to take effect.",
+
+  "container.uusi-aurinko.item_pedestal": "Item Pedestal"
 }

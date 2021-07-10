@@ -1,7 +1,6 @@
 package io.github.lucunji.uusiaurinko.client.render.tileentity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.tileentity.PedestalTileEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -14,13 +13,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.world.World;
 
 import java.util.Random;
 
 public class PedestalTileEntityRenderer extends TileEntityRenderer<PedestalTileEntity> {
     private final ItemRenderer itemRenderer;
     private final Random random;
-    private float hoverStart;
+    private final float hoverStart;
+    private static final float DEPTH_OFFSET_PER_NONBLOCK_MODEL = 0.09375F;
 
     public PedestalTileEntityRenderer(TileEntityRendererDispatcher rendererDispatcherIn, ItemRenderer itemRenderer) {
         super(rendererDispatcherIn);
@@ -34,50 +35,63 @@ public class PedestalTileEntityRenderer extends TileEntityRenderer<PedestalTileE
      */
     @Override
     public void render(PedestalTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+        ItemStack itemstack = tileEntityIn.getStackInSlot(0);
+
+        World world = tileEntityIn.getWorld();
+
+        if (itemstack.isEmpty() || world == null) return;
+
+        float theta = (world.getGameTime() + partialTicks) / 10F + this.hoverStart;
+
         matrixStackIn.push();
 
-        ItemStack itemstack = tileEntityIn.getContent();
+        this.random.setSeed(Item.getIdFromItem(itemstack.getItem()) + itemstack.getDamage());
+        IBakedModel ibakedmodel = this.itemRenderer.getItemModelWithOverrides(itemstack, world, null);
 
-        int i = itemstack.isEmpty() ? 187 : Item.getIdFromItem(itemstack.getItem()) + itemstack.getDamage();
-        this.random.setSeed(i);
-        IBakedModel ibakedmodel = this.itemRenderer.getItemModelWithOverrides(itemstack, tileEntityIn.getWorld(), null);
-        boolean flag = ibakedmodel.isGui3d();
-        int j = this.getModelCount(itemstack);
-        float f1 = MathHelper.sin(((float)tileEntityIn.getWorld().getGameTime() + partialTicks) / 10.0F + this.hoverStart) * 0.1F + 0.1F;
-        float f2 = ibakedmodel.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.getY();
+        float bobbingHeight = MathHelper.sin(theta) * 0.1F + 0.1F;
+        //noinspection deprecation
+        float modelTransformHeight = ibakedmodel.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.getY();
+        matrixStackIn.translate(0.5, 1 + bobbingHeight + 0.25 * modelTransformHeight, 0.5);
 
-        matrixStackIn.translate(0.5, 1 + f1 + 0.25 * f2, 0.5);
-        float f3 = ((float)tileEntityIn.getWorld().getGameTime() + partialTicks) / 10.0F + this.hoverStart;
-        matrixStackIn.rotate(Vector3f.YP.rotation(f3));
-        if (!flag) {
-            float f7 = -0.0F * (float)(j - 1) * 0.5F;
-            float f8 = -0.0F * (float)(j - 1) * 0.5F;
-            float f9 = -0.09375F * (float)(j - 1) * 0.5F;
-            matrixStackIn.translate(f7, f8, f9);
-        }
+        // rotating effect
+        matrixStackIn.rotate(Vector3f.YP.rotation(theta));
 
-        for(int k = 0; k < j; ++k) {
+        boolean gui3d = ibakedmodel.isGui3d(); // a gui3d model usually means a block item model
+        int modelCount = this.getModelCount(itemstack);
+
+        // correct the deviation in z-axis when there are multiple non-block item models
+        if (!gui3d)
+            matrixStackIn.translate(0, 0, -0.5 * DEPTH_OFFSET_PER_NONBLOCK_MODEL * (modelCount - 1));
+
+        for(int i = 0; i < modelCount; ++i) {
             matrixStackIn.push();
-            if (k > 0) {
-                if (flag) {
-                    float f11 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    float f13 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    float f10 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    matrixStackIn.translate(f11, f13, f10);
+            // give each model a random offset
+            if (i > 0) {
+                if (gui3d) {
+                    // for block item models, offsets are in all 3 dimensions
+                    float dx = (this.random.nextFloat() * 2F - 1F) * 0.15F;
+                    float dy = (this.random.nextFloat() * 2F - 1F) * 0.15F;
+                    float dz = (this.random.nextFloat() * 2F - 1F) * 0.15F;
+                    matrixStackIn.translate(dx, dy, dz);
                 } else {
-                    float f12 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
-                    float f14 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
-                    matrixStackIn.translate(f12, f14, 0.0D);
+                    // for non-block item models, only give offsets in x and y
+                    float dx = (this.random.nextFloat() * 2F - 1F) * 0.15F * 0.5F;
+                    float dy = (this.random.nextFloat() * 2F - 1F) * 0.15F * 0.5F;
+                    matrixStackIn.translate(dx, dy, 0);
                 }
             }
-
             this.itemRenderer.renderItem(itemstack, ItemCameraTransforms.TransformType.GROUND, false,
                     matrixStackIn, bufferIn, combinedLightIn, OverlayTexture.NO_OVERLAY, ibakedmodel);
+
             matrixStackIn.pop();
-            if (!flag) {
-                matrixStackIn.translate(0.0, 0.0, 0.09375F);
+
+            if (!gui3d) {
+                // for non-block item models, give translation along z axis to each model
+                // to avoid rendering them in one plane
+                matrixStackIn.translate(0, 0, DEPTH_OFFSET_PER_NONBLOCK_MODEL);
             }
         }
+
         matrixStackIn.pop();
     }
 

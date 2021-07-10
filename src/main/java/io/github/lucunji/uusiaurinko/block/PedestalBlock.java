@@ -1,8 +1,12 @@
 package io.github.lucunji.uusiaurinko.block;
 
 import io.github.lucunji.uusiaurinko.tileentity.PedestalTileEntity;
+import io.github.lucunji.uusiaurinko.util.MathUtil;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
@@ -27,29 +31,81 @@ import javax.annotation.Nullable;
 public class PedestalBlock extends ContainerBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+    private static final VoxelShape SHAPE_UP = Block.makeCuboidShape(2, 14, 2, 14, 16, 14);
+    private static final VoxelShape SHAPE_MID = Block.makeCuboidShape(4, 3, 4, 12, 14, 12);
+    private static final VoxelShape SHAPE_BELOW = Block.makeCuboidShape(2, 0, 2, 14, 3, 14);
 
     public PedestalBlock(Properties properties) {
         super(properties);
         this.setDefaultState(this.getDefaultState().with(POWERED, false).with(FACING, Direction.NORTH));
     }
 
+    /**
+     * If the player is holding something, try to place it on pedestal.
+     * Otherwise, try to get item from the pedestal.
+     */
+    @SuppressWarnings("deprecation")
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (!worldIn.isRemote) {
-            ItemStack heldItem = player.getHeldItem(handIn);
-            PedestalTileEntity tileEntity = (PedestalTileEntity) worldIn.getTileEntity(pos);
-
-            if (tileEntity.getContent().isEmpty() && !heldItem.isEmpty()) {
-                tileEntity.setContent(heldItem.copy());
-                player.setHeldItem(handIn, ItemStack.EMPTY);
-            }
-            else if (!tileEntity.getContent().isEmpty() && heldItem.isEmpty()) {
-                player.setHeldItem(handIn, tileEntity.getContent().copy());
-                tileEntity.setContent(ItemStack.EMPTY);
-            }
+        // must click on the upper surface
+        if (hit.getFace() != Direction.UP || !MathUtil.containsInclusive(
+                SHAPE_UP.getBoundingBox(),
+                hit.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ())
+        )) {
+            return ActionResultType.PASS;
         }
 
+        if (!worldIn.isRemote) {
+            ItemStack heldItem = player.getHeldItem(handIn);
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof PedestalTileEntity) {
+                PedestalTileEntity tileEntity = (PedestalTileEntity) te;
+                ItemStack pedestalStack = tileEntity.getStackInSlot(0);
+                BlockState newState = null;
+                if (pedestalStack.isEmpty() && !heldItem.isEmpty()) {
+                    tileEntity.setInventorySlotContents(0, heldItem.copy());
+                    player.setHeldItem(handIn, ItemStack.EMPTY);
+                } else if (!pedestalStack.isEmpty() && heldItem.isEmpty()) {
+                    player.setHeldItem(handIn, pedestalStack.copy());
+                    tileEntity.setInventorySlotContents(0, ItemStack.EMPTY);
+                }
+            }
+        }
         return ActionResultType.SUCCESS;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean hasComparatorInputOverride(BlockState state) {
+        return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
+        return Container.calcRedstoneFromInventory((IInventory) worldIn.getTileEntity(pos));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+        return blockState.get(POWERED) && side == Direction.UP ? 15 : 0;
+    }
+
+    /**
+     * Drops out item when broken.
+     */
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.matchesBlock(newState.getBlock())) {
+            TileEntity tileentity = worldIn.getTileEntity(pos);
+            if (tileentity instanceof IInventory) {
+                InventoryHelper.dropInventoryItems(worldIn, pos, (IInventory) tileentity);
+            }
+
+            super.onReplaced(state, worldIn, pos, newState, isMoving);
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -60,8 +116,7 @@ public class PedestalBlock extends ContainerBlock {
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(POWERED);
-        builder.add(FACING);
+        builder.add(POWERED, FACING);
     }
 
     @Override
@@ -72,11 +127,7 @@ public class PedestalBlock extends ContainerBlock {
     @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return VoxelShapes.or(
-                Block.makeCuboidShape(2, 0, 2, 14, 3, 4),
-                Block.makeCuboidShape(4, 3, 4, 12, 14, 12),
-                Block.makeCuboidShape(2, 14, 2, 14, 16, 14)
-        );
+        return VoxelShapes.or(SHAPE_UP, SHAPE_MID, SHAPE_BELOW);
     }
 
     @SuppressWarnings("deprecation")
@@ -89,5 +140,10 @@ public class PedestalBlock extends ContainerBlock {
     @Override
     public TileEntity createNewTileEntity(IBlockReader worldIn) {
         return new PedestalTileEntity();
+    }
+
+    private void updateNeighbors(World world, BlockPos pos) {
+        world.notifyNeighborsOfStateChange(pos, this);
+        world.notifyNeighborsOfStateChange(pos.offset(Direction.DOWN), this);
     }
 }
