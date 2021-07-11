@@ -55,6 +55,8 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
     public final BlockTaggedListConfigValue NEW_SUN_DESTROY_BLACKLIST;
 
+    public final ItemTaggedListConfigValue PEDESTAL_SPECIAL_ITEMS;
+
     public ServerConfigs(ForgeConfigSpec.Builder builder) {
         FIRE_STONE_IGNITE_BLOCK_RANGE = defineInteger(builder,
                 "Kiuaskivi may ignite blocks in the cuboid which goes from (-range, -range, -range) to (range, range + 2, range)\n" +
@@ -205,6 +207,12 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
         NEW_SUN_DESTROY_BLACKLIST = new BlockTaggedListConfigValue(defineList(builder,
                 "????????????",
                 "new_sun_destroy_blacklist", Lists.newArrayList("#")
+        ), this);
+
+        PEDESTAL_SPECIAL_ITEMS = new ItemTaggedListConfigValue(defineList(builder,
+                "The specials item which makes item pedestal block emits a redstone signal of 15 instead of 7" +
+                        "at the block below it.",
+                "pedestal_special_items", Lists.newArrayList("#uusi-aurinko:pedestal_special_items")
         ), this);
     }
 

@@ -131,7 +131,7 @@ public abstract class ItemRadiative extends ItemBase {
         return itemStack.hasTag() && itemStack.getTag().getBoolean("Inactive");
     }
 
-    protected void makeParticles(ItemEntity entity) {
+    public void makeParticles(ItemEntity entity) {
         IParticleData particleData = inWorldParticleType(entity);
         if (particleData != null) {
             Random random = entity.world.getRandom();

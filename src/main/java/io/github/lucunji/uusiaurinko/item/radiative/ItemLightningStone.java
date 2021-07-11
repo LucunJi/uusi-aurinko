@@ -73,7 +73,7 @@ public class ItemLightningStone extends ItemRadiative {
      * Make more particles than the super method.
      */
     @Override
-    protected void makeParticles(ItemEntity entity) {
+    public void makeParticles(ItemEntity entity) {
         super.makeParticles(entity);
         super.makeParticles(entity);
         super.makeParticles(entity);

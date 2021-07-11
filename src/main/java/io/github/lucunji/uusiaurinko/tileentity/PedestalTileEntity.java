@@ -1,13 +1,17 @@
 package io.github.lucunji.uusiaurinko.tileentity;
 
 import io.github.lucunji.uusiaurinko.block.PedestalBlock;
+import io.github.lucunji.uusiaurinko.config.ServerConfigs;
+import io.github.lucunji.uusiaurinko.item.radiative.ItemRadiative;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.LockableLootTileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
@@ -19,7 +23,7 @@ import javax.annotation.Nullable;
 
 import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
-public class PedestalTileEntity extends LockableLootTileEntity {
+public class PedestalTileEntity extends LockableLootTileEntity implements ITickableTileEntity {
     private final NonNullList<ItemStack> content = NonNullList.withSize(1, ItemStack.EMPTY);
 
     public PedestalTileEntity() {
@@ -50,25 +54,24 @@ public class PedestalTileEntity extends LockableLootTileEntity {
         return content;
     }
 
-    /**
-     * Set item in the inventory and update both the tile entity and block.
-     */
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
-        BlockPos pos = this.getPos();
-        //noinspection ConstantConditions
-        BlockState oldState = this.world.getBlockState(pos);
         super.setInventorySlotContents(index, stack);
-        BlockState newState = oldState.with(PedestalBlock.POWERED, !stack.isEmpty());
-        // update block
-        if (newState != oldState) {
-            this.world.setBlockState(pos, newState);
-            // it gives strong redstone power to the block below
-            this.world.notifyNeighborsOfStateChange(pos.offset(Direction.DOWN), newState.getBlock());
-        }
-        // update tile entity, only flag 0b1000 matters
-        // always send notify because the rendering effect of items changes when they stacks up
-        this.world.notifyBlockUpdate(this.getPos(), oldState, newState, 0);
+        update();
+    }
+
+    @Override
+    public ItemStack removeStackFromSlot(int index) {
+        ItemStack itemStack = super.removeStackFromSlot(index);
+        update();
+        return itemStack;
+    }
+
+    @Override
+    public ItemStack decrStackSize(int index, int count) {
+        ItemStack itemStack = super.decrStackSize(index, count);
+        update();
+        return itemStack;
     }
 
     /**
@@ -142,5 +145,36 @@ public class PedestalTileEntity extends LockableLootTileEntity {
     @Override
     protected Container createMenu(int id, PlayerInventory player) {
         return null;
+    }
+
+    @Override
+    public void tick() {
+        if (this.world != null && this.world.isRemote) {
+            ItemStack itemStack = this.getStackInSlot(0);
+            if (itemStack.getItem() instanceof ItemRadiative) {
+                ItemEntity dummyItemEntity = new ItemEntity(this.world,
+                        this.getPos().getX() + 0.5, this.getPos().getY() + 1, this.getPos().getZ() + 0.5,
+                        itemStack);
+                dummyItemEntity.setOnGround(true);
+                ((ItemRadiative) itemStack.getItem()).makeParticles(dummyItemEntity);
+            }
+        }
+    }
+
+    private void update() {
+        BlockPos pos = this.getPos();
+        //noinspection ConstantConditions
+        BlockState oldState = this.world.getBlockState(pos);
+        BlockState newState = oldState.with(PedestalBlock.POWERED, !content.get(0).isEmpty())
+                .with(PedestalBlock.SPECIAL_ITEM, ServerConfigs.INSTANCE.PEDESTAL_SPECIAL_ITEMS.contains(this.content.get(0)));
+        // update block
+        if (newState != oldState) {
+            this.world.setBlockState(pos, newState);
+            // it gives strong redstone power to the block below
+            this.world.notifyNeighborsOfStateChange(pos.offset(Direction.DOWN), newState.getBlock());
+        }
+        // update tile entity, only flag 0b1000 matters
+        // always send notify because the rendering effect of items changes when they stacks up
+        this.world.notifyBlockUpdate(this.getPos(), oldState, newState, 0);
     }
 }

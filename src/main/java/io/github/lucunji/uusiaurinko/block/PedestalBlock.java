@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 
 public class PedestalBlock extends ContainerBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final BooleanProperty SPECIAL_ITEM = BooleanProperty.create("special_item");
     public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
     private static final VoxelShape SHAPE_UP = Block.makeCuboidShape(2, 14, 2, 14, 16, 14);
     private static final VoxelShape SHAPE_MID = Block.makeCuboidShape(4, 3, 4, 12, 14, 12);
@@ -89,7 +90,10 @@ public class PedestalBlock extends ContainerBlock {
     @SuppressWarnings("deprecation")
     @Override
     public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-        return blockState.get(POWERED) && side == Direction.UP ? 15 : 0;
+        if (blockState.get(POWERED) && side == Direction.UP) {
+            return blockState.get(SPECIAL_ITEM) ? 15 : 7;
+        }
+        return 0;
     }
 
     /**
@@ -116,7 +120,7 @@ public class PedestalBlock extends ContainerBlock {
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(POWERED, FACING);
+        builder.add(POWERED, SPECIAL_ITEM, FACING);
     }
 
     @Override

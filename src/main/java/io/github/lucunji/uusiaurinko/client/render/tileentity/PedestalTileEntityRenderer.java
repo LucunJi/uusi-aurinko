@@ -18,10 +18,13 @@ import net.minecraft.world.World;
 import java.util.Random;
 
 public class PedestalTileEntityRenderer extends TileEntityRenderer<PedestalTileEntity> {
+    private static final float DEPTH_OFFSET_PER_NONBLOCK_MODEL = 0.09375F;
+    private static final float RESCALE_SIZE_ITEM = 0.575F;
+    private static final float RESCALE_SIZE_BLOCK = 0.2875F;
+
     private final ItemRenderer itemRenderer;
     private final Random random;
     private final float hoverStart;
-    private static final float DEPTH_OFFSET_PER_NONBLOCK_MODEL = 0.09375F;
 
     public PedestalTileEntityRenderer(TileEntityRendererDispatcher rendererDispatcherIn, ItemRenderer itemRenderer) {
         super(rendererDispatcherIn);
@@ -48,20 +51,33 @@ public class PedestalTileEntityRenderer extends TileEntityRenderer<PedestalTileE
         this.random.setSeed(Item.getIdFromItem(itemstack.getItem()) + itemstack.getDamage());
         IBakedModel ibakedmodel = this.itemRenderer.getItemModelWithOverrides(itemstack, world, null);
 
+        boolean gui3d = ibakedmodel.isGui3d(); // a gui3d model usually means a block item model
+
         float bobbingHeight = MathHelper.sin(theta) * 0.1F + 0.1F;
         //noinspection deprecation
-        float modelTransformHeight = ibakedmodel.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.getY();
-        matrixStackIn.translate(0.5, 1 + bobbingHeight + 0.25 * modelTransformHeight, 0.5);
+        Vector3f modelScale = ibakedmodel.getItemCameraTransforms()
+                .getTransform(ItemCameraTransforms.TransformType.GROUND).scale.copy();
+        // also transform in y direction by y scale of item model to avoid render scaled item inside ground
+        matrixStackIn.translate(0.5, 1 + bobbingHeight + 0.25 * modelScale.getY(), 0.5);
 
-        // rotating effect
+        // rotation effect
         matrixStackIn.rotate(Vector3f.YP.rotation(theta));
 
-        boolean gui3d = ibakedmodel.isGui3d(); // a gui3d model usually means a block item model
         int modelCount = this.getModelCount(itemstack);
 
         // correct the deviation in z-axis when there are multiple non-block item models
         if (!gui3d)
             matrixStackIn.translate(0, 0, -0.5 * DEPTH_OFFSET_PER_NONBLOCK_MODEL * (modelCount - 1));
+
+        // scale the item model to make it fit the pedestal size
+        float maxScale = Math.max(modelScale.getX(), Math.max(modelScale.getY(), modelScale.getZ()));
+        if (!gui3d && maxScale < RESCALE_SIZE_ITEM) {
+            float scale = RESCALE_SIZE_ITEM / maxScale;
+            matrixStackIn.scale(scale, scale, scale);
+        } else if (gui3d && maxScale < RESCALE_SIZE_BLOCK) {
+            float scale = RESCALE_SIZE_BLOCK / maxScale;
+            matrixStackIn.scale(scale, scale, scale);
+        }
 
         for(int i = 0; i < modelCount; ++i) {
             matrixStackIn.push();

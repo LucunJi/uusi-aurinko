@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "uusi-aurinko:water_stone",
+    "uusi-aurinko:earth_stone",
+    "uusi-aurinko:fire_stone",
+    "uusi-aurinko:lightning_stone",
+    "uusi-aurinko:poop_stone",
+    "uusi-aurinko:sun_seed",
+    "uusi-aurinko:sun_stone"
+  ]
+}

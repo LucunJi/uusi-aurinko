@@ -54,7 +54,7 @@ public class ItemPoopStone extends ItemRadiative {
     }
 
     @Override
-    protected void makeParticles(ItemEntity entity) {
+    public void makeParticles(ItemEntity entity) {
         Random random = entity.world.getRandom();
         if (random.nextFloat() < 0.07) {
             double posX = entity.getPosX() - 0.2 + random.nextFloat() * 0.4;
