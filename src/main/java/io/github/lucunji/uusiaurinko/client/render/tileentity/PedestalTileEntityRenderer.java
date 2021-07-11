@@ -31,7 +31,7 @@ public class PedestalTileEntityRenderer extends TileEntityRenderer<PedestalTileE
     }
 
     /**
-     * Code borrowed from {@code net.minecraft.client.renderer.entity.ItemRenderer.render()}
+     * Code borrowed from {@link net.minecraft.client.renderer.entity.ItemRenderer#render}
      */
     @Override
     public void render(PedestalTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {

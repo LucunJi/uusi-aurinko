@@ -149,7 +149,7 @@ public class TransmutingBlock extends Block {
     }
 
     /**
-     * Code borrowed from {@code ParticleManager.addBlockHitEffects()}
+     * Code borrowed from {@link ParticleManager#addBlockHitEffects}
      */
     @Override
     @OnlyIn(Dist.CLIENT)
@@ -199,7 +199,7 @@ public class TransmutingBlock extends Block {
     }
 
     /**
-     * Code borrowed from {@code ParticleManager.addBlockDestroyEffects()}
+     * Code borrowed from {@link ParticleManager#addBlockDestroyEffects}
      */
     @Override
     @OnlyIn(Dist.CLIENT)

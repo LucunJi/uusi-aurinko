@@ -65,7 +65,7 @@ public abstract class ItemRadiative extends ItemBase {
     }
 
     /**
-     * Returns true only to trigger {@code createEntity} method
+     * Returns true only to trigger {@link ItemRadiative#createEntity} method
      *
      * @return true
      */

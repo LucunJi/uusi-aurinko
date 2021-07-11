@@ -67,7 +67,7 @@ public class SparkParticle extends SpriteTexturedParticle {
     }
 
     /**
-     * Integer version of {@code setColor()}, accept three 0-255 integers.
+     * Integer version of {@link Particle#setColor}, accept three 0-255 integers.
      */
     public void setColor(int particleRedIn, int particleGreenIn, int particleBlueIn) {
         super.setColor(particleRedIn / 255F, particleGreenIn / 255F, particleBlueIn / 255F);

@@ -68,7 +68,7 @@ public class ItemWaterStone extends ItemRadiative {
     }
 
     /**
-     * Code borrowed from {@code FrostWalkerEnchantment.freezeNearby()}.
+     * Code borrowed from {@link net.minecraft.enchantment.FrostWalkerEnchantment#freezeNearby}.
      * It performs less checks than the original code and thus more dangerous.
      * <p>
      * Only runs in server side.

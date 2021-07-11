@@ -52,8 +52,9 @@ public class InFluidRenderingEventHandler {
     }
 
     /**
-     * Borrowed from {@code OverlayRenderer.renderUnderwater}
+     * Borrowed from {@link net.minecraft.client.renderer.OverlayRenderer#renderUnderwater}
      */
+    @SuppressWarnings("JavadocReference")
     private static void renderUnderFluid(Fluid fluid, Minecraft minecraftIn, MatrixStack matrixStackIn) {
         RenderSystem.enableTexture();
         minecraftIn.getTextureManager().bindTexture(TEXTURE_UNDER_FLUID);

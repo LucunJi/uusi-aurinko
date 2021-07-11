@@ -72,8 +72,10 @@ public class PedestalTileEntity extends LockableLootTileEntity {
     }
 
     /**
-     * @deprecated Only used by vanilla code to swap item between two chests in {@link com.mojang.datafixers.DataFixer}.
+     * @deprecated Only used by vanilla code to swap items between two chests in constructing
+     * {@link net.minecraft.util.palette.UpgradeData.BlockFixers#CHEST}.
      */
+    @SuppressWarnings("JavadocReference")
     @Deprecated
     @Override
     protected void setItems(NonNullList<ItemStack> itemsIn) {

@@ -23,14 +23,14 @@ public abstract class LoadListeningConfigManagerAbstract {
 
     /**
      * Getter of the {@link ForgeConfigSpec} instance corresponding to the current config,
-     * used to identify config in {@code onConfigLoadOrReload()} event handler.
+     * used to identify config in {@link LoadListeningConfigManagerAbstract#onConfigLoadOrReload} event handler.
      *
      * @return the {@link ForgeConfigSpec} instance corresponding to the current config
      */
     protected abstract ForgeConfigSpec getSpec();
 
     /**
-     * This method must be registered in {@code net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD}
+     * This method must be registered in {@link net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus#MOD}
      * to update the registered {@link ILoadListeningConfigValue} when game loads or reloads the config file
      */
     public final void onConfigLoadOrReload(ModConfig.ModConfigEvent configEvent) {
