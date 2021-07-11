@@ -14,7 +14,7 @@ public @interface Itemize {
     boolean genItemModel() default true;
 
     /**
-     * You may need to add "modid:block/" before referenced model name.
+     * You may need to add <b>"modid:block/"</b> before referenced model name.
      */
     String parentModel() default "";
 }

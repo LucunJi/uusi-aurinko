@@ -10,18 +10,18 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.potion.Effect;
-import net.minecraft.resources.ResourcePackType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -29,20 +29,16 @@ import java.util.*;
 public class ModLanguageProvider extends LanguageProvider {
     private static final Logger LOGGER = LogManager.getLogger(ModLanguageProvider.class);
 
-    private final ExistingFileHelper existingFileHelper;
     private final ResourceLocation existingLang;
 
-    private final Map<String, String> existingKeys;
     private final List<String> keys;
     private final List<String> translations;
     private final List<RegistryObject<?>> objects;
 
     public ModLanguageProvider(DataGenerator gen, ExistingFileHelper existingFileHelper, String modid, String locale) {
         super(gen, modid, locale);
-        this.existingFileHelper = existingFileHelper;
         this.existingLang = new ResourceLocation(modid + ":lang/" + locale + ".json");
 
-        this.existingKeys = new HashMap<>();
         this.keys = new ArrayList<>();
         this.translations = new ArrayList<>();
         this.objects = new ArrayList<>();
@@ -60,7 +56,9 @@ public class ModLanguageProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        addExisting();
+        for (Pair<String, String> entry : HardcodedLanguageEntries.valueOf(this.locale.toUpperCase()).entries) {
+            add(entry.getLeft(), entry.getRight());
+        }
 
         for (int i = 0; i < objects.size(); i++) {
             String key = keys.get(i);
@@ -88,31 +86,6 @@ public class ModLanguageProvider extends LanguageProvider {
         }
     }
 
-    @Nullable
-    private void addExisting() {
-        LOGGER.debug("Trying to load existing language file " + existingLang.toString());
-        try (InputStream inputStream = existingFileHelper
-                .getResource(existingLang, ResourcePackType.CLIENT_RESOURCES).getInputStream();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-
-            Map<?, ?> langMap = new Gson().fromJson(reader, Map.class);
-            langMap.forEach((key, val) -> {
-                add(key.toString(), val.toString());
-                existingKeys.put(key.toString(), val.toString());
-            });
-
-        } catch (FileNotFoundException ignored) {
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
-
-        if (existingKeys.isEmpty()) {
-            LOGGER.info("There is no existing language file " + existingLang);
-        } else {
-            LOGGER.debug(existingKeys.size() + " entries loaded from " + existingLang);
-        }
-    }
-
 
     /* -------------------- Code Borrowed From LanguageProvider To Remove Escaping -------------------- */
     private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
@@ -121,6 +94,11 @@ public class ModLanguageProvider extends LanguageProvider {
     private final String locale;
     private final Map<String, String> data = new TreeMap<>();
 
+    /**
+     * Copied from {@link LanguageProvider#act} just to direct the method call to
+     * {@link ModLanguageProvider#save} instead of the original private method {@link LanguageProvider#save}
+     */
+    @SuppressWarnings("JavadocReference")
     @Override
     public void act(DirectoryCache cache) throws IOException {
         addTranslations();
@@ -128,6 +106,14 @@ public class ModLanguageProvider extends LanguageProvider {
             save(cache, data, this.gen.getOutputFolder().resolve("assets/" + modid + "/lang/" + locale + ".json"));
     }
 
+    /**
+     * Copied from {@link LanguageProvider#save} but removed the line
+     * <p>
+     * {@code         data = JavaUnicodeEscaper.outsideOf(0, 0x7f).translate(data); // Escape unicode after the fact so that it's not double escaped by GSON}
+     * <p>
+     * to avoid escaping formatting and Chinese characters.
+     */
+    @SuppressWarnings("JavadocReference")
     private void save(DirectoryCache cache, Object object, Path target) throws IOException {
         String data = GSON.toJson(object);
         //noinspection UnstableApiUsage

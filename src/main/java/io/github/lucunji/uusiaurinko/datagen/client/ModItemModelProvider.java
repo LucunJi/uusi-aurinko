@@ -16,14 +16,23 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
+        blockItems();
+    }
+
+    private void blockItems() {
         ModBlocks.itemizedBlocks()
                 .filter(pair -> pair.getRight().genItemModel())
                 .forEach(pair ->
-                        simpleBlockItem((BlockItem) pair.getLeft().get().asItem(), pair.getRight().parentModel())
+                        inheritFromBlock((BlockItem) pair.getLeft().get().asItem(), pair.getRight().parentModel())
                 );
     }
 
-    protected void simpleBlockItem(BlockItem blockItem, String parentModel) {
+    /**
+     * Inherit from a block model with the same name as the item's registry name
+     * if {@code parentModel} is empty. Otherwise, use {@code parentModel} as the
+     * parent's name. Thus <b>inheriting from a non-block parent is also possible</b>.
+     */
+    private void inheritFromBlock(BlockItem blockItem, String parentModel) {
         String name = Objects.requireNonNull(blockItem.getRegistryName()).getPath();
         withExistingParent(
                 name,   // file name
