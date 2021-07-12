@@ -138,7 +138,7 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                 "Blocks in this blacklist won't be transmuted by Tannerkivi.\n" +
                         "Also accept block tags starting with #",
                 "earth_stone_transmutation_blacklist",
-                Lists.newArrayList("#uusi-aurinko:transmutation_immune")
+                Lists.newArrayList("#uusi-aurinko:transmutation_immune", "#minecraft:leaves")
         ), this);
         EARTH_STONE_EARTHQUAKE_RANGE = defineInteger(builder,
                 "The earthquake of Tannerkivi collapses blocks in this range.\n" +
@@ -205,8 +205,10 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
         ), this);
 
         NEW_SUN_DESTROY_BLACKLIST = new BlockTaggedListConfigValue(defineList(builder,
-                "????????????",
-                "new_sun_destroy_blacklist", Lists.newArrayList("#")
+                "Blocks in this blacklist won't be destroyed or turned into lava by the new sun.\n" +
+                        "Also accept block tags starting with #",
+                "new_sun_destroy_blacklist",
+                Lists.newArrayList("#uusi-aurinko:transmutation_immune")
         ), this);
 
         PEDESTAL_SPECIAL_ITEMS = new ItemTaggedListConfigValue(defineList(builder,

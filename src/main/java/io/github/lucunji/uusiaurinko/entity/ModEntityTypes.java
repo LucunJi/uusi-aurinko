@@ -31,7 +31,7 @@ public class ModEntityTypes {
     @Localize(locales = {"en_us", "zh_cn"}, translations = {"§4§lNew Sun§r", "§4§l新日§r"})
     public static final RegistryObject<EntityType<NewSunEntity>> NEW_SUN = ENTITY_TYPES.register("new_sun",
             () -> EntityType.Builder.create(NewSunEntity::new, EntityClassification.MISC)
-                    .size(0.25f, 0.25f).trackingRange(16).build("new_sun"));
+                    .size(0.25f, 0.25f).immuneToFire().trackingRange(16).build("new_sun"));
 
     @OnlyIn(Dist.CLIENT)
     public static class ClientRenderer {

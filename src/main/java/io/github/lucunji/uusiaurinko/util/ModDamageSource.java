@@ -9,8 +9,8 @@ public class ModDamageSource {
             .setDamageBypassesArmor().setMagicDamage();
 
     public static final DamageSource SUN_HEAT = new DamageSource(MODID + ".sun_heat")
-            .setDamageBypassesArmor().setMagicDamage();
+            .setFireDamage();
 
-    public static final DamageSource SUN_NUCLEAR = new DamageSource(MODID + ".sun_nuclear")
+    public static final DamageSource SUN_FUSION = new DamageSource(MODID + ".sun_fusion")
             .setDamageBypassesArmor().setMagicDamage();
 }

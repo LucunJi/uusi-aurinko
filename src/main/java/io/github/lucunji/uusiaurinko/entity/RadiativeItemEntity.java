@@ -61,15 +61,16 @@ public class RadiativeItemEntity extends ItemEntity {
 
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
-        if (!this.world.isRemote && this.getItem().getItem() == ModItems.SUN_STONE.get() &&
-                source.isExplosion() && amount >= 25) {
-            this.countdownSinceExplosion = 10;
-            this.explosionCount++;
-            if (explosionCount >= 6) {
-                NewSunEntity newSunEntity = new NewSunEntity(ModEntityTypes.NEW_SUN.get(), this.world);
-                newSunEntity.setPosition(this.getPosX(), this.getPosY() - newSunEntity.getActualSize() / 2f , this.getPosZ());
-                this.world.addEntity(newSunEntity);
-                this.remove();
+        if (!this.world.isRemote && this.getItem().getItem() == ModItems.SUN_STONE.get()) {
+            if (source.isExplosion() && amount >= 25) {
+                this.countdownSinceExplosion = 10;
+                this.explosionCount++;
+                if (explosionCount >= 6) {
+                    NewSunEntity newSunEntity = new NewSunEntity(ModEntityTypes.NEW_SUN.get(), this.world);
+                    newSunEntity.setPosition(this.getPosX(), this.getPosY() - newSunEntity.getActualSize() / 2f, this.getPosZ());
+                    this.world.addEntity(newSunEntity);
+                    this.remove();
+                }
             }
             return false;
         }

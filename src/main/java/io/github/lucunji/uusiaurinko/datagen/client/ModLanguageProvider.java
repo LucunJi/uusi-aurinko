@@ -132,15 +132,7 @@ public class ModLanguageProvider extends LanguageProvider {
     @Override
     public void add(String key, String value) {
         String oldVal = data.put(key, value);
-        if (oldVal != null) {
-            if (value.equals(oldVal)) {
-                LOGGER.warn("The generated translation for key '" + key
-                        + "' is the same in the existing language file " + existingLang);
-            } else {
-                LOGGER.warn("The generated translation for key '" + key
-                        + "' is different in the existing language file " + existingLang);
-            }
+        if (oldVal != null)
             throw new IllegalStateException("Duplicate translation key " + key);
-        }
     }
 }
