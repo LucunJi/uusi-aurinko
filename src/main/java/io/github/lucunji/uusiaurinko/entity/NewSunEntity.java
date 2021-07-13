@@ -6,14 +6,13 @@ import io.github.lucunji.uusiaurinko.network.ModDataSerializers;
 import io.github.lucunji.uusiaurinko.util.MathUtil;
 import io.github.lucunji.uusiaurinko.util.ModDamageSource;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
@@ -66,52 +65,59 @@ public class NewSunEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        // TODO: test this
+        // TODO: test this. Issue: https://github.com/LucunJi/uusi-aurinko/issues/17
 
         List<Entity> affectedEntities = this.getAffectedEntities();
 
         doEntityBothSides(affectedEntities);
 
-//        if (!world.isRemote) {
-//            doEntityServerOnly(affectedEntities);
-//            doBlockServerOnly();
-//        }
-//
-//        if (this.getSunState() != SunState.NEW_BORN) {
-//            Vector3d add = new Vector3d(0, 200, 0).subtract(getPositionVec()).normalize().scale(0.05);
-//            Vector3d a = getPositionVec().add(add);
-//            setPosition(a.x, a.y, a.z);
-//        }
-//
+        if (!world.isRemote) {
+            doEntityServerOnly(affectedEntities);
+            doBlockServerOnly();
+        }
+
+        if (this.getSunState() != SunState.NEW_BORN) {
+            Vector3d vec = new Vector3d(0, 200, 0).subtract(getPositionVec());
+            if (vec.lengthSquared() < 9) return;
+            vec = vec.normalize().scale(0.1);
+            Vector3d sum = getPositionVec().add(vec);
+            setPosition(sum.x, sum.y, sum.z);
+        }
+
         this.recalculateState();
     }
 
     private List<Entity> getAffectedEntities() {
         double range = this.getAffectEntityRange();
         return world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(
-                getPosX() + range,
-                getPosY() + range,
-                getPosZ() + range,
-                getPosX() - range,
-                getPosY() - range,
-                getPosZ() - range
-        ), (entity) -> entity.getDistanceSq(getPositionVec()) <= range * range
-                && !entity.isSpectator()
-                && (!(entity instanceof PlayerEntity) || ((PlayerEntity) entity).isCreative())
+                        getPosX() + range,
+                        getPosY() + range,
+                        getPosZ() + range,
+                        getPosX() - range,
+                        getPosY() - range,
+                        getPosZ() - range
+                ), entity -> entity != this
+                        && entity.getDistanceSq(getPositionVec()) <= range * range
+                        && !entity.isSpectator()
+                        && (!(entity instanceof PlayerEntity) || ((PlayerEntity) entity).isCreative())
                 // TODO: add blacklist
         );
     }
 
     private void doEntityBothSides(List<Entity> entities) {
-        attractEntity(entities, 0.02);
+        attractEntity(entities, 0.06);
     }
 
     private void attractEntity(List<Entity> entityList, double attractSpeedBase) {
         for (Entity entity : entityList) {
+            double distance = entity.getDistance(this);
+            if (distance == 0) continue;
+            // TODO: the calculation is problematic
             Vector3d toSun = MathUtil.getVectorToTargetNormalized(this, entity);
-            double rawSpeed = attractSpeedBase * (this.getAffectEntityRange() / entity.getDistance(this));
+            double rawSpeed = attractSpeedBase * (this.getAffectEntityRange() / distance);
             double attractSpeedMax = attractSpeedBase;
             double realSpeed = Math.min(rawSpeed, attractSpeedMax);
+//            LOGGER.info(String.format("raw: %f, max: %f, final: %f", rawSpeed, attractSpeedMax, realSpeed));
             Vector3d e1 = toSun.scale(realSpeed);
             entity.setMotion(entity.getMotion().add(e1));
         }
@@ -123,13 +129,22 @@ public class NewSunEntity extends Entity {
 
     private void damageEntity(List<Entity> entities) {
         for (Entity entity : entities) {
+            if (!entity.isAlive()) continue;
+
             if (this.getSunState() == SunState.GROWING && entity instanceof ItemEntity) {
                 Item item = ((ItemEntity) entity).getItem().getItem();
-                if      (item == ModItems.FIRE_STONE.get())         this.setHasFireStone(true);
-                else if (item == ModItems.WATER_STONE.get())        this.setHasWaterStone(true);
-                else if (item == ModItems.EARTH_STONE.get())        this.setHasEarthStone(true);
-                else if (item == ModItems.LIGHTNING_STONE.get())    this.setHasLightningStone(true);
-                else if (item == ModItems.POOP_STONE.get())         this.setHasPoopStone(true);
+                boolean flag = true;
+                if (item == ModItems.FIRE_STONE.get()) this.setHasFireStone(true);
+                else if (item == ModItems.WATER_STONE.get()) this.setHasWaterStone(true);
+                else if (item == ModItems.EARTH_STONE.get()) this.setHasEarthStone(true);
+                else if (item == ModItems.LIGHTNING_STONE.get()) this.setHasLightningStone(true);
+                else if (item == ModItems.POOP_STONE.get()) this.setHasPoopStone(true);
+                else flag = false;
+
+                if (flag) {
+                    entity.remove();
+                    continue;
+                }
             }
 
             entity.setFire(1);
@@ -158,9 +173,10 @@ public class NewSunEntity extends Entity {
     private void doBlockServerOnly() {
         float range = this.getMeltBlockRange();
         for (BlockPos pos : this.getAffectedBlocks(range)) {
-            world.destroyBlock(pos, false); // TODO： destroy?
             if (pos.distanceSq(this.getPositionVec(), true) > this.getVaporizeBlockRange()) {
-                world.setBlockState(pos, Fluids.FLOWING_LAVA.getDefaultState().getBlockState().with(FlowingFluidBlock.LEVEL, 2));
+                world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+            } else {
+                world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3, 512);
             }
         }
     }
@@ -171,27 +187,27 @@ public class NewSunEntity extends Entity {
                 getPositionVec().subtract(searchRange, searchRange, searchRange),
                 getPositionVec().add(searchRange, searchRange, searchRange)))
                 .filter(pos -> pos.distanceSq(getPositionVec(), true) <= searchRangeSq)
-                .filter((pos) -> {
+                .filter(pos -> !(this.world.isAirBlock(pos)))
+                .filter(pos -> {
                             BlockState blockState = world.getBlockState(pos);
-                            return !blockState.isAir() &&
-                                    blockState.getFluidState().getFluid() != Fluids.LAVA &&
-                                    blockState.getFluidState().getFluid() != Fluids.FLOWING_LAVA &&
+                            return !blockState.matchesBlock(Blocks.FIRE) &&
                                     !ServerConfigs.INSTANCE.NEW_SUN_DESTROY_BLACKLIST.contains(world.getBlockState(pos));
                         }
                 )
-                .filter(pos -> pos.equals(
-                        this.world.rayTraceBlocks(new RayTraceContext(
-                                this.getPositionVec(),
-                                Vector3d.copy(pos),
-                                RayTraceContext.BlockMode.VISUAL,
-                                RayTraceContext.FluidMode.ANY, // ignore fluids
-                                null)
-                        ).getPos()
-                ))
-                .limit(1)
+                .filter(pos ->
+                        pos.equals(
+                                this.world.rayTraceBlocks(new RayTraceContext(
+                                        this.getPositionVec(),
+                                        Vector3d.copy(pos).add(0.5, 0.5, 0.5),
+                                        RayTraceContext.BlockMode.COLLIDER,
+                                        RayTraceContext.FluidMode.NONE, // ignore fluids
+                                        null)
+                                ).getPos())
+                )
                 .map(BlockPos::toImmutable)
                 .collect(Collectors.toList());
         Collections.shuffle(list);
+        if (list.size() > 10) list = list.subList(0, 10);
         return list;
     }
 

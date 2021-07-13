@@ -26,14 +26,13 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
         matrixStackIn.push();
         float size = entityIn.getActualSize();
         matrixStackIn.scale(size, size, size);
-        model.render(matrixStackIn, bufferIn.getBuffer(RenderType.getEntitySolid(this.getEntityTexture(entityIn))),
+        model.render(matrixStackIn, bufferIn.getBuffer(RenderType.getBeaconBeam(this.getEntityTexture(entityIn), false)),
                 packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
         matrixStackIn.pop();
     }
 
     @Override
     public ResourceLocation getEntityTexture(NewSunEntity entity) {
-        // FIXME: make-do with moon texture, replace it with sun texture in the future
-        return new ResourceLocation(MODID, "textures/entity/moon.png");
+        return new ResourceLocation(MODID, "textures/entity/sun.png");
     }
 }

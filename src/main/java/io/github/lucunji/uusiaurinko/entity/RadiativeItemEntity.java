@@ -62,7 +62,7 @@ public class RadiativeItemEntity extends ItemEntity {
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
         if (!this.world.isRemote && this.getItem().getItem() == ModItems.SUN_STONE.get()) {
-            if (source.isExplosion() && amount >= 25) {
+            if (this.isAlive() && source.isExplosion() && amount >= 25) {
                 this.countdownSinceExplosion = 10;
                 this.explosionCount++;
                 if (explosionCount >= 6) {
