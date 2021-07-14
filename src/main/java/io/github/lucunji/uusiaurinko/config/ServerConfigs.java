@@ -54,6 +54,11 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
     public final BlockTaggedListConfigValue POWDERY_BLOCK;
 
     public final BlockTaggedListConfigValue NEW_SUN_DESTROY_BLACKLIST;
+    public final EntityTypeTaggedListConfigValue NEW_SUN_ATTRACTION_IMMUNE_ENTITY_TYPES;
+    public final ForgeConfigSpec.ConfigValue<Double> NEW_SUN_BLAZE_DAMAGE_AMOUNT;
+    public final EntityTypeTaggedListConfigValue NEW_SUN_BLAZE_DAMAGE_IMMUNE_ENTITY_TYPES;
+    public final ForgeConfigSpec.ConfigValue<Double> NEW_SUN_FUSION_DAMAGE_AMOUNT;
+    public final EntityTypeTaggedListConfigValue NEW_SUN_FUSION_DAMAGE_IMMUNE_ENTITY_TYPES;
 
     public final ItemTaggedListConfigValue PEDESTAL_SPECIAL_ITEMS;
 
@@ -209,6 +214,36 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                         "Also accept block tags starting with #",
                 "new_sun_destroy_blacklist",
                 Lists.newArrayList("#uusi-aurinko:transmutation_immune")
+        ), this);
+        NEW_SUN_ATTRACTION_IMMUNE_ENTITY_TYPES = new EntityTypeTaggedListConfigValue(defineList(builder,
+                "Entities with their types in this blacklist won't be attracted by the new sun.\n" +
+                        "Also accept entity type tags starting with #",
+                "new_sun_attraction_immune_entity_types",
+                Lists.newArrayList()
+        ), this);
+        NEW_SUN_BLAZE_DAMAGE_AMOUNT = defineDouble(builder,
+                "Defines the damage amount of the new sun's blaze.\n" +
+                        "Entities starts to receive the blaze damage when they are still far away from the sun.\n" +
+                        "Set this value to 0 to disable.",
+                "new_sun_blaze_damage_amount", 4, 0, Float.MAX_VALUE);
+        NEW_SUN_BLAZE_DAMAGE_IMMUNE_ENTITY_TYPES = new EntityTypeTaggedListConfigValue(defineList(builder,
+                "Entities with their types in this blacklist won't receive blaze damage.\n" +
+                        "Entities starts to receive the blaze damage when they are still far away from the sun.\n" +
+                        "Also accept entity type tags starting with #",
+                "new_sun_blaze_damage_immune_entity_types",
+                Lists.newArrayList()
+        ), this);
+        NEW_SUN_FUSION_DAMAGE_AMOUNT = defineDouble(builder,
+                "Defines the damage amount of the new sun's fusion.\n" +
+                        "Entities starts to receive the fusion damage when they literally get into the sun.\n" +
+                        "Set this value to 0 to disable.",
+                "new_sun_blaze_damage_amount", 8, 0, Float.MAX_VALUE);
+        NEW_SUN_FUSION_DAMAGE_IMMUNE_ENTITY_TYPES = new EntityTypeTaggedListConfigValue(defineList(builder,
+                "Entities with their types in this blacklist won't receive fusion damage.\n" +
+                        "Entities starts to receive the fusion damage when they literally get into the sun.\n" +
+                        "Also accept entity type tags starting with #",
+                "new_sun_fusion_damage_immune_entity_types",
+                Lists.newArrayList()
         ), this);
 
         PEDESTAL_SPECIAL_ITEMS = new ItemTaggedListConfigValue(defineList(builder,

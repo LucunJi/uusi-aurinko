@@ -12,8 +12,6 @@ import java.util.function.Function;
 public class ModDataSerializers {
     public static List<IDataSerializer<?>> REGISTRY = Lists.newArrayList();
 
-    public static IDataSerializer<NewSunEntity.SunState> SUN_STATE = register(new EnumDataSerializer<>(NewSunEntity.SunState.class));
-
     private static <T> IDataSerializer<T> register(IDataSerializer<T> dataSerializer) {
         REGISTRY.add(dataSerializer);
         return dataSerializer;

@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.config.loadlistening;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.ResourceLocation;
@@ -38,5 +39,9 @@ public class EntityTypeTaggedListConfigValue extends TaggedListConfigValue<Entit
                 getTags().stream()
                         .map(EntityTypeTags.getCollection()::getTagByID)
                         .anyMatch(tag -> tag.contains(val));
+    }
+
+    public boolean contains(Entity val) {
+        return contains(val.getType());
     }
 }

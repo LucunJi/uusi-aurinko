@@ -25,12 +25,12 @@ public enum HardcodedLanguageEntries {
             Pair.of("item.uusi-aurinko.sun_seed.tooltip", "它发着光，充满希望。\n周围的尘土都因它的热量迅速崩裂。"),
             Pair.of("item.uusi-aurinko.sun_stone.tooltip", "太阳精华之结晶。\n周围的尘土在顷刻间被焚烧殆尽。"),
             Pair.of("item.uusi-aurinko.evil_eye.tooltip", "这个形似眼球的人工物恶毒地瞪着。\n放在额头上，它将助你看清一切。\n强烈的凝视也使你感到紧张疲惫……"),
-            Pair.of("item.uusi-aurinko.moon.tooltip", "这个小巧的天体有着强大的重力。\n万物都被它吸引，尤其是其它天体。"),
+            Pair.of("item.uusi-aurinko.moon.tooltip", "WIP\n这个小巧的天体有着强大的重力。\n万物都被它吸引，尤其是其它天体。"),
 
             Pair.of("death.attack.uusi-aurinko.electricity", "%1$s感受到了贯穿身体的高压电流"),
             Pair.of("death.attack.uusi-aurinko.electricity.player", "%1$s在与%2$s的战斗中感受到了贯穿身体的高压电流"),
-            Pair.of("death.attack.uusi-aurinko.sun_heat", "%1$s被新日的烈焰化为灰烬"),
-            Pair.of("death.attack.uusi-aurinko.sun_heat.player", "%1$s在与%2$s的战斗中被新日的烈焰化为灰烬"),
+            Pair.of("death.attack.uusi-aurinko.sun_blaze", "%1$s被新日的烈焰化为灰烬"),
+            Pair.of("death.attack.uusi-aurinko.sun_blaze.player", "%1$s在与%2$s的战斗中被新日的烈焰化为灰烬"),
             Pair.of("death.attack.uusi-aurinko.sun_fusion", "%1$s感受到了新日的核聚变能量"),
             Pair.of("death.attack.uusi-aurinko.sun_fusion.player", "%1$s在与%2$s的战斗中感受到了新日的核聚变能量"),
 
@@ -52,12 +52,12 @@ public enum HardcodedLanguageEntries {
             Pair.of("item.uusi-aurinko.sun_seed.tooltip", "It glows, full of promise.\nDust and dirt around burst into pieces quickly under its tremendous heat."),
             Pair.of("item.uusi-aurinko.sun_stone.tooltip", "The essence of the Sun, crystallized.\nDust and dirt around are burnt down within seconds."),
             Pair.of("item.uusi-aurinko.evil_eye.tooltip", "This eye-shaped artefact projects a malevolent glare.\nPut it on your forehead, it then reveals everything to you.\nExhausting to you is its intense gaze."),
-            Pair.of("item.uusi-aurinko.moon.tooltip", "This tiny celestial object has a strong gravitational pull.\nIt attracts everything, especially other stars."),
+            Pair.of("item.uusi-aurinko.moon.tooltip", "WIP\nThis tiny celestial object has a strong gravitational pull.\nIt attracts everything, especially other stars."),
 
             Pair.of("death.attack.uusi-aurinko.electricity", "%1$s experienced high voltage pass through the body"),
             Pair.of("death.attack.uusi-aurinko.electricity.player", "%1$s experienced high voltage pass through the body whilst fighting %2$s"),
-            Pair.of("death.attack.uusi-aurinko.sun_heat", "%1$s was burnt into ash by the extreme heat of the new sun"),
-            Pair.of("death.attack.uusi-aurinko.sun_heat.player", "%1$s was burnt into ash by the extreme heat of the new sun whilst fighting %2$s"),
+            Pair.of("death.attack.uusi-aurinko.sun_blaze", "%1$s was burnt into ash by the blaze the new sun"),
+            Pair.of("death.attack.uusi-aurinko.sun_blaze.player", "%1$s was burnt into ash by the blaze of the new sun whilst fighting %2$s"),
             Pair.of("death.attack.uusi-aurinko.sun_fusion", "%1$s experienced the nuclear fusion energy inside the new sun"),
             Pair.of("death.attack.uusi-aurinko.sun_fusion.player", "%1$s experienced the nuclear fusion energy inside the new sun whilst fighting %2$s"),
 
