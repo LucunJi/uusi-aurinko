@@ -90,14 +90,13 @@ public class NewSunEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        // TODO: test this. Issue: https://github.com/LucunJi/uusi-aurinko/issues/17
 
         List<Entity> affectedEntities = this.getAffectedEntities();
 
         doEntityBothSides(affectedEntities);
 
         // move towards rest position
-        if (this.getSunState() != SunState.NEW_BORN) {
+        if (this.getSunState() != SunState.NEW_BORN && ServerConfigs.INSTANCE.NEW_SUN_RISE_UP.get()) {
             Vector3d vec = Vector3d.copy(this.getRestPosition()).subtract(this.getPositionCenter());
             if (vec.lengthSquared() > 1) {
                 this.move(MoverType.SELF, vec.normalize().scale(0.1));

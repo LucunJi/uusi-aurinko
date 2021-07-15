@@ -53,6 +53,7 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
     public final BlockTaggedListConfigValue POWDERY_BLOCK;
 
+    public final ForgeConfigSpec.ConfigValue<Boolean> NEW_SUN_RISE_UP;
     public final ForgeConfigSpec.ConfigValue<Integer> NEW_SUN_DESTROY_RATE;
     public final ForgeConfigSpec.ConfigValue<Double> NEW_SUN_DESTROY_FIRE_CHANCE;
     public final BlockTaggedListConfigValue NEW_SUN_DESTROY_BLACKLIST;
@@ -212,6 +213,11 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
         ), this);
 
 
+        NEW_SUN_RISE_UP = defineBoolean(builder,
+                "If the new sun flys to a specific position in the world after consuming a specific amount of entities.\n" +
+                        "It is y=200 at the spawn point in the overword, y=100 with x and z equal to 1/8 of the overworld's spawn point in the nether,\n" +
+                        "and y=200, x=z=0 in the end.",
+                "new_sun_rise_up", true);
         NEW_SUN_DESTROY_RATE = defineInteger(builder,
                 "The maximum amount of blocks destroyed by the new sun per tick.\n" +
                         "Set this value to 0 to disable.",
