@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 
 import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
@@ -26,6 +27,11 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
         matrixStackIn.push();
         float size = entityIn.getActualSize();
         matrixStackIn.scale(size, size, size);
+        matrixStackIn.translate(0, 0.5, 0);
+        float t = (entityIn.world.getGameTime() + partialTicks) / 2;
+        matrixStackIn.rotate(Vector3f.XP.rotationDegrees(t));
+        matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(t + 71));
+        matrixStackIn.translate(0, -0.5, 0);
         // DefaultVertexFormats.BLOCK, NO_FOG, other options are all default
         RenderType renderType = RenderType.getBeaconBeam(this.getEntityTexture(entityIn), false);
         model.render(matrixStackIn, bufferIn.getBuffer(renderType),
@@ -35,8 +41,15 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
 
     @Override
     public ResourceLocation getEntityTexture(NewSunEntity entity) {
-        if (entity.getSunState() == NewSunEntity.SunState.FULL_BLACK)
-            return new ResourceLocation(MODID, "textures/entity/sun_black.png");
-        return new ResourceLocation(MODID, "textures/entity/sun.png");
+        switch (entity.getSunState()) {
+            case NEW_BORN:
+                return new ResourceLocation(MODID, "textures/entity/sun_yellow.png");
+            case GROWING:
+            case FULL_YELLOW:
+                return new ResourceLocation(MODID, "textures/entity/sun_white.png");
+            case FULL_BLACK:
+            default:
+                return new ResourceLocation(MODID, "textures/entity/sun_black.png");
+        }
     }
 }

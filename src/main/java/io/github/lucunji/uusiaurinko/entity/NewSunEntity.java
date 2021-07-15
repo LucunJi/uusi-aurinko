@@ -104,7 +104,6 @@ public class NewSunEntity extends Entity {
         }
 
         if (!world.isRemote) {
-            long startTime = System.nanoTime();
             doEntityServerOnly(affectedEntities);
 
             doBlockServerOnly();
@@ -115,7 +114,6 @@ public class NewSunEntity extends Entity {
             if (getSunState() != newState) {
                 this.setSunState(newState);
             }
-            LOGGER.debug((System.nanoTime() - startTime) / 1000_000D);
         }
     }
 
