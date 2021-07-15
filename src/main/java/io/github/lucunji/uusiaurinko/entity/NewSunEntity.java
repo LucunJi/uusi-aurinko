@@ -16,10 +16,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -28,9 +25,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class NewSunEntity extends Entity {
     /* A scratch for setting sun's entity data:
@@ -54,11 +49,10 @@ public class NewSunEntity extends Entity {
 
     private static final int SIZE_INCREMENT_PER_STONE = 1;
 
-    private int killCount;
+    private int killCount = 0;
 
     public NewSunEntity(EntityType<?> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
-        this.killCount = 0;
     }
 
     @Override
@@ -114,7 +108,7 @@ public class NewSunEntity extends Entity {
             long startTime = System.nanoTime();
             doEntityServerOnly(affectedEntities);
 
-            doBlockServerOnly(); // FIXME: optimize this
+            doBlockServerOnly();
 
             updateRestPosition(((ServerWorld) this.world));
 
@@ -127,15 +121,15 @@ public class NewSunEntity extends Entity {
     }
 
     private List<Entity> getAffectedEntities() {
-        double range = this.getAffectEntityRange();
+        double radius = this.getAffectEntityRadius();
         return world.getEntitiesInAABBexcluding(this, new AxisAlignedBB(
-                        getPosX() + range,
-                        getPosYCenter() + range,
-                        getPosZ() + range,
-                        getPosX() - range,
-                        getPosYCenter() - range,
-                        getPosZ() - range
-                ), entity -> entity.getDistanceSq(getPositionCenter()) <= range * range
+                        getPosX() + radius,
+                        getPosYCenter() + radius,
+                        getPosZ() + radius,
+                        getPosX() - radius,
+                        getPosYCenter() - radius,
+                        getPosZ() - radius
+                ), entity -> entity.getDistanceSq(getPositionCenter()) <= radius * radius
                         && entity.isAlive()
                         && !entity.isSpectator()
                         && (!(entity instanceof PlayerEntity) || ((PlayerEntity) entity).isCreative())
@@ -152,7 +146,7 @@ public class NewSunEntity extends Entity {
             if (distance == 0) continue;
             // TODO: the calculation is problematic
             Vector3d toSun = this.getPositionCenter().subtract(entity.getPositionVec()).normalize();
-            double rawSpeed = attractSpeedBase * (this.getAffectEntityRange() / distance);
+            double rawSpeed = attractSpeedBase * (this.getAffectEntityRadius() / distance);
             double attractSpeedMax = attractSpeedBase;
             double realSpeed = Math.min(rawSpeed, attractSpeedMax);
 //            LOGGER.info(String.format("raw: %f, max: %f, final: %f", rawSpeed, attractSpeedMax, realSpeed));
@@ -166,7 +160,7 @@ public class NewSunEntity extends Entity {
         float fusionAmount = ServerConfigs.INSTANCE.NEW_SUN_FUSION_DAMAGE_AMOUNT.get().floatValue();
 
         for (Entity entity : entities) {
-            if (entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(getFusionRange())) {
+            if (entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(this.getFusionRadius())) {
                 if (this.getSunState() == SunState.GROWING
                         && entity instanceof ItemEntity
                         && tryConsumeMagicStoneEntity((ItemEntity) entity)) {
@@ -225,9 +219,12 @@ public class NewSunEntity extends Entity {
     }
 
     private void doBlockServerOnly() {
-        float range = this.getMeltBlockRange();
-        for (BlockPos pos : this.getAffectedBlocks(range)) {
-            if (pos.distanceSq(this.getPositionCenter(), true) > this.getVaporizeBlockRange()) {
+        int amount = ServerConfigs.INSTANCE.NEW_SUN_DESTROY_RATE.get();
+        if (amount == 0) return;
+        float radius = this.getMeltBlockRadius();
+        for (BlockPos pos : this.getAffectedBlocks(radius, amount)) {
+            if (pos.distanceSq(this.getPositionCenter(), true) > this.getVaporizeBlockRadius()
+            && Math.random() < 0.3) {
                 world.setBlockState(pos, Blocks.FIRE.getDefaultState());
             } else {
                 world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3, 512);
@@ -235,39 +232,55 @@ public class NewSunEntity extends Entity {
         }
     }
 
-    private List<BlockPos> getAffectedBlocks(float range) {
-        float rangeSq = range * range;
-        List<BlockPos> list = BlockPos.getAllInBox(new AxisAlignedBB(
-                getPosX() + range,
-                getPosYCenter() + range,
-                getPosZ() + range,
-                getPosX() - range,
-                getPosYCenter() - range,
-                getPosZ() - range
-        ))
-                .filter(pos -> pos.distanceSq(getPositionCenter(), true) <= rangeSq)
-                .filter(pos -> !(this.world.isAirBlock(pos)))
-                .filter(pos -> {
-                            BlockState blockState = world.getBlockState(pos);
-                            return !blockState.matchesBlock(Blocks.FIRE) &&
-                                    !ServerConfigs.INSTANCE.NEW_SUN_DESTROY_BLACKLIST.contains(world.getBlockState(pos));
-                        }
-                )
-                .filter(pos ->
-                        pos.equals(
-                                this.world.rayTraceBlocks(new RayTraceContext(
-                                        this.getPositionCenter(),
-                                        Vector3d.copy(pos).add(0.5, 0.5, 0.5),
-                                        RayTraceContext.BlockMode.COLLIDER,
-                                        RayTraceContext.FluidMode.NONE, // ignore fluids
-                                        null)
-                                ).getPos())
-                )
-                .map(BlockPos::toImmutable)
-                .collect(Collectors.toList());
-        Collections.shuffle(list);
-        if (list.size() > 10) list = list.subList(0, 10);
-        return list;
+    private List<BlockPos> getAffectedBlocks(float radius, int amount) {
+        // filter out empty sections
+        Vector3d positionCenter = this.getPositionCenter();
+        int xMin = (int) (positionCenter.getX() - radius) >> 4;
+        int yMin = (int) (positionCenter.getY() - radius) >> 4;
+        int zMin = (int) (positionCenter.getZ() - radius) >> 4;
+        int xMax = (int) (positionCenter.getX() + radius) >> 4;
+        int yMax = (int) (positionCenter.getY() + radius) >> 4;
+        int zMax = (int) (positionCenter.getZ() + radius) >> 4;
+        LinkedList<SectionPos> sectionPosList = new LinkedList<>();
+        for (int x = xMin; x <= xMax; x++) {
+            for (int y = yMin; y <= yMax; y++) {
+                for (int z = zMin; z <= zMax; z++) {
+                    if (this.world.getChunk(x, z).isEmptyBetween(y << 4, (y << 4) | 0b1111)) continue;
+                    sectionPosList.add(SectionPos.of(x, y, z));
+                }
+            }
+        }
+
+        List<BlockPos> results = new ArrayList<>();
+        if (sectionPosList.isEmpty()) return results;
+
+        // randomly pick blocks in non-empty sections
+        float radiusSq = radius * radius;
+        Random random = new Random();
+        int trial;
+        for (trial = 0; trial < 1024 && results.size() < amount; trial++) {
+            SectionPos sectionPos = sectionPosList.get(random.nextInt(sectionPosList.size()));
+            int x = sectionPos.getWorldStartX() | random.nextInt(16);
+            int y = sectionPos.getWorldStartY() | random.nextInt(16);
+            int z = sectionPos.getWorldStartZ() | random.nextInt(16);
+            BlockPos p = new BlockPos(x, y, z);
+
+            if (p.distanceSq(getPositionCenter(), true) > radiusSq
+                    || this.world.isAirBlock(p)) continue;
+            BlockState blockState = world.getBlockState(p);
+            if (blockState.matchesBlock(Blocks.FIRE)
+                    || ServerConfigs.INSTANCE.NEW_SUN_DESTROY_BLACKLIST.contains(world.getBlockState(p))) continue;
+
+            p = this.world.rayTraceBlocks(new RayTraceContext(
+                    this.getPositionCenter(),
+                    Vector3d.copy(p).add(0.5, 0.5, 0.5),
+                    RayTraceContext.BlockMode.COLLIDER,
+                    RayTraceContext.FluidMode.NONE, // ignore fluids
+                    null)
+            ).getPos();
+            results.add(p);
+        }
+        return results;
     }
 
     private void updateRestPosition(ServerWorld world) {
@@ -364,24 +377,24 @@ public class NewSunEntity extends Entity {
         return this.getPosY() + this.getActualSize() / 2D;
     }
 
-    private float getAffectEntityRange() {
+    private float getAffectEntityRadius() {
         return this.getActualSize() * 1.3F;
     }
 
-    private float getFireRange() {
-        return this.getAffectEntityRange();
+    private float getFireRadius() {
+        return this.getAffectEntityRadius();
     }
 
-    private float getFusionRange() {
-        return this.getActualSize() * 0.4F;
+    private float getFusionRadius() {
+        return this.getActualSize() * 0.5F;
     }
 
-    private float getMeltBlockRange() {
-        return this.getAffectEntityRange();
+    private float getMeltBlockRadius() {
+        return this.getAffectEntityRadius();
     }
 
-    private float getVaporizeBlockRange() {
-        return this.getFusionRange();
+    private float getVaporizeBlockRadius() {
+        return this.getFusionRadius();
     }
 
     public boolean getHasWaterStone() {

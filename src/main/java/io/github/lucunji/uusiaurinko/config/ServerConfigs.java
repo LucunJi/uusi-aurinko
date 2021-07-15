@@ -53,6 +53,8 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
     public final BlockTaggedListConfigValue POWDERY_BLOCK;
 
+    public final ForgeConfigSpec.ConfigValue<Integer> NEW_SUN_DESTROY_RATE;
+    public final ForgeConfigSpec.ConfigValue<Double> NEW_SUN_DESTROY_FIRE_CHANCE;
     public final BlockTaggedListConfigValue NEW_SUN_DESTROY_BLACKLIST;
     public final EntityTypeTaggedListConfigValue NEW_SUN_ATTRACTION_IMMUNE_ENTITY_TYPES;
     public final ForgeConfigSpec.ConfigValue<Double> NEW_SUN_BLAZE_DAMAGE_AMOUNT;
@@ -209,6 +211,15 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                 Lists.newArrayList("#uusi-aurinko:powdery")
         ), this);
 
+
+        NEW_SUN_DESTROY_RATE = defineInteger(builder,
+                "The maximum amount of blocks destroyed by the new sun per tick.\n" +
+                        "Set this value to 0 to disable.",
+                "new_sun_destroy_rate", 50, 0, 1024);
+        NEW_SUN_DESTROY_FIRE_CHANCE = defineDouble(builder,
+                "The probability of leaving fire behind when destroying a block.\n" +
+                        "Note that blocks inside the new sun never leave fire behind when destroyed.",
+        "new_sun_destroy_fire_chance", 0.3, 0, 1);
         NEW_SUN_DESTROY_BLACKLIST = new BlockTaggedListConfigValue(defineList(builder,
                 "Blocks in this blacklist won't be destroyed or turned into lava by the new sun.\n" +
                         "Also accept block tags starting with #",
@@ -237,7 +248,7 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                 "Defines the damage amount of the new sun's fusion.\n" +
                         "Entities starts to receive the fusion damage when they literally get into the sun.\n" +
                         "Set this value to 0 to disable.",
-                "new_sun_blaze_damage_amount", 8, 0, Float.MAX_VALUE);
+                "new_sun_fusion_damage_amount", 12, 0, Float.MAX_VALUE);
         NEW_SUN_FUSION_DAMAGE_IMMUNE_ENTITY_TYPES = new EntityTypeTaggedListConfigValue(defineList(builder,
                 "Entities with their types in this blacklist won't receive fusion damage.\n" +
                         "Entities starts to receive the fusion damage when they literally get into the sun.\n" +
