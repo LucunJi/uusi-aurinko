@@ -2,14 +2,10 @@ package io.github.lucunji.uusiaurinko.entity;
 
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.item.ModItems;
-import io.github.lucunji.uusiaurinko.util.MathUtil;
 import io.github.lucunji.uusiaurinko.util.ModDamageSource;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MoverType;
+import net.minecraft.entity.*;
 import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,7 +34,8 @@ import java.util.stream.Collectors;
 
 public class NewSunEntity extends Entity {
     /* A scratch for setting sun's entity data:
-    /data merge entity @e[type=uusi-aurinko:new_sun, limit=1] {SunState:"GROWING"}
+    /data merge entity @e[type=uusi-aurinko:new_sun, limit=1] {}
+    /data get entity @e[type=uusi-aurinko:new_sun, limit=1]
      */
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -49,25 +46,49 @@ public class NewSunEntity extends Entity {
      * 2: earth stone;
      * 3: lightning stone;
      * 4: poop stone;
-     * 5-7: always 0.
+     * 5-6: sun state;
+     * 7: always 0.
      */
     private static final DataParameter<Byte> SYNC_DATA = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BYTE);
     private static final DataParameter<BlockPos> REST_POSITION = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BLOCK_POS);
 
     private static final int SIZE_INCREMENT_PER_STONE = 1;
 
-    private SunState sunState;
     private int killCount;
 
     public NewSunEntity(EntityType<?> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
-        this.sunState = SunState.NEW_BORN;
         this.killCount = 0;
     }
 
     @Override
     public boolean isInRangeToRenderDist(double distance) {
         return true;
+    }
+
+    @Override
+    public EntitySize getSize(Pose poseIn) {
+        float size = this.getActualSize();
+        return new EntitySize(size, size, false);
+    }
+
+    @Override
+    public void recalculateSize() {
+        double x = this.getPosX();
+        double y = this.getPosY();
+        double z = this.getPosZ();
+
+        super.recalculateSize(); // has the side-effect of adding an offset in position when it expands
+
+        this.setPosition(x, y, z);
+        AxisAlignedBB box = this.getBoundingBox(this.getPose());
+    }
+
+    @Override
+    public void notifyDataManagerChange(DataParameter<?> key) {
+        if (SYNC_DATA.equals(key)) {
+            this.recalculateSize();
+        }
     }
 
     /* ------------------------------ Major Logic ------------------------------ */
@@ -81,34 +102,40 @@ public class NewSunEntity extends Entity {
 
         doEntityBothSides(affectedEntities);
 
-        if (!world.isRemote) {
-            doEntityServerOnly(affectedEntities);
-            doBlockServerOnly();
-            updateRestPosition(((ServerWorld) this.world));
-        }
-
         // move towards rest position
-        if (this.sunState != SunState.NEW_BORN) {
-            Vector3d vec = Vector3d.copy(this.getRestPosition()).subtract(getPositionVec());
-            if (vec.lengthSquared() > 9) {
-                vec = vec.normalize().scale(0.1);
-                this.move(MoverType.SELF, vec);
+        if (this.getSunState() != SunState.NEW_BORN) {
+            Vector3d vec = Vector3d.copy(this.getRestPosition()).subtract(this.getPositionCenter());
+            if (vec.lengthSquared() > 1) {
+                this.move(MoverType.SELF, vec.normalize().scale(0.1));
             }
         }
 
-        this.recalculateState();
+        if (!world.isRemote) {
+            long startTime = System.nanoTime();
+            doEntityServerOnly(affectedEntities);
+
+            doBlockServerOnly(); // FIXME: optimize this
+
+            updateRestPosition(((ServerWorld) this.world));
+
+            SunState newState = this.recalculateState();
+            if (getSunState() != newState) {
+                this.setSunState(newState);
+            }
+            LOGGER.debug((System.nanoTime() - startTime) / 1000_000D);
+        }
     }
 
     private List<Entity> getAffectedEntities() {
         double range = this.getAffectEntityRange();
         return world.getEntitiesInAABBexcluding(this, new AxisAlignedBB(
                         getPosX() + range,
-                        getPosY() + range,
+                        getPosYCenter() + range,
                         getPosZ() + range,
                         getPosX() - range,
-                        getPosY() - range,
+                        getPosYCenter() - range,
                         getPosZ() - range
-                ), entity -> entity.getDistanceSq(getPositionVec()) <= range * range
+                ), entity -> entity.getDistanceSq(getPositionCenter()) <= range * range
                         && entity.isAlive()
                         && !entity.isSpectator()
                         && (!(entity instanceof PlayerEntity) || ((PlayerEntity) entity).isCreative())
@@ -118,12 +145,13 @@ public class NewSunEntity extends Entity {
     private void doEntityBothSides(List<Entity> entities) {
         float attractSpeedBase = 0.06F;
         for (Entity entity : entities) {
+            // attract entities
             if (ServerConfigs.INSTANCE.NEW_SUN_ATTRACTION_IMMUNE_ENTITY_TYPES.contains(entity)) continue;
 
-            double distance = entity.getDistance(this);
+            double distance = MathHelper.sqrt(entity.getDistanceSq(this.getPositionCenter()));
             if (distance == 0) continue;
             // TODO: the calculation is problematic
-            Vector3d toSun = MathUtil.getVectorToTargetNormalized(this, entity);
+            Vector3d toSun = this.getPositionCenter().subtract(entity.getPositionVec()).normalize();
             double rawSpeed = attractSpeedBase * (this.getAffectEntityRange() / distance);
             double attractSpeedMax = attractSpeedBase;
             double realSpeed = Math.min(rawSpeed, attractSpeedMax);
@@ -138,8 +166,8 @@ public class NewSunEntity extends Entity {
         float fusionAmount = ServerConfigs.INSTANCE.NEW_SUN_FUSION_DAMAGE_AMOUNT.get().floatValue();
 
         for (Entity entity : entities) {
-            if (entity.getDistanceSq(this) < MathHelper.squareFloat(getFusionRange())) {
-                if (this.sunState == SunState.GROWING
+            if (entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(getFusionRange())) {
+                if (this.getSunState() == SunState.GROWING
                         && entity instanceof ItemEntity
                         && tryConsumeMagicStoneEntity((ItemEntity) entity)) {
                     entity.remove();
@@ -166,7 +194,7 @@ public class NewSunEntity extends Entity {
                 entity.attackEntityFrom(ModDamageSource.SUN_BLAZE, blazeAmount);
             }
 
-            if (this.sunState == SunState.NEW_BORN
+            if (this.getSunState() == SunState.NEW_BORN
                     && entity instanceof LivingEntity && ((LivingEntity) entity).getShouldBeDead()
                     && killCount < 100) {
                 killCount++;
@@ -199,7 +227,7 @@ public class NewSunEntity extends Entity {
     private void doBlockServerOnly() {
         float range = this.getMeltBlockRange();
         for (BlockPos pos : this.getAffectedBlocks(range)) {
-            if (pos.distanceSq(this.getPositionVec(), true) > this.getVaporizeBlockRange()) {
+            if (pos.distanceSq(this.getPositionCenter(), true) > this.getVaporizeBlockRange()) {
                 world.setBlockState(pos, Blocks.FIRE.getDefaultState());
             } else {
                 world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3, 512);
@@ -207,12 +235,17 @@ public class NewSunEntity extends Entity {
         }
     }
 
-    private List<BlockPos> getAffectedBlocks(float searchRange) {
-        float searchRangeSq = searchRange * searchRange;
+    private List<BlockPos> getAffectedBlocks(float range) {
+        float rangeSq = range * range;
         List<BlockPos> list = BlockPos.getAllInBox(new AxisAlignedBB(
-                getPositionVec().subtract(searchRange, searchRange, searchRange),
-                getPositionVec().add(searchRange, searchRange, searchRange)))
-                .filter(pos -> pos.distanceSq(getPositionVec(), true) <= searchRangeSq)
+                getPosX() + range,
+                getPosYCenter() + range,
+                getPosZ() + range,
+                getPosX() - range,
+                getPosYCenter() - range,
+                getPosZ() - range
+        ))
+                .filter(pos -> pos.distanceSq(getPositionCenter(), true) <= rangeSq)
                 .filter(pos -> !(this.world.isAirBlock(pos)))
                 .filter(pos -> {
                             BlockState blockState = world.getBlockState(pos);
@@ -223,7 +256,7 @@ public class NewSunEntity extends Entity {
                 .filter(pos ->
                         pos.equals(
                                 this.world.rayTraceBlocks(new RayTraceContext(
-                                        this.getPositionVec(),
+                                        this.getPositionCenter(),
                                         Vector3d.copy(pos).add(0.5, 0.5, 0.5),
                                         RayTraceContext.BlockMode.COLLIDER,
                                         RayTraceContext.FluidMode.NONE, // ignore fluids
@@ -250,24 +283,20 @@ public class NewSunEntity extends Entity {
         }
     }
 
-    private void recalculateState() {
-        switch (this.sunState) {
-            case NEW_BORN:
-                if (killCount >= 100) {
-                    this.sunState = SunState.GROWING;
+    private SunState recalculateState() {
+        if (killCount >= 100) {
+            if (getHasFireStone() && getHasEarthStone() && getHasWaterStone() && getHasLightningStone()) {
+                if (getHasPoopStone()) {
+                    return SunState.FULL_BLACK;
+                } else {
+                    return SunState.FULL_YELLOW;
                 }
-                break;
-            case GROWING:
-                if (getHasFireStone() && getHasEarthStone() && getHasWaterStone() && getHasLightningStone()) {
-                    if (getHasPoopStone()) {
-                        this.sunState = SunState.FULL_BLACK;
-                    } else {
-                        this.sunState = SunState.FULL_YELLOW;
-                    }
-                }
-                break;
+            } else {
+                return SunState.GROWING;
+            }
+        } else {
+            return SunState.NEW_BORN;
         }
-
     }
 
     /* ------------------------------ Data Sync & Storage ------------------------------ */
@@ -283,13 +312,6 @@ public class NewSunEntity extends Entity {
 
     @Override
     protected void readAdditional(CompoundNBT compound) {
-        if (compound.contains("SunState")) {
-            try {
-                this.sunState = SunState.valueOf(compound.getString("SunState"));
-            } catch (IllegalArgumentException e) {
-                LOGGER.error(e);
-            }
-        }
         this.setHasWaterStone(compound.getBoolean("Water"));
         this.setHasFireStone(compound.getBoolean("Fire"));
         this.setHasEarthStone(compound.getBoolean("Earth"));
@@ -300,7 +322,6 @@ public class NewSunEntity extends Entity {
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
-        compound.putString("SunState", this.sunState.name());
         compound.putBoolean("Water", this.getHasWaterStone());
         compound.putBoolean("Fire", this.getHasFireStone());
         compound.putBoolean("Earth", this.getHasEarthStone());
@@ -317,7 +338,7 @@ public class NewSunEntity extends Entity {
     /* ------------------------------ Getters & Setters ------------------------------ */
 
     public float getActualSize() {
-        SunState sunState = this.sunState;
+        SunState sunState = this.getSunState();
         if (sunState == SunState.GROWING) {
             float baseSize = sunState.size;
             if (this.getHasWaterStone()) baseSize += SIZE_INCREMENT_PER_STONE;
@@ -329,6 +350,18 @@ public class NewSunEntity extends Entity {
         } else {
             return sunState.size;
         }
+    }
+
+    private Vector3d getPositionCenter() {
+        return this.getPositionVec().add(0, this.getActualSize() / 2D, 0);
+    }
+
+    private BlockPos getBlockPosCenter() {
+        return new BlockPos(this.getPositionVec().add(0, this.getActualSize() / 2D, 0));
+    }
+
+    private double getPosYCenter() {
+        return this.getPosY() + this.getActualSize() / 2D;
     }
 
     private float getAffectEntityRange() {
@@ -352,52 +385,62 @@ public class NewSunEntity extends Entity {
     }
 
     public boolean getHasWaterStone() {
-        return (this.dataManager.get(SYNC_DATA) & (byte) 0b1) != (byte) 0;
+        return (this.dataManager.get(SYNC_DATA) & 0b1) != 0;
     }
 
     public void setHasWaterStone(boolean newVal) {
         byte data = this.dataManager.get(SYNC_DATA);
-        data = newVal ? (byte) (data | (byte) 0b1) : (byte) (data & (byte) 0b1_1110);
+        data = (byte) (newVal ? data | 0b1 : data & 0b111_1110);
         this.dataManager.set(SYNC_DATA, data);
     }
 
     public boolean getHasFireStone() {
-        return (this.dataManager.get(SYNC_DATA) & (byte) 0b10) != (byte) 0;
+        return (this.dataManager.get(SYNC_DATA) & 0b10) != 0;
     }
 
     public void setHasFireStone(boolean newVal) {
         byte data = this.dataManager.get(SYNC_DATA);
-        data = newVal ? (byte) (data | (byte) 0b10) : (byte) (data & (byte) 0b1_1101);
+        data = (byte) (newVal ? data | 0b10 : data & 0b111_1101);
         this.dataManager.set(SYNC_DATA, data);
     }
 
     public boolean getHasEarthStone() {
-        return (this.dataManager.get(SYNC_DATA) & (byte) 0b100) != (byte) 0;
+        return (this.dataManager.get(SYNC_DATA) & 0b100) != 0;
     }
 
     public void setHasEarthStone(boolean newVal) {
         byte data = this.dataManager.get(SYNC_DATA);
-        data = newVal ? (byte) (data | (byte) 0b100) : (byte) (data & (byte) 0b1_1011);
+        data = (byte) (newVal ? data | 0b100 : data & 0b111_1011);
         this.dataManager.set(SYNC_DATA, data);
     }
 
     public boolean getHasLightningStone() {
-        return (this.dataManager.get(SYNC_DATA) & (byte) 0b1000) != (byte) 0;
+        return (this.dataManager.get(SYNC_DATA) & 0b1000) != 0;
     }
 
     public void setHasLightningStone(boolean newVal) {
         byte data = this.dataManager.get(SYNC_DATA);
-        data = newVal ? (byte) (data | (byte) 0b1000) : (byte) (data & (byte) 0b1_0111);
+        data = (byte) (newVal ? data | 0b1000 : data & 0b111_0111);
         this.dataManager.set(SYNC_DATA, data);
     }
 
     public boolean getHasPoopStone() {
-        return (this.dataManager.get(SYNC_DATA) & (byte) 0b1_0000) != (byte) 0;
+        return (this.dataManager.get(SYNC_DATA) & 0b1_0000) != 0;
     }
 
     public void setHasPoopStone(boolean newVal) {
         byte data = this.dataManager.get(SYNC_DATA);
-        data = newVal ? (byte) (data | (byte) 0b1_0000) : (byte) (data & (byte) 0b0_1111);
+        data = (byte) (newVal ? data | 0b1_0000 : data & 0b110_1111);
+        this.dataManager.set(SYNC_DATA, data);
+    }
+
+    public SunState getSunState() {
+        return SunState.values()[this.dataManager.get(SYNC_DATA) >>> 5];
+    }
+
+    public void setSunState(SunState sunState) {
+        byte data = this.dataManager.get(SYNC_DATA);
+        data = (byte) (data & 0b001_1111 | sunState.ordinal() << 5);
         this.dataManager.set(SYNC_DATA, data);
     }
 

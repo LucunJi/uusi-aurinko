@@ -13,7 +13,7 @@ public class NewSunModel extends Model {
         super(RenderType::getEntitySolid);
         this.renderer = new ModelRenderer(this);
         this.renderer.setTextureOffset(0, 0);
-        this.renderer.addBox(-8, -8, -8, 16, 16, 16);
+        this.renderer.addBox(-8, 0, -8, 16, 16, 16);
     }
 
     @Override
