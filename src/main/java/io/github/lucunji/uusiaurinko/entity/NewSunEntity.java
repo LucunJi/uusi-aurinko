@@ -2,6 +2,8 @@ package io.github.lucunji.uusiaurinko.entity;
 
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.item.ModItems;
+import io.github.lucunji.uusiaurinko.item.radiative.ItemRadiative;
+import io.github.lucunji.uusiaurinko.network.ModDataSerializers;
 import io.github.lucunji.uusiaurinko.util.ModDamageSource;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -21,10 +23,12 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class NewSunEntity extends Entity {
@@ -44,8 +48,12 @@ public class NewSunEntity extends Entity {
      * 5-6: sun state;
      * 7: always 0.
      */
-    private static final DataParameter<Byte> SYNC_DATA = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BYTE);
-    private static final DataParameter<BlockPos> REST_POSITION = EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BLOCK_POS);
+    private static final DataParameter<Byte> SYNC_DATA =
+            EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BYTE);
+    private static final DataParameter<ConsumedMagicStone> LAST_CONSUMED_STONE =
+            EntityDataManager.createKey(NewSunEntity.class, ModDataSerializers.CONSUMED_MAGIC_STONE);
+    private static final DataParameter<BlockPos> REST_POSITION =
+            EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BLOCK_POS);
 
     private static final int SIZE_INCREMENT_PER_STONE = 1;
 
@@ -195,24 +203,15 @@ public class NewSunEntity extends Entity {
 
     private boolean tryConsumeMagicStoneEntity(ItemEntity itemEntity) {
         Item item = itemEntity.getItem().getItem();
-        if (item == ModItems.FIRE_STONE.get()) {
-            this.setHasFireStone(true);
-            return true;
-        } else if (item == ModItems.WATER_STONE.get()) {
-            this.setHasWaterStone(true);
-            return true;
-        } else if (item == ModItems.EARTH_STONE.get()) {
-            this.setHasEarthStone(true);
-            return true;
-        } else if (item == ModItems.LIGHTNING_STONE.get()) {
-            this.setHasLightningStone(true);
-            return true;
-        } else if (item == ModItems.POOP_STONE.get()) {
-            this.setHasPoopStone(true);
-            return true;
-        } else {
-            return false;
+        ConsumedMagicStone[] values = ConsumedMagicStone.values();
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] != ConsumedMagicStone.NONE && item == Objects.requireNonNull(values[i].item).get()) {
+                this.setSyncDataBit(i, true);
+                this.setLastConsumedStone(values[i]);
+                return true;
+            }
         }
+        return false;
     }
 
     private void doBlockServerOnly() {
@@ -221,7 +220,7 @@ public class NewSunEntity extends Entity {
         float radius = this.getMeltBlockRadius();
         for (BlockPos pos : this.getAffectedBlocks(radius, amount)) {
             if (pos.distanceSq(this.getPositionCenter(), true) > this.getVaporizeBlockRadius()
-            && Math.random() < 0.3) {
+                    && Math.random() < 0.3) {
                 world.setBlockState(pos, Blocks.FIRE.getDefaultState());
             } else {
                 world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3, 512);
@@ -295,8 +294,8 @@ public class NewSunEntity extends Entity {
 
     private SunState recalculateState() {
         if (killCount >= 100) {
-            if (getHasFireStone() && getHasEarthStone() && getHasWaterStone() && getHasLightningStone()) {
-                if (getHasPoopStone()) {
+            if (this.getHas4Stones()) {
+                if (this.getHasPoopStone()) {
                     return SunState.FULL_BLACK;
                 } else {
                     return SunState.FULL_YELLOW;
@@ -318,25 +317,39 @@ public class NewSunEntity extends Entity {
     protected void registerData() {
         this.dataManager.register(SYNC_DATA, (byte) 0);
         this.dataManager.register(REST_POSITION, new BlockPos(0, 0, 0));
+        this.dataManager.register(LAST_CONSUMED_STONE, ConsumedMagicStone.NONE);
     }
 
     @Override
     protected void readAdditional(CompoundNBT compound) {
-        this.setHasWaterStone(compound.getBoolean("Water"));
-        this.setHasFireStone(compound.getBoolean("Fire"));
-        this.setHasEarthStone(compound.getBoolean("Earth"));
-        this.setHasLightningStone(compound.getBoolean("Lightning"));
-        this.setHasPoopStone(compound.getBoolean("Poop"));
+        try {
+            this.setLastConsumedStone(ConsumedMagicStone.valueOf(compound.getString("LastStoneConsumed")));
+        } catch (IllegalArgumentException e) {
+            LOGGER.error(e);
+        }
+
+        CompoundNBT stoneConsumed = compound.getCompound("StoneConsumed");
+        this.setHasWaterStone(stoneConsumed.getBoolean("Water"));
+        this.setHasFireStone(stoneConsumed.getBoolean("Fire"));
+        this.setHasEarthStone(stoneConsumed.getBoolean("Earth"));
+        this.setHasLightningStone(stoneConsumed.getBoolean("Lightning"));
+        this.setHasPoopStone(stoneConsumed.getBoolean("Poop"));
+
         this.killCount = compound.getInt("KillCount");
     }
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
-        compound.putBoolean("Water", this.getHasWaterStone());
-        compound.putBoolean("Fire", this.getHasFireStone());
-        compound.putBoolean("Earth", this.getHasEarthStone());
-        compound.putBoolean("Lightning", this.getHasLightningStone());
-        compound.putBoolean("Poop", this.getHasPoopStone());
+        compound.putString("LastStoneConsumed", this.getLastConsumedStone().name());
+
+        CompoundNBT stoneConsumed = new CompoundNBT();
+        stoneConsumed.putBoolean("Water", this.getHasWaterStone());
+        stoneConsumed.putBoolean("Fire", this.getHasFireStone());
+        stoneConsumed.putBoolean("Earth", this.getHasEarthStone());
+        stoneConsumed.putBoolean("Lightning", this.getHasLightningStone());
+        stoneConsumed.putBoolean("Poop", this.getHasPoopStone());
+
+        compound.put("StoneConsumed", stoneConsumed);
         compound.putInt("KillCount", this.killCount);
     }
 
@@ -395,63 +408,73 @@ public class NewSunEntity extends Entity {
     }
 
     public boolean getHasWaterStone() {
-        return (this.dataManager.get(SYNC_DATA) & 0b1) != 0;
+        return this.getSyncDataBit(0);
     }
 
     public void setHasWaterStone(boolean newVal) {
-        byte data = this.dataManager.get(SYNC_DATA);
-        data = (byte) (newVal ? data | 0b1 : data & 0b111_1110);
-        this.dataManager.set(SYNC_DATA, data);
+        this.setSyncDataBit(0, newVal);
     }
 
     public boolean getHasFireStone() {
-        return (this.dataManager.get(SYNC_DATA) & 0b10) != 0;
+        return this.getSyncDataBit(1);
     }
 
     public void setHasFireStone(boolean newVal) {
-        byte data = this.dataManager.get(SYNC_DATA);
-        data = (byte) (newVal ? data | 0b10 : data & 0b111_1101);
-        this.dataManager.set(SYNC_DATA, data);
+        this.setSyncDataBit(1, newVal);
     }
 
     public boolean getHasEarthStone() {
-        return (this.dataManager.get(SYNC_DATA) & 0b100) != 0;
+        return this.getSyncDataBit(2);
     }
 
     public void setHasEarthStone(boolean newVal) {
-        byte data = this.dataManager.get(SYNC_DATA);
-        data = (byte) (newVal ? data | 0b100 : data & 0b111_1011);
-        this.dataManager.set(SYNC_DATA, data);
+        this.setSyncDataBit(2, newVal);
     }
 
     public boolean getHasLightningStone() {
-        return (this.dataManager.get(SYNC_DATA) & 0b1000) != 0;
+        return this.getSyncDataBit(3);
     }
 
     public void setHasLightningStone(boolean newVal) {
-        byte data = this.dataManager.get(SYNC_DATA);
-        data = (byte) (newVal ? data | 0b1000 : data & 0b111_0111);
-        this.dataManager.set(SYNC_DATA, data);
+        this.setSyncDataBit(3, newVal);
+    }
+
+    private boolean getHas4Stones() {
+        return (this.dataManager.get(SYNC_DATA) & 0b1111 ^ 0b1111) == 0;
     }
 
     public boolean getHasPoopStone() {
-        return (this.dataManager.get(SYNC_DATA) & 0b1_0000) != 0;
+        return this.getSyncDataBit(4);
     }
 
     public void setHasPoopStone(boolean newVal) {
-        byte data = this.dataManager.get(SYNC_DATA);
-        data = (byte) (newVal ? data | 0b1_0000 : data & 0b110_1111);
-        this.dataManager.set(SYNC_DATA, data);
+        this.setSyncDataBit(4, newVal);
     }
 
     public SunState getSunState() {
-        return SunState.values()[this.dataManager.get(SYNC_DATA) >>> 5];
+        return SunState.values()[this.dataManager.get(SYNC_DATA) >> 5];
     }
 
     public void setSunState(SunState sunState) {
         byte data = this.dataManager.get(SYNC_DATA);
-        data = (byte) (data & 0b001_1111 | sunState.ordinal() << 5);
-        this.dataManager.set(SYNC_DATA, data);
+        this.dataManager.set(SYNC_DATA, (byte) (data & 0b001_1111 | sunState.ordinal() << 5));
+    }
+
+    private boolean getSyncDataBit(int offset) {
+        return (this.dataManager.get(SYNC_DATA) & 1 << offset) != 0;
+    }
+
+    private void setSyncDataBit(int offset, boolean set) {
+        byte data = this.dataManager.get(SYNC_DATA);
+        this.dataManager.set(SYNC_DATA, (byte) (set ? data | 1 << offset : data & ~(1 << offset)));
+    }
+
+    public ConsumedMagicStone getLastConsumedStone() {
+        return this.dataManager.get(LAST_CONSUMED_STONE);
+    }
+
+    public void setLastConsumedStone(ConsumedMagicStone stone) {
+        this.dataManager.set(LAST_CONSUMED_STONE, stone);
     }
 
     private void setRestPosition(BlockPos newVal) {
@@ -472,6 +495,22 @@ public class NewSunEntity extends Entity {
 
         SunState(float size) {
             this.size = size;
+        }
+    }
+
+    public enum ConsumedMagicStone {
+        WATER(ModItems.WATER_STONE),
+        FIRE(ModItems.FIRE_STONE),
+        EARTH(ModItems.EARTH_STONE),
+        LIGHTNING(ModItems.LIGHTNING_STONE),
+        POOP(ModItems.POOP_STONE),
+        NONE(null);
+
+        @Nullable
+        public final RegistryObject<? extends ItemRadiative> item;
+
+        ConsumedMagicStone(RegistryObject<? extends ItemRadiative> item) {
+            this.item = item;
         }
     }
 }

@@ -12,6 +12,9 @@ import java.util.function.Function;
 public class ModDataSerializers {
     public static List<IDataSerializer<?>> REGISTRY = Lists.newArrayList();
 
+    public static final IDataSerializer<NewSunEntity.ConsumedMagicStone> CONSUMED_MAGIC_STONE =
+            register(new EnumDataSerializer<>(NewSunEntity.ConsumedMagicStone.class));
+
     private static <T> IDataSerializer<T> register(IDataSerializer<T> dataSerializer) {
         REGISTRY.add(dataSerializer);
         return dataSerializer;
