@@ -18,6 +18,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
@@ -30,6 +31,8 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.*;
+
+import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
 public class NewSunEntity extends Entity {
     /* A scratch for setting sun's entity data:
@@ -486,31 +489,35 @@ public class NewSunEntity extends Entity {
     }
 
     public enum SunState {
-        NEW_BORN(8F),
-        GROWING(16F),
-        FULL_YELLOW(24F),
-        FULL_BLACK(48F);
+        NEW_BORN(8F, new ResourceLocation(MODID, "textures/entity/sun_yellow.png")),
+        GROWING(16F, new ResourceLocation(MODID, "textures/entity/sun_white.png")),
+        FULL_YELLOW(24F, new ResourceLocation(MODID, "textures/entity/sun_white.png")),
+        FULL_BLACK(48F, new ResourceLocation(MODID, "textures/entity/sun_black.png"));
 
         public final float size;
+        public final ResourceLocation texture;
 
-        SunState(float size) {
+        SunState(float size, ResourceLocation texture) {
             this.size = size;
+            this.texture = texture;
         }
     }
 
     public enum ConsumedMagicStone {
-        WATER(ModItems.WATER_STONE),
-        FIRE(ModItems.FIRE_STONE),
-        EARTH(ModItems.EARTH_STONE),
-        LIGHTNING(ModItems.LIGHTNING_STONE),
-        POOP(ModItems.POOP_STONE),
-        NONE(null);
+        WATER(ModItems.WATER_STONE, new ResourceLocation(MODID, "textures/entity/sun_purple.png")),
+        FIRE(ModItems.FIRE_STONE, new ResourceLocation(MODID, "textures/entity/sun_red.png")),
+        EARTH(ModItems.EARTH_STONE, new ResourceLocation(MODID, "textures/entity/sun_green.png")),
+        LIGHTNING(ModItems.LIGHTNING_STONE, new ResourceLocation(MODID, "textures/entity/sun_blue.png")),
+        POOP(ModItems.POOP_STONE, new ResourceLocation(MODID, "textures/entity/sun_white.png")),
+        NONE(null, new ResourceLocation(MODID, "textures/entity/sun_white.png"));
 
         @Nullable
         public final RegistryObject<? extends ItemRadiative> item;
+        public final ResourceLocation texture;
 
-        ConsumedMagicStone(RegistryObject<? extends ItemRadiative> item) {
+        ConsumedMagicStone(RegistryObject<? extends ItemRadiative> item, ResourceLocation texture) {
             this.item = item;
+            this.texture = texture;
         }
     }
 }

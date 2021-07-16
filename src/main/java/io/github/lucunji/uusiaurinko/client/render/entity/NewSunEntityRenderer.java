@@ -41,29 +41,6 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
 
     @Override
     public ResourceLocation getEntityTexture(NewSunEntity entity) {
-        switch (entity.getSunState()) {
-            case NEW_BORN:
-                return new ResourceLocation(MODID, "textures/entity/sun_yellow.png");
-            case GROWING:
-                switch (entity.getLastConsumedStone()) {
-                    case WATER:
-                        return new ResourceLocation(MODID, "textures/entity/sun_purple.png");
-                    case FIRE:
-                        return new ResourceLocation(MODID, "textures/entity/sun_red.png");
-                    case EARTH:
-                        return new ResourceLocation(MODID, "textures/entity/sun_green.png");
-                    case LIGHTNING:
-                        return new ResourceLocation(MODID, "textures/entity/sun_blue.png");
-                    case POOP:
-                    case NONE:
-                    default:
-                        return new ResourceLocation(MODID, "textures/entity/sun_white.png");
-                }
-            case FULL_YELLOW:
-                return new ResourceLocation(MODID, "textures/entity/sun_white.png");
-            case FULL_BLACK:
-            default:
-                return new ResourceLocation(MODID, "textures/entity/sun_black.png");
-        }
+        return entity.getSunState() == NewSunEntity.SunState.GROWING ? entity.getLastConsumedStone().texture : entity.getSunState().texture;
     }
 }
