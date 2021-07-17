@@ -12,11 +12,15 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
+import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
+
 public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
     /* A scratch for setting sun's entity data:
     /data merge entity @e[type=uusi-aurinko:new_sun, limit=1] {}
     /data get entity @e[type=uusi-aurinko:new_sun, limit=1]
      */
+    private static final ResourceLocation SUN_DARK_BLUE_TEXTURE = new ResourceLocation(MODID, "textures/entity/sun_dark_blue.png");
+
     private final NewSunModel model;
 
     public NewSunEntityRenderer(EntityRendererManager renderManager) {
@@ -44,8 +48,11 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
         model.render(matrixStackIn, bufferIn.getBuffer(renderType),
                 packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
 
+        // negate the size to use the feature of culling: only show the surfaces on the back
+        matrixStackIn.scale(-1, 1, 1);
+
         // render the sun's halo
-        renderType = ModRenderTypes.getHalo(sunState.texture);
+        renderType = ModRenderTypes.getHalo(sunState == NewSunEntity.SunState.FULL_BLACK ? SUN_DARK_BLUE_TEXTURE : sunState.texture);
         // iteration number increases with the sun's size to keep transition smooth when the sun grows
         final int iters = sunState.haloIters;
         final float it = iters / 10F;
