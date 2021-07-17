@@ -4,6 +4,7 @@ import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.item.radiative.ItemRadiative;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
@@ -56,13 +57,19 @@ public class RadiativeItemEntity extends ItemEntity {
 
     @Override
     public boolean isImmuneToExplosions() {
-        return ((ItemRadiative) getItem().getItem()).isImmuneToExplosions();
+        Item item = this.getItem().getItem();
+        if (item instanceof ItemRadiative) {
+            return ((ItemRadiative) item).isImmuneToExplosions();
+        } else {
+            return super.isImmuneToExplosions();
+        }
     }
 
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
-        if (!this.world.isRemote && this.getItem().getItem() == ModItems.SUN_STONE.get()) {
-            if (this.isAlive() && source.isExplosion() && amount >= 25) {
+        if (!this.world.isRemote && this.getItem().getItem() == ModItems.SUN_STONE.get()
+                && source.isExplosion()) {
+            if (this.isAlive() && amount >= 25) {
                 this.countdownSinceExplosion = 10;
                 this.explosionCount++;
                 if (explosionCount >= 6) {
