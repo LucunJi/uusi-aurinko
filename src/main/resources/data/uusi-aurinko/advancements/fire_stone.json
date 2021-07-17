@@ -1,0 +1,35 @@
+{
+  "parent": "uusi-aurinko:root",
+  "display": {
+    "icon": {
+      "item": "uusi-aurinko:fire_stone"
+    },
+    "title": {
+      "translate": "advancements.uusi-aurinko.fire_stone.title"
+    },
+    "description": {
+      "translate": "advancements.uusi-aurinko.fire_stone.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "uusi-aurinko:fire_stone": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "uusi-aurinko:fire_stone"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "uusi-aurinko:fire_stone"
+    ]
+  ]
+}

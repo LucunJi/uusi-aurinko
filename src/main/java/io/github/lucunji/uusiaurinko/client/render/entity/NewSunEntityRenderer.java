@@ -52,7 +52,7 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
         matrixStackIn.scale(-1, 1, 1);
 
         // render the sun's halo
-        renderType = ModRenderTypes.getHalo(sunState == NewSunEntity.SunState.FULL_BLACK ? SUN_DARK_BLUE_TEXTURE : sunState.texture);
+        renderType = ModRenderTypes.getHalo(sunState == NewSunEntity.SunState.FULL_DARK ? SUN_DARK_BLUE_TEXTURE : sunState.texture);
         // iteration number increases with the sun's size to keep transition smooth when the sun grows
         final int iters = sunState.haloIters;
         final float it = iters / 10F;

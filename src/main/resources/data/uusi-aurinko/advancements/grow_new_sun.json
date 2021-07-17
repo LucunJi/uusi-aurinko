@@ -1,0 +1,40 @@
+{
+  "parent": "uusi-aurinko:make_new_sun",
+  "display": {
+    "icon": {
+      "item": "minecraft:blaze_powder"
+    },
+    "title": {
+      "translate": "advancements.uusi-aurinko.grow_new_sun.title"
+    },
+    "description": {
+      "translate": "advancements.uusi-aurinko.grow_new_sun.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "uusi-aurinko:grow_new_sun": {
+      "trigger": "uusi-aurinko:new_sun_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "predicate": {
+              "type": "uusi-aurinko:new_sun",
+              "nbt": "{KillCount: 100, StoneConsumed:{Water: 0b, Fire: 0b, Earth: 0b, Lightning: 0b, Poop: 0b}}"
+            },
+            "entity": "this"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "uusi-aurinko:grow_new_sun"
+    ]
+  ]
+}

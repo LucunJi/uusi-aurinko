@@ -1,0 +1,40 @@
+{
+  "parent": "uusi-aurinko:grow_new_sun",
+  "display": {
+    "icon": {
+      "item": "minecraft:black_concrete"
+    },
+    "title": {
+      "translate": "advancements.uusi-aurinko.dark_new_sun.title"
+    },
+    "description": {
+      "translate": "advancements.uusi-aurinko.dark_new_sun.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "uusi-aurinko:dark_new_sun": {
+      "trigger": "uusi-aurinko:new_sun_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "predicate": {
+              "type": "uusi-aurinko:new_sun",
+              "nbt": "{KillCount: 100, StoneConsumed:{Water: 1b, Fire: 1b, Earth: 1b, Lightning: 1b, Poop: 1b}}"
+            },
+            "entity": "this"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "uusi-aurinko:dark_new_sun"
+    ]
+  ]
+}

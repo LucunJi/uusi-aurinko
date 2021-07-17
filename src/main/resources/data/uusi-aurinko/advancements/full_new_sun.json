@@ -1,0 +1,48 @@
+{
+  "parent": "uusi-aurinko:grow_new_sun",
+  "display": {
+    "icon": {
+      "item": "minecraft:white_concrete"
+    },
+    "title": {
+      "translate": "advancements.uusi-aurinko.full_new_sun.title"
+    },
+    "description": {
+      "translate": "advancements.uusi-aurinko.full_new_sun.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "uusi-aurinko:rise_full_new_sun": {
+      "trigger": "uusi-aurinko:new_sun_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "predicate": {
+              "type": "uusi-aurinko:new_sun",
+              "nbt": "{KillCount: 100, StoneConsumed:{Water: 1b, Fire: 1b, Earth: 1b, Lightning: 1b, Poop: 0b}}",
+              "location": {
+                "position": {
+                  "y": {
+                    "min": 198.5
+                  }
+                },
+                "dimension": "minecraft:overworld"
+              }
+            },
+            "entity": "this"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "uusi-aurinko:rise_full_new_sun"
+    ]
+  ]
+}

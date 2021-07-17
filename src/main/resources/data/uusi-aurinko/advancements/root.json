@@ -1,0 +1,35 @@
+{
+  "display": {
+    "icon": {
+      "item": "uusi-aurinko:rune_temple_bricks"
+    },
+    "title": {
+      "translate": "advancements.uusi-aurinko.root.title"
+    },
+    "description": {
+      "translate": "advancements.uusi-aurinko.root.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false,
+    "background": "uusi-aurinko:textures/block/temple_stone.png"
+  },
+  "criteria": {
+    "uusi-aurinko:emerald_tablet": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "uusi-aurinko:rune_temple_bricks"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "uusi-aurinko:emerald_tablet"
+    ]
+  ]
+}

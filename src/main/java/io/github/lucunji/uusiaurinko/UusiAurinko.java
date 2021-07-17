@@ -1,7 +1,7 @@
 package io.github.lucunji.uusiaurinko;
 
+import io.github.lucunji.uusiaurinko.advancements.ModCriteriaTriggers;
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
-import io.github.lucunji.uusiaurinko.datagen.ModDataGenerators;
 import io.github.lucunji.uusiaurinko.config.ClientConfigs;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
@@ -12,6 +12,7 @@ import io.github.lucunji.uusiaurinko.network.ModDataSerializers;
 import io.github.lucunji.uusiaurinko.particles.ModParticleTypes;
 import io.github.lucunji.uusiaurinko.tileentity.ModTileEntityTypes;
 import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -41,5 +42,6 @@ public class UusiAurinko {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigs.INSTANCE.getSpec());
 
         ModDataSerializers.REGISTRY.forEach(DataSerializers::registerSerializer);
+        ModCriteriaTriggers.REGISTRY.forEach(CriteriaTriggers::register);
     }
 }

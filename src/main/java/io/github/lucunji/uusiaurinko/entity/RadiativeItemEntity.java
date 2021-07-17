@@ -1,9 +1,11 @@
 package io.github.lucunji.uusiaurinko.entity;
 
+import io.github.lucunji.uusiaurinko.advancements.ModCriteriaTriggers;
 import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.item.radiative.ItemRadiative;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -76,6 +78,10 @@ public class RadiativeItemEntity extends ItemEntity {
                     NewSunEntity newSunEntity = new NewSunEntity(ModEntityTypes.NEW_SUN.get(), this.world);
                     newSunEntity.setPosition(this.getPosX(), this.getPosY() - newSunEntity.getBoundingBoxSize() / 2f, this.getPosZ());
                     this.world.addEntity(newSunEntity);
+                    for(ServerPlayerEntity serverPlayerEntity :
+                            world.getEntitiesWithinAABB(ServerPlayerEntity.class, this.getBoundingBox().grow(64))) {
+                        ModCriteriaTriggers.SUMMONED_ENTITY.trigger(serverPlayerEntity, newSunEntity);
+                    }
                     this.remove();
                 }
             }

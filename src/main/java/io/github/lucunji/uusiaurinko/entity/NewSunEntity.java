@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.entity;
 
+import io.github.lucunji.uusiaurinko.advancements.ModCriteriaTriggers;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.item.radiative.ItemRadiative;
@@ -11,6 +12,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
@@ -112,9 +114,15 @@ public class NewSunEntity extends Entity {
 
         // move towards rest position
         if (this.getSunState() != SunState.NEW_BORN && this.getRiseUp()) {
-            Vector3d vec = Vector3d.copy(this.getRestPosition()).subtract(this.getPositionCenter());
+            Vector3d vec = Vector3d.copy(this.getRestPosition()).subtract(this.getPositionVec());
             if (vec.lengthSquared() > 1) {
                 this.move(MoverType.SELF, vec.normalize().scale(0.1));
+            } else if ((this.world.getGameTime() & 0b1111) == 0) { // x & 0b1111 = x % 16
+                // trigger criteria to grant advancement
+                AxisAlignedBB box = new AxisAlignedBB(-128, 0, -128, 128, 256, 128).offset(this.getPosX(), 0, this.getPosZ());
+                for (ServerPlayerEntity serverPlayerEntity : this.world.getEntitiesWithinAABB(ServerPlayerEntity.class, box)) {
+                    ModCriteriaTriggers.SUMMONED_ENTITY.trigger(serverPlayerEntity, this);
+                }
             }
         }
 
@@ -128,6 +136,12 @@ public class NewSunEntity extends Entity {
             SunState newState = this.recalculateState();
             if (getSunState() != newState) {
                 this.setSunState(newState);
+
+                // trigger criteria to grant advancement
+                for(ServerPlayerEntity serverPlayerEntity :
+                        world.getEntitiesWithinAABB(ServerPlayerEntity.class, this.getBoundingBox().grow(128))) {
+                    ModCriteriaTriggers.SUMMONED_ENTITY.trigger(serverPlayerEntity, this);
+                }
             }
         }
     }
@@ -167,7 +181,7 @@ public class NewSunEntity extends Entity {
             distanceQd *= distanceQd;
             if (distanceQd == 0) continue;
             Vector3d toSun = this.getPositionCenter().subtract(entity.getPositionVec()).normalize();
-            final double maxForce = this.getSunState() == SunState.FULL_BLACK ? 0.085 : 0.07;
+            final double maxForce = this.getSunState() == SunState.FULL_DARK ? 0.085 : 0.07;
             double scale = -distanceQd * maxForce / rangeQd + maxForce;
             entity.setMotion(entity.getMotion().add(toSun.scale(scale)));
         }
@@ -314,7 +328,7 @@ public class NewSunEntity extends Entity {
         if (killCount >= 100) {
             if (this.getHas4Stones()) {
                 if (this.getHasPoopStone()) {
-                    return SunState.FULL_BLACK;
+                    return SunState.FULL_DARK;
                 } else {
                     return SunState.FULL_YELLOW;
                 }
@@ -341,6 +355,11 @@ public class NewSunEntity extends Entity {
     @Override
     protected void readAdditional(CompoundNBT compound) {
         try {
+            this.setSunState(SunState.valueOf(compound.getString("SunState"))); // stored just for advancement predicates
+        } catch (IllegalArgumentException e) {
+            LOGGER.error(e);
+        }
+        try {
             this.setLastConsumedStone(ConsumedMagicStone.valueOf(compound.getString("LastStoneConsumed")));
         } catch (IllegalArgumentException ignored) {
         }
@@ -362,6 +381,7 @@ public class NewSunEntity extends Entity {
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
+        compound.putString("SunState", this.getSunState().name());
         compound.putString("LastStoneConsumed", this.getLastConsumedStone().name());
 
         CompoundNBT stoneConsumed = new CompoundNBT();
@@ -418,7 +438,7 @@ public class NewSunEntity extends Entity {
      * Should be larger than {@link NewSunEntity#getMeltBlockRadius}
      */
     private float getAffectingEntityRadius() {
-        return this.getRenderingSize() * 1.7F;
+        return this.getRenderingSize() * 1.5F;
     }
 
     private float getEntityFireDamageRadius() {
@@ -530,7 +550,7 @@ public class NewSunEntity extends Entity {
         NEW_BORN(8F, new ResourceLocation(MODID, "textures/entity/sun_yellow.png"), 20),
         GROWING(16F, new ResourceLocation(MODID, "textures/entity/sun_white.png"), 30),
         FULL_YELLOW(24F, new ResourceLocation(MODID, "textures/entity/sun_white.png"), 30),
-        FULL_BLACK(48F, new ResourceLocation(MODID, "textures/entity/sun_black.png"), 40);
+        FULL_DARK(48F, new ResourceLocation(MODID, "textures/entity/sun_black.png"), 40);
 
         public final float size;
         public final ResourceLocation texture;
