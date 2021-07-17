@@ -1,6 +1,7 @@
 package io.github.lucunji.uusiaurinko.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import io.github.lucunji.uusiaurinko.client.render.ModRenderTypes;
 import io.github.lucunji.uusiaurinko.client.render.entity.model.NewSunModel;
 import io.github.lucunji.uusiaurinko.entity.NewSunEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -38,17 +39,15 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
         matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(t + 71));
 
         final NewSunEntity.SunState sunState = entityIn.getSunState();
-        RenderType renderType = RenderType.getBeaconBeam(this.getEntityTexture(entityIn), false); // disable fog and alpha
-        model.render(matrixStackIn, bufferIn.getBuffer(renderType), // render the sun itself
-                packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
-
-        matrixStackIn.scale(-1, 1, 1); // negate the size to use the feature of culling: only show the faces on the back
-        model.render(matrixStackIn, bufferIn.getBuffer(renderType), // render again to make the player cannot see outside when inside the sun
+        // render the sun itself
+        RenderType renderType = ModRenderTypes.getSun(this.getEntityTexture(entityIn));
+        model.render(matrixStackIn, bufferIn.getBuffer(renderType),
                 packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
 
         // render the sun's halo
-        renderType = RenderType.getBeaconBeam(sunState.texture, true); // disable fog and enable alpha
-        final int iters = sunState.haloIters; // iteration increase with the sun's size to keep transition smooth when the sun grows
+        renderType = ModRenderTypes.getHalo(sunState.texture);
+        // iteration number increases with the sun's size to keep transition smooth when the sun grows
+        final int iters = sunState.haloIters;
         final float it = iters / 10F;
         for (int i = 0; i < iters; i++) {
             matrixStackIn.push();
