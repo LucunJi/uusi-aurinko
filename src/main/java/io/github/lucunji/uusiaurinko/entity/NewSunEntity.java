@@ -71,9 +71,12 @@ public class NewSunEntity extends Entity {
         return true;
     }
 
+    /**
+     * The hitbox of sun entity is actually smaller than its rendering size
+     */
     @Override
     public EntitySize getSize(Pose poseIn) {
-        float size = this.getActualSize();
+        float size = this.getActualSize() * 0.7F;
         return new EntitySize(size, size, false);
     }
 
@@ -144,22 +147,26 @@ public class NewSunEntity extends Entity {
         );
     }
 
+    /**
+     * The attraction strength does not follow the inverse-square formula,
+     * anf it is actually calculated like this:
+     * <p>
+     * -r^4 * maxForce / affectEntityRadius^4 + maxForce
+     */
     private void doEntityBothSides(List<Entity> entities) {
-        float attractSpeedBase = 0.06F;
         for (Entity entity : entities) {
             // attract entities
             if (ServerConfigs.INSTANCE.NEW_SUN_ATTRACTION_IMMUNE_ENTITY_TYPES.contains(entity)) continue;
-
-            double distance = MathHelper.sqrt(entity.getDistanceSq(this.getPositionCenter()));
-            if (distance == 0) continue;
-            // TODO: the calculation is problematic
+            double rangeQd = this.getAffectEntityRadius();
+            rangeQd *= rangeQd;
+            rangeQd *= rangeQd;
+            double distanceQd = entity.getDistanceSq(this.getPositionCenter());
+            distanceQd *= distanceQd;
+            if (distanceQd == 0) continue;
             Vector3d toSun = this.getPositionCenter().subtract(entity.getPositionVec()).normalize();
-            double rawSpeed = attractSpeedBase * (this.getAffectEntityRadius() / distance);
-            double attractSpeedMax = attractSpeedBase;
-            double realSpeed = Math.min(rawSpeed, attractSpeedMax);
-//            LOGGER.info(String.format("raw: %f, max: %f, final: %f", rawSpeed, attractSpeedMax, realSpeed));
-            Vector3d attraction = toSun.scale(realSpeed);
-            entity.setMotion(entity.getMotion().add(attraction));
+            final double maxForce = this.getSunState() == SunState.FULL_BLACK ? 0.085 : 0.07;
+            double scale = -distanceQd * maxForce / rangeQd + maxForce;
+            entity.setMotion(entity.getMotion().add(toSun.scale(scale)));
         }
     }
 
@@ -193,7 +200,7 @@ public class NewSunEntity extends Entity {
 
             if (blazeAmount > 0) {
                 entity.setFire(10);
-                entity.attackEntityFrom(ModDamageSource.SUN_BLAZE, blazeAmount);
+                if (entity instanceof LivingEntity) entity.attackEntityFrom(ModDamageSource.SUN_BLAZE, blazeAmount);
             }
 
             if (this.getSunState() == SunState.NEW_BORN
@@ -274,7 +281,7 @@ public class NewSunEntity extends Entity {
                     this.getPositionCenter(),
                     Vector3d.copy(p).add(0.5, 0.5, 0.5),
                     RayTraceContext.BlockMode.COLLIDER,
-                    RayTraceContext.FluidMode.NONE, // ignore fluids
+                    RayTraceContext.FluidMode.SOURCE_ONLY, // ignore non-source fluid blocks
                     null)
             ).getPos();
             results.add(p);
@@ -390,8 +397,11 @@ public class NewSunEntity extends Entity {
         return this.getPosY() + this.getActualSize() / 2D;
     }
 
+    /**
+     * Should be larger than {@link NewSunEntity#getMeltBlockRadius}
+     */
     private float getAffectEntityRadius() {
-        return this.getActualSize() * 1.3F;
+        return this.getActualSize() * 1.7F;
     }
 
     private float getFireRadius() {
@@ -399,11 +409,14 @@ public class NewSunEntity extends Entity {
     }
 
     private float getFusionRadius() {
-        return this.getActualSize() * 0.5F;
+        return this.getActualSize() * 0.6F;
     }
 
+    /**
+     * Should be smaller than {@link NewSunEntity#getAffectEntityRadius()}
+     */
     private float getMeltBlockRadius() {
-        return this.getAffectEntityRadius();
+        return this.getActualSize() * 1.3F;
     }
 
     private float getVaporizeBlockRadius() {
