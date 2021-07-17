@@ -13,11 +13,9 @@ public class ModSoundEvents {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MODID);
 
     @Localize(locales = {"en_us", "zh_cn"}, translations = {"Magical Stone fies", "魔法石：飞出"})
-    public static final RegistryObject<SoundEvent> ENTITY_RADIATIVE_STONE_THROW =
-            register("entity.radiative_stone.throw");
+    public static final RegistryObject<SoundEvent> ENTITY_RADIATIVE_STONE_THROW = register("entity.radiative_stone.throw");
     @Localize(locales = {"en_us", "zh_cn"}, translations = {"§oUkkoskivi§r discharges", "§oUkkoskivi§r：放电"})
-    public static final RegistryObject<SoundEvent> ENTITY_LIGHTNING_STONE_DISCHARGE =
-            register("entity.lightning_rock.discharge");
+    public static final RegistryObject<SoundEvent> ENTITY_LIGHTNING_STONE_DISCHARGE = register("entity.lightning_rock.discharge");
 
     @Localize(locales = {"en_us", "zh_cn"}, translations = {"§oPaha Silmä§r attaches", "§oPaha Silmä§r：佩戴"})
     public static final RegistryObject<SoundEvent> ITEM_EVIL_EYE_EQUIP = register("item.evil_eye.equip");
