@@ -67,7 +67,7 @@ public class RadiativeItemEntity extends ItemEntity {
                 this.explosionCount++;
                 if (explosionCount >= 6) {
                     NewSunEntity newSunEntity = new NewSunEntity(ModEntityTypes.NEW_SUN.get(), this.world);
-                    newSunEntity.setPosition(this.getPosX(), this.getPosY() - newSunEntity.getActualSize() / 2f, this.getPosZ());
+                    newSunEntity.setPosition(this.getPosX(), this.getPosY() - newSunEntity.getBoundingBoxSize() / 2f, this.getPosZ());
                     this.world.addEntity(newSunEntity);
                     this.remove();
                 }

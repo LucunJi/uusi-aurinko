@@ -11,8 +11,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
-import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
-
 public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
     private final NewSunModel model;
 
@@ -25,13 +23,13 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
     public void render(NewSunEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
         super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
         matrixStackIn.push();
-        float size = entityIn.getActualSize();
+        float size = entityIn.getRenderingSize();
+        float hitboxSize = entityIn.getBoundingBoxSize();
+        matrixStackIn.translate(0, hitboxSize / 2D, 0);
         matrixStackIn.scale(size, size, size);
-        matrixStackIn.translate(0, 0.5, 0);
         float t = (entityIn.world.getGameTime() + partialTicks) / 2;
         matrixStackIn.rotate(Vector3f.XP.rotationDegrees(t));
         matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(t + 71));
-        matrixStackIn.translate(0, -0.5, 0);
         // DefaultVertexFormats.BLOCK, NO_FOG, other options are all default
         RenderType renderType = RenderType.getBeaconBeam(this.getEntityTexture(entityIn), false);
         model.render(matrixStackIn, bufferIn.getBuffer(renderType),

@@ -76,7 +76,7 @@ public class NewSunEntity extends Entity {
      */
     @Override
     public EntitySize getSize(Pose poseIn) {
-        float size = this.getActualSize() * 0.7F;
+        float size = this.getBoundingBoxSize() * 0.7F;
         return new EntitySize(size, size, false);
     }
 
@@ -132,7 +132,7 @@ public class NewSunEntity extends Entity {
     }
 
     private List<Entity> getAffectedEntities() {
-        double radius = this.getAffectEntityRadius();
+        double radius = this.getAffectingEntityRadius();
         return world.getEntitiesInAABBexcluding(this, new AxisAlignedBB(
                         getPosX() + radius,
                         getPosYCenter() + radius,
@@ -148,6 +148,9 @@ public class NewSunEntity extends Entity {
     }
 
     /**
+     * Entity operations that on both client side and server side. Currently it only
+     * attracts entities.
+     * <p>
      * The attraction strength does not follow the inverse-square formula,
      * anf it is actually calculated like this:
      * <p>
@@ -155,9 +158,8 @@ public class NewSunEntity extends Entity {
      */
     private void doEntityBothSides(List<Entity> entities) {
         for (Entity entity : entities) {
-            // attract entities
             if (ServerConfigs.INSTANCE.NEW_SUN_ATTRACTION_IMMUNE_ENTITY_TYPES.contains(entity)) continue;
-            double rangeQd = this.getAffectEntityRadius();
+            double rangeQd = this.getAffectingEntityRadius();
             rangeQd *= rangeQd;
             rangeQd *= rangeQd;
             double distanceQd = entity.getDistanceSq(this.getPositionCenter());
@@ -175,7 +177,7 @@ public class NewSunEntity extends Entity {
         float fusionAmount = ServerConfigs.INSTANCE.NEW_SUN_FUSION_DAMAGE_AMOUNT.get().floatValue();
 
         for (Entity entity : entities) {
-            if (entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(this.getFusionRadius())) {
+            if (entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(this.getEntityFusionDamageRadius())) {
                 if (this.getSunState() == SunState.GROWING
                         && entity instanceof ItemEntity
                         && tryConsumeMagicStoneEntity((ItemEntity) entity)) {
@@ -238,6 +240,11 @@ public class NewSunEntity extends Entity {
         }
     }
 
+    /**
+     * It randomly picks {@link ServerConfigs#NEW_SUN_DESTROY_RATE} blocks in range.
+     * It avoids picking air blocks by filtering out empty 16x16x16 sections before picking,
+     * thus achieves better performance and large block amount at the same time.
+     */
     private List<BlockPos> getAffectedBlocks(float radius, int amount) {
         // filter out empty sections
         Vector3d positionCenter = this.getPositionCenter();
@@ -297,7 +304,7 @@ public class NewSunEntity extends Entity {
         } else if (dimensionRegistryKey == World.THE_NETHER) {
             BlockPos spawnPoint = world.getSpawnPoint();
             this.setRestPosition(new BlockPos(spawnPoint.getX() / 8, 100, spawnPoint.getZ() / 8));
-        } else if (dimensionRegistryKey == World.THE_END) {
+        } else { // for end and other dimensions
             this.setRestPosition(new BlockPos(0, 200, 0));
         }
     }
@@ -370,7 +377,7 @@ public class NewSunEntity extends Entity {
 
     /* ------------------------------ Getters & Setters ------------------------------ */
 
-    public float getActualSize() {
+    public float getRenderingSize() {
         SunState sunState = this.getSunState();
         if (sunState == SunState.GROWING) {
             float baseSize = sunState.size;
@@ -385,42 +392,46 @@ public class NewSunEntity extends Entity {
         }
     }
 
+    public float getBoundingBoxSize() {
+        return this.getRenderingSize() * 0.7F;
+    }
+
     private Vector3d getPositionCenter() {
-        return this.getPositionVec().add(0, this.getActualSize() / 2D, 0);
+        return this.getPositionVec().add(0, this.getBoundingBoxSize() / 2D, 0);
     }
 
     private BlockPos getBlockPosCenter() {
-        return new BlockPos(this.getPositionVec().add(0, this.getActualSize() / 2D, 0));
+        return new BlockPos(this.getPositionVec().add(0, this.getBoundingBoxSize() / 2D, 0));
     }
 
     private double getPosYCenter() {
-        return this.getPosY() + this.getActualSize() / 2D;
+        return this.getPosY() + this.getBoundingBoxSize() / 2D;
     }
 
     /**
      * Should be larger than {@link NewSunEntity#getMeltBlockRadius}
      */
-    private float getAffectEntityRadius() {
-        return this.getActualSize() * 1.7F;
+    private float getAffectingEntityRadius() {
+        return this.getRenderingSize() * 1.7F;
     }
 
-    private float getFireRadius() {
-        return this.getAffectEntityRadius();
+    private float getEntityFireDamageRadius() {
+        return this.getAffectingEntityRadius();
     }
 
-    private float getFusionRadius() {
-        return this.getActualSize() * 0.6F;
+    private float getEntityFusionDamageRadius() {
+        return this.getRenderingSize() * 0.6F;
     }
 
     /**
-     * Should be smaller than {@link NewSunEntity#getAffectEntityRadius()}
+     * Should be smaller than {@link NewSunEntity#getAffectingEntityRadius()}
      */
     private float getMeltBlockRadius() {
-        return this.getActualSize() * 1.3F;
+        return this.getRenderingSize() * 1.3F;
     }
 
     private float getVaporizeBlockRadius() {
-        return this.getFusionRadius();
+        return this.getEntityFusionDamageRadius();
     }
 
     public boolean getHasWaterStone() {
