@@ -513,17 +513,19 @@ public class NewSunEntity extends Entity {
     }
 
     public enum SunState {
-        NEW_BORN(8F, new ResourceLocation(MODID, "textures/entity/sun_yellow.png")),
-        GROWING(16F, new ResourceLocation(MODID, "textures/entity/sun_white.png")),
-        FULL_YELLOW(24F, new ResourceLocation(MODID, "textures/entity/sun_white.png")),
-        FULL_BLACK(48F, new ResourceLocation(MODID, "textures/entity/sun_black.png"));
+        NEW_BORN(8F, new ResourceLocation(MODID, "textures/entity/sun_yellow.png"), 20),
+        GROWING(16F, new ResourceLocation(MODID, "textures/entity/sun_white.png"), 30),
+        FULL_YELLOW(24F, new ResourceLocation(MODID, "textures/entity/sun_white.png"), 30),
+        FULL_BLACK(48F, new ResourceLocation(MODID, "textures/entity/sun_black.png"), 40);
 
         public final float size;
         public final ResourceLocation texture;
+        public final int haloIters;
 
-        SunState(float size, ResourceLocation texture) {
+        SunState(float size, ResourceLocation texture, int haloIters) {
             this.size = size;
             this.texture = texture;
+            this.haloIters = haloIters;
         }
     }
 
