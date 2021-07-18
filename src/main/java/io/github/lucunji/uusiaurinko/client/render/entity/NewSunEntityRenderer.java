@@ -20,6 +20,7 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
     /data get entity @e[type=uusi-aurinko:new_sun, limit=1]
      */
     private static final ResourceLocation SUN_DARK_BLUE_TEXTURE = new ResourceLocation(MODID, "textures/entity/sun_dark_blue.png");
+    private static final int HALO_ITERATIONS = 40;
 
     private final NewSunModel model;
 
@@ -53,20 +54,17 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
 
         // render the sun's halo
         renderType = ModRenderTypes.getHalo(sunState == NewSunEntity.SunState.FULL_DARK ? SUN_DARK_BLUE_TEXTURE : sunState.texture);
-        // iteration number increases with the sun's size to keep transition smooth when the sun grows
-        final int iters = sunState.haloIters;
-        final float it = iters / 10F;
-        for (int i = 0; i < iters; i++) {
+        for (int i = 0; i < HALO_ITERATIONS; i++) {
             matrixStackIn.push();
             // maps i ∈ [0, iters) to iit ∈ [0, 1)
-            float iit = (float) i / iters;
+            float iit = (float) i / HALO_ITERATIONS;
             // maps i ∈ [0, iters) to scale ∈ [1, 2)
             float scale = 1 + iit;
             matrixStackIn.scale(scale, scale, scale);
             // alpha = (0.24 - 0.225 * iit) / (iters / 10)
             // maps i ∈ [0, iters) to ɑ ∈ [0.24/iters, 0.015/iters)
             // the integration of ɑ over the range [0, iter) is approximately constant
-            float alpha = (2.4F - 2.25F * iit) / iters;
+            float alpha = (2.4F - 2.25F * iit) / HALO_ITERATIONS;
             model.render(matrixStackIn, bufferIn.getBuffer(renderType),
                     packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, alpha);
             matrixStackIn.pop();

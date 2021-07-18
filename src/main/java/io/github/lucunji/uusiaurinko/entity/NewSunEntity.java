@@ -158,7 +158,7 @@ public class NewSunEntity extends Entity {
                 ), entity -> entity.getDistanceSq(getPositionCenter()) <= radius * radius
                         && entity.isAlive()
                         && !entity.isSpectator()
-                        && (!(entity instanceof PlayerEntity) || ((PlayerEntity) entity).isCreative())
+                        && (!(entity instanceof PlayerEntity) || !((PlayerEntity) entity).isCreative())
         );
     }
 
@@ -181,7 +181,7 @@ public class NewSunEntity extends Entity {
             distanceQd *= distanceQd;
             if (distanceQd == 0) continue;
             Vector3d toSun = this.getPositionCenter().subtract(entity.getPositionVec()).normalize();
-            final double maxForce = this.getSunState() == SunState.FULL_DARK ? 0.085 : 0.07;
+            final double maxForce = this.getSunState() == SunState.FULL_DARK ? 0.085 : 0.045;
             double scale = -distanceQd * maxForce / rangeQd + maxForce;
             entity.setMotion(entity.getMotion().add(toSun.scale(scale)));
         }
@@ -215,7 +215,7 @@ public class NewSunEntity extends Entity {
 
             }
 
-            if (blazeAmount > 0) {
+            if (blazeAmount > 0 && entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(this.getEntityFireDamageRadius())) {
                 entity.setFire(10);
                 if (entity instanceof LivingEntity) entity.attackEntityFrom(ModDamageSource.SUN_BLAZE, blazeAmount);
             }
@@ -306,6 +306,9 @@ public class NewSunEntity extends Entity {
                     RayTraceContext.FluidMode.SOURCE_ONLY, // ignore non-source fluid blocks
                     null)
             ).getPos();
+            // check again after adjusting position using raytrace
+            if (blockState.matchesBlock(Blocks.FIRE)
+                    || ServerConfigs.INSTANCE.NEW_SUN_DESTROY_BLACKLIST.contains(world.getBlockState(p))) continue;
             results.add(p);
         }
         return results;
@@ -441,8 +444,12 @@ public class NewSunEntity extends Entity {
         return this.getRenderingSize() * 1.5F;
     }
 
+    /**
+     * Should be larger than {@link NewSunEntity#getMeltBlockRadius} but smaller than
+     * {@link NewSunEntity#getAffectingEntityRadius}
+     */
     private float getEntityFireDamageRadius() {
-        return this.getAffectingEntityRadius();
+        return this.getRenderingSize() * 1.35F;
     }
 
     private float getEntityFusionDamageRadius() {
@@ -547,19 +554,17 @@ public class NewSunEntity extends Entity {
     }
 
     public enum SunState {
-        NEW_BORN(8F, new ResourceLocation(MODID, "textures/entity/sun_yellow.png"), 20),
-        GROWING(16F, new ResourceLocation(MODID, "textures/entity/sun_white.png"), 30),
-        FULL_YELLOW(24F, new ResourceLocation(MODID, "textures/entity/sun_white.png"), 30),
-        FULL_DARK(48F, new ResourceLocation(MODID, "textures/entity/sun_black.png"), 40);
+        NEW_BORN(8F, new ResourceLocation(MODID, "textures/entity/sun_yellow.png")),
+        GROWING(16F, new ResourceLocation(MODID, "textures/entity/sun_white.png")),
+        FULL_YELLOW(24F, new ResourceLocation(MODID, "textures/entity/sun_white.png")),
+        FULL_DARK(48F, new ResourceLocation(MODID, "textures/entity/sun_black.png"));
 
         public final float size;
         public final ResourceLocation texture;
-        public final int haloIters;
 
-        SunState(float size, ResourceLocation texture, int haloIters) {
+        SunState(float size, ResourceLocation texture) {
             this.size = size;
             this.texture = texture;
-            this.haloIters = haloIters;
         }
     }
 
