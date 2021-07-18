@@ -36,8 +36,8 @@ import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
 
 public class NewSunEntity extends Entity {
     /* A scratch for setting sun's entity data:
-    /data merge entity @e[type=uusi-aurinko:new_sun, limit=1] {}
-    /data get entity @e[type=uusi-aurinko:new_sun, limit=1]
+    /data merge entity @e[type=uusi-aurinko:new_sun, limit=1, sort=nearest] {}
+    /data get entity @e[type=uusi-aurinko:new_sun, limit=1, sort=nearest]
      */
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -49,7 +49,7 @@ public class NewSunEntity extends Entity {
      * 3: lightning stone;
      * 4: poop stone;
      * 5-6: sun state;
-     * 7: always 0.
+     * 7: rise up to rest position.
      */
     private static final DataParameter<Byte> SYNC_DATA =
             EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BYTE);
@@ -64,6 +64,7 @@ public class NewSunEntity extends Entity {
 
     public NewSunEntity(EntityType<?> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
+        this.setRiseUp(ServerConfigs.INSTANCE.NEW_SUN_RISE_UP.get());
     }
 
     @Override
@@ -110,7 +111,7 @@ public class NewSunEntity extends Entity {
         doEntityBothSides(affectedEntities);
 
         // move towards rest position
-        if (this.getSunState() != SunState.NEW_BORN && ServerConfigs.INSTANCE.NEW_SUN_RISE_UP.get()) {
+        if (this.getSunState() != SunState.NEW_BORN && this.getRiseUp()) {
             Vector3d vec = Vector3d.copy(this.getRestPosition()).subtract(this.getPositionCenter());
             if (vec.lengthSquared() > 1) {
                 this.move(MoverType.SELF, vec.normalize().scale(0.1));
@@ -341,8 +342,7 @@ public class NewSunEntity extends Entity {
     protected void readAdditional(CompoundNBT compound) {
         try {
             this.setLastConsumedStone(ConsumedMagicStone.valueOf(compound.getString("LastStoneConsumed")));
-        } catch (IllegalArgumentException e) {
-            LOGGER.error(e);
+        } catch (IllegalArgumentException ignored) {
         }
 
         CompoundNBT stoneConsumed = compound.getCompound("StoneConsumed");
@@ -353,6 +353,11 @@ public class NewSunEntity extends Entity {
         this.setHasPoopStone(stoneConsumed.getBoolean("Poop"));
 
         this.killCount = compound.getInt("KillCount");
+        if (compound.contains("RiseUp")) {
+            this.setRiseUp(compound.getBoolean("RiseUp"));
+        } else {
+            this.setRiseUp(ServerConfigs.INSTANCE.NEW_SUN_RISE_UP.get());
+        }
     }
 
     @Override
@@ -365,9 +370,10 @@ public class NewSunEntity extends Entity {
         stoneConsumed.putBoolean("Earth", this.getHasEarthStone());
         stoneConsumed.putBoolean("Lightning", this.getHasLightningStone());
         stoneConsumed.putBoolean("Poop", this.getHasPoopStone());
-
         compound.put("StoneConsumed", stoneConsumed);
+
         compound.putInt("KillCount", this.killCount);
+        compound.putBoolean("RiseUp", this.getRiseUp());
     }
 
     @Override
@@ -479,12 +485,20 @@ public class NewSunEntity extends Entity {
     }
 
     public SunState getSunState() {
-        return SunState.values()[this.dataManager.get(SYNC_DATA) >> 5];
+        return SunState.values()[this.dataManager.get(SYNC_DATA) >> 5 & 0b11];
     }
 
     public void setSunState(SunState sunState) {
         byte data = this.dataManager.get(SYNC_DATA);
-        this.dataManager.set(SYNC_DATA, (byte) (data & 0b001_1111 | sunState.ordinal() << 5));
+        this.dataManager.set(SYNC_DATA, (byte) (data & 0b1001_1111 | sunState.ordinal() << 5));
+    }
+
+    private boolean getRiseUp() {
+        return this.getSyncDataBit(7);
+    }
+
+    private void setRiseUp(boolean val) {
+        this.setSyncDataBit(7, val);
     }
 
     private boolean getSyncDataBit(int offset) {
