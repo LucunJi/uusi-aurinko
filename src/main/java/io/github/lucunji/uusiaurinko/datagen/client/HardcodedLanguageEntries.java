@@ -26,6 +26,13 @@ public enum HardcodedLanguageEntries {
             Pair.of("item.uusi-aurinko.sun_stone.tooltip", "太阳精华之结晶。\n周围的尘土在顷刻间被焚烧殆尽。"),
             Pair.of("item.uusi-aurinko.evil_eye.tooltip", "这个形似眼球的人工物恶毒地瞪着。\n放在额头上，它将助你看清一切。\n强烈的凝视也使你感到紧张疲惫……"),
             Pair.of("item.uusi-aurinko.moon.tooltip", "WIP\n这个小巧的天体有着强大的重力。\n万物都被它吸引，尤其是其它天体。"),
+            Pair.of("item.uusi-aurinko.emerald_tablet.tooltip",
+                    "一：寻找到太阳的种子，将它放在神殿的中间接受正午太阳的照射；\n" +
+                            "二：快速给予红色的太阳结晶足够的爆炸；\n" +
+                            "三：为初生的太阳献上足够多的活祭品；\n" +
+                            "四：收集四种元素的结晶，投入太阳使其成长完全；\n" +
+                            "五：等待新生的太阳完全升起。\n" +
+                            "§4注：第五种元素会带来腐化，投入不完全的太阳会带来无法预料的后果。§r"),
 
             Pair.of("death.attack.uusi-aurinko.electricity", "%1$s感受到了贯穿身体的高压电流"),
             Pair.of("death.attack.uusi-aurinko.electricity.player", "%1$s在与%2$s的战斗中感受到了贯穿身体的高压电流"),
@@ -76,6 +83,13 @@ public enum HardcodedLanguageEntries {
             Pair.of("item.uusi-aurinko.sun_stone.tooltip", "The essence of the Sun, crystallized.\nDust and dirt around are burnt down within seconds."),
             Pair.of("item.uusi-aurinko.evil_eye.tooltip", "This eye-shaped artefact projects a malevolent glare.\nPut it on your forehead, it then reveals everything to you.\nExhausting to you is its intense gaze."),
             Pair.of("item.uusi-aurinko.moon.tooltip", "WIP\nThis tiny celestial object has a strong gravitational pull.\nIt attracts everything, especially other stars."),
+            Pair.of("item.uusi-aurinko.emerald_tablet.tooltip",
+                    "I: Find the solar seed, place it at the center of temple to receive the midday sunshine;\n" +
+                            "II: Give enough explosion to the reddish solar cristal rapidly;\n" +
+                            "III: Contribute enough sacrifice to the new sun;\n" +
+                            "IV: Collect four crystallized elements and throw them into the new sun;\n" +
+                            "V: Wait for the new sun to fully rise up.\n" +
+                            "§4Warning: The fifth element brings corruption. Throwing it into the half-completed star may have unexpected consequence.§r"),
 
             Pair.of("death.attack.uusi-aurinko.electricity", "%1$s experienced high voltage pass through the body"),
             Pair.of("death.attack.uusi-aurinko.electricity.player", "%1$s experienced high voltage pass through the body whilst fighting %2$s"),
@@ -99,7 +113,7 @@ public enum HardcodedLanguageEntries {
             Pair.of("advancements.uusi-aurinko.make_new_sun.title", "Transmutation"),
             Pair.of("advancements.uusi-aurinko.make_new_sun.description", "Make a new sun"),
             Pair.of("advancements.uusi-aurinko.grow_new_sun.title", "Blood and Fire"),
-            Pair.of("advancements.uusi-aurinko.grow_new_sun.description", "Give the new sun enough sacrifice"),
+            Pair.of("advancements.uusi-aurinko.grow_new_sun.description", "Contribute enough sacrifice to the new sun"),
             Pair.of("advancements.uusi-aurinko.full_new_sun.title", "The Sun Also Rises"),
             Pair.of("advancements.uusi-aurinko.full_new_sun.description", "Make the fullest golden new sun rise up in the Overworld"),
             Pair.of("advancements.uusi-aurinko.dark_new_sun.title", "Corruption"),

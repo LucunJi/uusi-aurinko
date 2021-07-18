@@ -61,7 +61,7 @@ public class ItemSunSeed extends ItemRadiative {
                     .getStructureStart(pos, false, Structure.DESERT_PYRAMID);
             if (start != StructureStart.DUMMY) {
                 MutableBoundingBox boundingBox = start.getBoundingBox();
-                if (pos.equals(new BlockPos(boundingBox.minX + 10, boundingBox.minY + 1, boundingBox.minZ + 10))) {
+                if (pos.getX() == boundingBox.minX + 10 && pos.getZ() == boundingBox.minZ + 10) {
                     ItemStack newStack = new ItemStack(ModItems.SUN_STONE.get());
                     entity.setItem(newStack);
                     // FIXME: make the particle prettier

@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public abstract class ItemBase extends Item {
+public class ItemBase extends Item {
     public ItemBase(Properties properties) {
         super(properties);
     }

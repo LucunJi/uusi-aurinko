@@ -50,6 +50,10 @@ public class ModItems {
     public static final RegistryObject<ItemMoon> MOON = ITEMS.register("moon",
             () -> new ItemMoon(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
 
+    @Localize(locales = {"en_us", "zh_cn"}, translations = {"§eEmerald Tablet§r", "§e翠玉石板§r"})
+    public static final RegistryObject<ItemBase> EMERALD_TABLET = ITEMS.register("emerald_tablet",
+            () -> new ItemBase(new Properties().isImmuneToFire().maxStackSize(1).group(DEFAULT_GROUP)));
+
     @Localize(locales = "zh_cn", translations = "排泄物桶")
     public static final RegistryObject<BucketItem> EXCREMENT_BUCKET = ITEMS.register("excrement_bucket",
             () -> new BucketItem(ModFluids.EXCREMENT, new Item.Properties().containerItem(Items.BUCKET).maxStackSize(1).group(ItemGroup.MISC)));
