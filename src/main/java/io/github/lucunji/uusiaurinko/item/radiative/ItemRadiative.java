@@ -74,10 +74,6 @@ public abstract class ItemRadiative extends ItemBase {
         return true;
     }
 
-    /**
-     * 改成true防爆
-     * @return false
-     */
     public boolean isImmuneToExplosions() {
         return false;
     }
