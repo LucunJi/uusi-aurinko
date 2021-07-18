@@ -12,8 +12,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 public class RadiativeItemEntity extends ItemEntity {
@@ -122,7 +120,6 @@ public class RadiativeItemEntity extends ItemEntity {
      * This function is used for particle generation.
      * Result from super method has to be wrapped to prevent {@link ClassCastException}.
      */
-    @OnlyIn(Dist.CLIENT)
     @Override
     public ItemEntity func_234273_t_() {
         return new RadiativeItemEntity(super.func_234273_t_());

@@ -27,8 +27,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -120,7 +118,6 @@ public class ItemLightningStone extends ItemRadiative {
      *
      * @param number Number of particles to generate
      */
-    @OnlyIn(Dist.CLIENT)
     private void spreadSpark(World world, BlockPos blockPos, @Nullable Direction direction, int number, Random random) {
         int x = blockPos.getX();
         int y = blockPos.getY();
@@ -194,7 +191,6 @@ public class ItemLightningStone extends ItemRadiative {
      * @return A list of Block-Direction pairs. Direction represents the visible face of block, might be {@code null}.
      * {@code null} represents that the block is transparent so particles can be rendered inside.
      */
-    @OnlyIn(Dist.CLIENT)
     private List<ImmutablePair<BlockPos, Direction>>
     findExposedConductorsDFS(World world, final ImmutableList<BlockPos> startSet, final Vector3d startPos, int range) {
         int rangeSq = range * range;

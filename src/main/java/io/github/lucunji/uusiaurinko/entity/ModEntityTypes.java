@@ -7,8 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -33,7 +31,6 @@ public class ModEntityTypes {
             () -> EntityType.Builder.create(NewSunEntity::new, EntityClassification.MISC)
                     .size(0.25f, 0.25f).immuneToFire().trackingRange(16).build("new_sun"));
 
-    @OnlyIn(Dist.CLIENT)
     public static class ClientRenderer {
         public static final List<Runnable> RENDERER_BINDERS = new ArrayList<>();
 
