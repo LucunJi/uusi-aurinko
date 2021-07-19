@@ -2,11 +2,14 @@ package io.github.lucunji.uusiaurinko.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.InputMappings;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
 
 /**
  * @author DustW
  */
+@OnlyIn(Dist.CLIENT)
 public class ClientUtil {
     public static boolean isShiftDown() {
         long windowHandle = Minecraft.getInstance().getMainWindow().getHandle();

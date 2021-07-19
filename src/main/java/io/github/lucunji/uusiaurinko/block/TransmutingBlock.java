@@ -27,6 +27,8 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.*;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -150,6 +152,7 @@ public class TransmutingBlock extends Block {
      * Code borrowed from {@link ParticleManager#addBlockHitEffects}
      */
     @Override
+    @OnlyIn(Dist.CLIENT)
     public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
         if (!world.isRemote) return true;
         BlockRayTraceResult result = (BlockRayTraceResult) target;
@@ -199,6 +202,7 @@ public class TransmutingBlock extends Block {
      * Code borrowed from {@link ParticleManager#addBlockDestroyEffects}
      */
     @Override
+    @OnlyIn(Dist.CLIENT)
     public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager) {
         if (!world.isRemote) return true;
 

@@ -6,6 +6,8 @@ import net.minecraft.item.IArmorMaterial;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.LazyValue;
 import net.minecraft.util.SoundEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.function.Supplier;
 
@@ -63,6 +65,7 @@ public enum ModArmorMaterial implements IArmorMaterial {
         return this.repairMaterial.getValue();
     }
 
+    @OnlyIn(Dist.CLIENT)
     public String getName() {
         return this.name;
     }

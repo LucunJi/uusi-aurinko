@@ -8,6 +8,8 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.registries.DeferredRegister;
@@ -29,6 +31,7 @@ public class ModTileEntityTypes {
     public final static RegistryObject<TileEntityType<PedestalTileEntity>> ITEM_PEDESTAL = TILE_ENTITY.register("item_pedestal",
             () -> TileEntityType.Builder.create(PedestalTileEntity::new, ModBlocks.ITEM_PEDESTAL.get()).build(null));
 
+    @OnlyIn(Dist.CLIENT)
     public static class ClientRenderer {
         public static final List<Runnable> RENDERER_BINDERS = new ArrayList<>();
 
