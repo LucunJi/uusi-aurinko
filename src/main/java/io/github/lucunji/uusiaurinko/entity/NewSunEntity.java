@@ -250,7 +250,7 @@ public class NewSunEntity extends Entity {
                     && Math.random() < 0.3) {
                 world.setBlockState(pos, Blocks.FIRE.getDefaultState());
             } else {
-                world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3, 512);
+                world.setBlockState(pos, Blocks.AIR.getDefaultState());
             }
         }
     }

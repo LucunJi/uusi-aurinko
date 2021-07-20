@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "uusi-aurinko:rune_temple_bricks"
+      "item": "uusi-aurinko:emerald_tablet"
     },
     "title": {
       "translate": "advancements.uusi-aurinko.root.title"
@@ -21,7 +21,7 @@
       "conditions": {
         "items": [
           {
-            "item": "uusi-aurinko:rune_temple_bricks"
+            "item": "uusi-aurinko:emerald_tablet"
           }
         ]
       }
