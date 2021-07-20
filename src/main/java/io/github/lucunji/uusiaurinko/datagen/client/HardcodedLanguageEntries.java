@@ -91,8 +91,8 @@ public enum HardcodedLanguageEntries {
                             "V: Wait for the new sun to fully rise up.\n" +
                             "§4Warning: The fifth element brings corruption. Throwing it into the half-completed star may have unexpected consequence.§r"),
 
-            Pair.of("death.attack.uusi-aurinko.electricity", "%1$s experienced high voltage pass through the body"),
-            Pair.of("death.attack.uusi-aurinko.electricity.player", "%1$s experienced high voltage pass through the body whilst fighting %2$s"),
+            Pair.of("death.attack.uusi-aurinko.electricity", "%1$s experienced high voltage passing through the body"),
+            Pair.of("death.attack.uusi-aurinko.electricity.player", "%1$s experienced high voltage passing through the body whilst fighting %2$s"),
             Pair.of("death.attack.uusi-aurinko.sun_blaze", "%1$s was burnt into ash by the blaze the new sun"),
             Pair.of("death.attack.uusi-aurinko.sun_blaze.player", "%1$s was burnt into ash by the blaze of the new sun whilst fighting %2$s"),
             Pair.of("death.attack.uusi-aurinko.sun_fusion", "%1$s experienced the nuclear fusion energy inside the new sun"),
