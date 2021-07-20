@@ -1,7 +1,11 @@
 {
   "replace": false,
   "values": [
-    "#minecraft:lava",
-    "#minecraft:water"
+    "minecraft:lava",
+    "minecraft:flowing_lava",
+    "minecraft:water",
+    "minecraft:flowing_water",
+    "uusi-aurinko:excrement",
+    "uusi-aurinko:flowing_excrement"
   ]
 }
