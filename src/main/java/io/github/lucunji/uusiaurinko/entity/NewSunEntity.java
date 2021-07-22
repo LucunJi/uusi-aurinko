@@ -95,6 +95,16 @@ public class NewSunEntity extends Entity {
         AxisAlignedBB box = this.getBoundingBox(this.getPose());
     }
 
+    /**
+     * Should be approximately the same size as the rendered halo.
+     */
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        Vector3d center = super.getRenderBoundingBox().getCenter();
+        double size = this.getRenderingSize() * 2;
+        return AxisAlignedBB.withSizeAtOrigin(size, size, size).offset(center);
+    }
+
     @Override
     public void notifyDataManagerChange(DataParameter<?> key) {
         if (SYNC_DATA.equals(key)) {
@@ -293,21 +303,20 @@ public class NewSunEntity extends Entity {
             int z = sectionPos.getWorldStartZ() | random.nextInt(16);
             BlockPos p = new BlockPos(x, y, z);
 
-            if (p.distanceSq(getPositionCenter(), true) > radiusSq
-                    || this.world.isAirBlock(p)) continue;
-            BlockState blockState = world.getBlockState(p);
-            if (blockState.matchesBlock(Blocks.FIRE)
-                    || ServerConfigs.INSTANCE.NEW_SUN_DESTROY_BLACKLIST.contains(world.getBlockState(p))) continue;
-
+            Vector3d vec = Vector3d.copy(p).add(0.5, 0.5, 0.5);
+            vec = vec.subtract(this.getPositionCenter()).normalize().scale(radius).add(this.getPositionCenter());
             p = this.world.rayTraceBlocks(new RayTraceContext(
                     this.getPositionCenter(),
-                    Vector3d.copy(p).add(0.5, 0.5, 0.5),
+                    vec,
                     RayTraceContext.BlockMode.COLLIDER,
                     RayTraceContext.FluidMode.SOURCE_ONLY, // ignore non-source fluid blocks
                     null)
             ).getPos();
-            // check again after adjusting position using raytrace
+
+            if (this.world.isAirBlock(p)) continue;
+            BlockState blockState = world.getBlockState(p);
             if (blockState.matchesBlock(Blocks.FIRE)
+                    || (!blockState.getFluidState().isEmpty() && !blockState.getFluidState().isSource())
                     || ServerConfigs.INSTANCE.NEW_SUN_DESTROY_BLACKLIST.contains(world.getBlockState(p))) continue;
             results.add(p);
         }

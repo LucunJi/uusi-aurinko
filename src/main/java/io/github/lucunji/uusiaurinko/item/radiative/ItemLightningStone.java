@@ -103,7 +103,7 @@ public class ItemLightningStone extends ItemRadiative {
 
         Random random = world.getRandom();
         if (Minecraft.getInstance().gameSettings.particles == ParticleStatus.MINIMAL) return;
-        if (exposure.size() <= 32) {
+        if (exposure.size() < 20) {
             for (ImmutablePair<BlockPos, Direction> pair : exposure)
                 spreadSpark(world, pair.left, pair.right, 10, random);
         } else {

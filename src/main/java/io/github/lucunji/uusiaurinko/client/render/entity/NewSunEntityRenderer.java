@@ -3,6 +3,7 @@ package io.github.lucunji.uusiaurinko.client.render.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.lucunji.uusiaurinko.client.render.ModRenderTypes;
 import io.github.lucunji.uusiaurinko.client.render.entity.model.NewSunModel;
+import io.github.lucunji.uusiaurinko.config.ClientConfigs;
 import io.github.lucunji.uusiaurinko.entity.NewSunEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
@@ -20,7 +21,6 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
     /data get entity @e[type=uusi-aurinko:new_sun, limit=1]
      */
     private static final ResourceLocation SUN_DARK_BLUE_TEXTURE = new ResourceLocation(MODID, "textures/entity/sun_dark_blue.png");
-    private static final int HALO_ITERATIONS = 40;
 
     private final NewSunModel model;
 
@@ -54,17 +54,18 @@ public class NewSunEntityRenderer extends EntityRenderer<NewSunEntity> {
 
         // render the sun's halo
         renderType = ModRenderTypes.getHalo(sunState == NewSunEntity.SunState.FULL_DARK ? SUN_DARK_BLUE_TEXTURE : sunState.texture);
-        for (int i = 0; i < HALO_ITERATIONS; i++) {
+        final int haloIter = ClientConfigs.INSTANCE.SUN_HALO_ITERATIONS.get();
+        for (int i = 0; i < haloIter; i++) {
             matrixStackIn.push();
             // maps i ∈ [0, iters) to iit ∈ [0, 1)
-            float iit = (float) i / HALO_ITERATIONS;
+            float iit = (float) i / haloIter;
             // maps i ∈ [0, iters) to scale ∈ [1, 2)
             float scale = 1 + iit;
             matrixStackIn.scale(scale, scale, scale);
             // alpha = (0.24 - 0.225 * iit) / (iters / 10)
             // maps i ∈ [0, iters) to ɑ ∈ [0.24/iters, 0.015/iters)
             // the integration of ɑ over the range [0, iter) is approximately constant
-            float alpha = (2.4F - 2.25F * iit) / HALO_ITERATIONS;
+            float alpha = (2.4F - 2.25F * iit) / haloIter;
             model.render(matrixStackIn, bufferIn.getBuffer(renderType),
                     packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, alpha);
             matrixStackIn.pop();
