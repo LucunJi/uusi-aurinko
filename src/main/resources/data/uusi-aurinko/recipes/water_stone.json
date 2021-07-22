@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX",
+    "XOX",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "item": "minecraft:prismarine_crystals"
+    },
+    "O": {
+      "item": "minecraft:nether_star"
+    }
+  },
+  "result": {
+    "item": "uusi-aurinko:water_stone"
+  }
+}

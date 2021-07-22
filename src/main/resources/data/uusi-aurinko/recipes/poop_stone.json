@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX",
+    "XOX",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "item": "minecraft:rotten_flesh"
+    },
+    "O": {
+      "item": "minecraft:nether_star"
+    }
+  },
+  "result": {
+    "item": "uusi-aurinko:poop_stone"
+  }
+}

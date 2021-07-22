@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TXT",
+    "XOX",
+    "TXT"
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:ghast_tear"
+    },
+    "X": {
+      "item": "minecraft:end_crystal"
+    },
+    "O": {
+      "item": "minecraft:nether_star"
+    }
+  },
+  "result": {
+    "item": "uusi-aurinko:sun_seed"
+  }
+}
