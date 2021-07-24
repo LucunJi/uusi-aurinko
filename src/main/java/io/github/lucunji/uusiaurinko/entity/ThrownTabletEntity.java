@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.entity;
 
+import io.github.lucunji.uusiaurinko.item.ModItems;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -9,10 +10,13 @@ import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.entity.projectile.ThrowableEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -166,8 +170,8 @@ public class ThrownTabletEntity extends ThrowableEntity {
      * Borrowed from {@link net.minecraft.entity.projectile.AbstractArrowEntity#func_230298_a_}
      */
     private boolean raytraceFilter(Entity entityIn) {
-        if (!entityIn.isSpectator() && entityIn.isAlive() && entityIn.canBeCollidedWith()) {
-            Entity shooter = this.getShooter();
+        Entity shooter = this.getShooter();
+        if (!entityIn.isSpectator() && entityIn.isAlive() && entityIn.canBeCollidedWith() && entityIn != shooter) {
             return shooter == null || this.leftOwner || !shooter.isRidingSameEntity(entityIn);
         } else {
             return false;
@@ -188,12 +192,12 @@ public class ThrownTabletEntity extends ThrowableEntity {
     private boolean leaveOwner() {
         Entity shooter = this.getShooter();
         if (shooter != null) {
-            for(Entity entity1 : this.world.getEntitiesInAABBexcluding(
+            for (Entity entity : this.world.getEntitiesInAABBexcluding(
                     this,
                     this.getBoundingBox().expand(this.getMotion()).grow(1.0D),
                     (entity) -> !entity.isSpectator() && entity.canBeCollidedWith())) {
 
-                if (entity1.getLowestRidingEntity() == shooter.getLowestRidingEntity()) {
+                if (entity.getLowestRidingEntity() == shooter.getLowestRidingEntity()) {
                     return false;
                 }
             }
@@ -207,6 +211,10 @@ public class ThrownTabletEntity extends ThrowableEntity {
 
     @Override
     protected void onEntityHit(EntityRayTraceResult result) {
+        result.getEntity().attackEntityFrom(
+                DamageSource.causeThrownDamage(this, this.getShooter()),
+                (float) this.getMotion().lengthSquared() * 40);
+        this.setMotion(this.getMotion().scale(0.6));
     }
 
     /**
@@ -285,5 +293,18 @@ public class ThrownTabletEntity extends ThrowableEntity {
     @Override
     public boolean canBeCollidedWith() {
         return true;
+    }
+
+    @Override
+    public ActionResultType applyPlayerInteraction(PlayerEntity player, Vector3d vec, Hand hand) {
+        if (player.getDistanceSq(this) < 4) {
+            if (!player.world.isRemote && player.addItemStackToInventory(ModItems.EMERALD_TABLET.get().getDefaultInstance())) {
+                this.remove();
+            }
+            return ActionResultType.SUCCESS;
+        }
+        player.sendStatusMessage(new TranslationTextComponent(
+                this.getType().getTranslationKey() + ".too_far_away"), true);
+        return ActionResultType.PASS;
     }
 }

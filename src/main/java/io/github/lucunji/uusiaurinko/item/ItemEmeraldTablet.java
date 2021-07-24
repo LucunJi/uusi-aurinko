@@ -23,8 +23,6 @@ public class ItemEmeraldTablet extends ItemBase {
      * <p>
      * Note that if you override this method, you generally want to also call the super version (on {@link net.minecraft.item.Item}) to get
      * the glint for enchanted items. Of course, that is unnecessary if the overwritten version always returns true.
-     *
-     * @param stack
      */
     @Override
     public boolean hasEffect(ItemStack stack) {
@@ -32,28 +30,16 @@ public class ItemEmeraldTablet extends ItemBase {
     }
 
     @Override
-    public void onUse(World worldIn, LivingEntity livingEntityIn, ItemStack stack, int count) {
-        if (!worldIn.isRemote) {
-            ThrownTabletEntity tabletEntity = new ThrownTabletEntity(ModEntityTypes.EMERALD_TABLET.get(), worldIn);
-            tabletEntity.setPosition(livingEntityIn.getPosX(), livingEntityIn.getPosYEye(), livingEntityIn.getPosZ());
-            Vector3d lookVec = livingEntityIn.getLookVec();
-            tabletEntity.shoot(lookVec.getX(), lookVec.getY(), lookVec.getZ(), 1.6F, 0);
-            worldIn.addEntity(tabletEntity);
-        }
-    }
-
-    @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
-        return super.onItemUse(context);
-    }
-
-    @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        if (!worldIn.isRemote) {
+        if (!worldIn.isRemote && playerIn.getHeldItem(handIn).getItem() == this) {
+            playerIn.getHeldItem(handIn).shrink(1);
+            playerIn.getCooldownTracker().setCooldown(this, 30);
+            // TODO: add sound
             ThrownTabletEntity tabletEntity = new ThrownTabletEntity(ModEntityTypes.EMERALD_TABLET.get(), worldIn);
+            tabletEntity.setShooter(playerIn);
             tabletEntity.setPosition(playerIn.getPosX(), playerIn.getPosYEye(), playerIn.getPosZ());
             Vector3d lookVec = playerIn.getLookVec();
-            tabletEntity.shoot(lookVec.getX(), lookVec.getY(), lookVec.getZ(), 1.6F, 0);
+            tabletEntity.shoot(lookVec.getX(), lookVec.getY(), lookVec.getZ(), 0.8F, 0);
             worldIn.addEntity(tabletEntity);
         }
         return ActionResult.resultSuccess(playerIn.getHeldItem(handIn));

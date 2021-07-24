@@ -52,6 +52,8 @@
   "death.attack.uusi-aurinko.sun_fusion.player": "%1$s experienced the nuclear fusion energy inside the new sun whilst fighting %2$s",
   "effect.uusi-aurinko.electricity_resistance": "Electricity Resis.",
   "effect.uusi-aurinko.true_vision": "True Vision",
+  "entity.uusi-aurinko.emerald_tablet": "Emerald Tablet",
+  "entity.uusi-aurinko.emerald_tablet.too_far_away": "Get closer to pick up the tablet",
   "entity.uusi-aurinko.new_sun": "§4§lNew Sun§r",
   "entity.uusi-aurinko.radiative_item": "Radiative Magical Stone",
   "item.uusi-aurinko.earth_stone": "Tannerkivi",

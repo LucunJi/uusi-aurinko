@@ -52,6 +52,8 @@
   "death.attack.uusi-aurinko.sun_fusion.player": "%1$s在与%2$s的战斗中感受到了新日的核聚变能量",
   "effect.uusi-aurinko.electricity_resistance": "雷电免疫",
   "effect.uusi-aurinko.true_vision": "真实之视",
+  "entity.uusi-aurinko.emerald_tablet": "翠玉石板",
+  "entity.uusi-aurinko.emerald_tablet.too_far_away": "在更近的距离捡起石板",
   "entity.uusi-aurinko.new_sun": "§4§l新日§r",
   "entity.uusi-aurinko.radiative_item": "放射性魔法石",
   "item.uusi-aurinko.earth_stone": "Tannerkivi",

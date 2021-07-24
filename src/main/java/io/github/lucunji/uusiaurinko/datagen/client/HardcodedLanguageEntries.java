@@ -66,7 +66,9 @@ public enum HardcodedLanguageEntries {
 
             Pair.of("config.uusi-aurinko.change_fluid_rendering", "流体方块的渲染效果改变了。按下 F3+T 使其生效。"),
 
-            Pair.of("container.uusi-aurinko.item_pedestal", "物品底座")
+            Pair.of("container.uusi-aurinko.item_pedestal", "物品底座"),
+
+            Pair.of("entity.uusi-aurinko.emerald_tablet.too_far_away", "在更近的距离捡起石板")
     ),
 
     EN_US("en_us",
@@ -123,7 +125,9 @@ public enum HardcodedLanguageEntries {
 
             Pair.of("config.uusi-aurinko.change_fluid_rendering", "The rendering effect of fluid blocks is changed. Press F3+T to take effect."),
 
-            Pair.of("container.uusi-aurinko.item_pedestal", "Item Pedestal")
+            Pair.of("container.uusi-aurinko.item_pedestal", "Item Pedestal"),
+
+            Pair.of("entity.uusi-aurinko.emerald_tablet.too_far_away", "Get closer to pick up the tablet")
     );
 
     final String locale;
