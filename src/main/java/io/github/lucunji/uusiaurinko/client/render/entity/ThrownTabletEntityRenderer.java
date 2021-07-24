@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class ThrownTabletEntityRenderer extends EntityRenderer<ThrownTabletEntity> {
@@ -38,14 +37,11 @@ public class ThrownTabletEntityRenderer extends EntityRenderer<ThrownTabletEntit
 
         matrixStackIn.translate(0, entityIn.getHeight() / 2, 0);
 
-//        Vector3f rollAxis = new Vector3f(entityIn.getMotion());
-        Vector3f rollAxis = new Vector3f(1, 0, 1);
+        Vector3f rollAxis = new Vector3f(entityIn.getMotion());
         rollAxis.cross(Vector3f.YP);
-        rollAxis.normalize();
-//        matrixStackIn.rotate(rollAxis.rotationDegrees(entityIn.getPitch(partialTicks));
-        matrixStackIn.rotate(rollAxis.rotationDegrees((entityIn.world.getGameTime() + partialTicks) * -10));
-//        matrixStackIn.rotate(Vector3f.YP.rotationDegrees(entityIn.getYaw(partialTicks)));
-        matrixStackIn.rotate(Vector3f.YP.rotationDegrees(50));
+        rollAxis.normalize(); // normalize([0, 1, 0] x motion), calculate the rotational axis
+        matrixStackIn.rotate(rollAxis.rotationDegrees(entityIn.getPitch(partialTicks)));
+        matrixStackIn.rotate(Vector3f.YP.rotationDegrees(entityIn.getYaw(partialTicks)));
         itemRenderer.renderItem(itemStack, ItemCameraTransforms.TransformType.NONE, false,
                 matrixStackIn, bufferIn, packedLightIn, OverlayTexture.NO_OVERLAY, ibakedmodel);
 
