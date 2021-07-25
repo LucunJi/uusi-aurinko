@@ -1,6 +1,8 @@
 package io.github.lucunji.uusiaurinko.entity;
 
+import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.item.ModItems;
+import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -26,6 +28,8 @@ import javax.annotation.Nullable;
 public class ThrownTabletEntity extends ThrowableEntity {
     private boolean inGround;
     private boolean leftOwner;
+    private int age;
+    private boolean disappear;
 
     public ThrownTabletEntity(EntityType<? extends ThrownTabletEntity> entityEntityType, World world) {
         super(entityEntityType, world);
@@ -38,6 +42,14 @@ public class ThrownTabletEntity extends ThrowableEntity {
      * rather than something like a snowball.
      */
     public void tick() {
+        if (this.age < Integer.MAX_VALUE) {
+            this.age++;
+        }
+        if (this.age >= 1200 && this.disappear) {
+            this.remove();
+            return;
+        }
+
         // ProjectileEntity.tick()
         if (!this.leftOwner) {
             this.leftOwner = this.leaveOwner();
@@ -211,9 +223,12 @@ public class ThrownTabletEntity extends ThrowableEntity {
 
     @Override
     protected void onEntityHit(EntityRayTraceResult result) {
-        result.getEntity().attackEntityFrom(
+        double baseDmg = ServerConfigs.INSTANCE.EMERALD_TABLET_BASE_DAMAGE.get();
+        if (baseDmg > 0 && result.getEntity().attackEntityFrom(
                 DamageSource.causeThrownDamage(this, this.getShooter()),
-                (float) this.getMotion().lengthSquared() * 40);
+                (float) (this.getMotion().lengthSquared() * baseDmg))) {
+            this.playSound(ModSoundEvents.ENTITY_EMERALD_TABLET_HIT.get(), 0.7F, 1F / (this.rand.nextFloat() * 0.2F + 0.9F));
+        }
         this.setMotion(this.getMotion().scale(0.6));
     }
 
@@ -229,8 +244,8 @@ public class ThrownTabletEntity extends ThrowableEntity {
         this.setMotion(hitVec);
         Vector3d hitVecScaled = hitVec.normalize().scale(0.05F);
         this.setRawPosition(this.getPosX() - hitVecScaled.x, this.getPosY() - hitVecScaled.y, this.getPosZ() - hitVecScaled.z);
+        this.playSound(ModSoundEvents.ENTITY_EMERALD_TABLET_LAND.get(), 0.5F, 1F / (this.rand.nextFloat() * 0.2F + 0.9F));
         this.inGround = true;
-        // TODO: play sound
     }
 
     /**
@@ -259,17 +274,21 @@ public class ThrownTabletEntity extends ThrowableEntity {
     @Override
     public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
-        compound.putBoolean("inGround", this.inGround);
+        compound.putBoolean("InGround", this.inGround);
         if (this.leftOwner) {
             compound.putBoolean("LeftOwner", true);
         }
+        compound.putInt("Age", this.age);
+        compound.putBoolean("Disappear", this.disappear);
     }
 
     @Override
     public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
-        this.inGround = compound.getBoolean("inGround");
+        this.inGround = compound.getBoolean("InGround");
         this.leftOwner = compound.getBoolean("LeftOwner");
+        this.age = compound.getInt("Age");
+        this.disappear = compound.getBoolean("Disappear");
     }
 
     @Override
@@ -297,14 +316,20 @@ public class ThrownTabletEntity extends ThrowableEntity {
 
     @Override
     public ActionResultType applyPlayerInteraction(PlayerEntity player, Vector3d vec, Hand hand) {
-        if (player.getDistanceSq(this) < 4) {
-            if (!player.world.isRemote && player.addItemStackToInventory(ModItems.EMERALD_TABLET.get().getDefaultInstance())) {
+        if (player.getDistanceSq(this) < 3) {
+            if (!player.world.isRemote
+                    // if disappear == true, the player won't get a tablet in its inventory.
+                    && (this.disappear || player.addItemStackToInventory(ModItems.EMERALD_TABLET.get().getDefaultInstance()))) {
                 this.remove();
             }
             return ActionResultType.SUCCESS;
         }
         player.sendStatusMessage(new TranslationTextComponent(
                 this.getType().getTranslationKey() + ".too_far_away"), true);
-        return ActionResultType.PASS;
+        return ActionResultType.FAIL;
+    }
+
+    public void setDisappear(boolean disappear) {
+        this.disappear = disappear;
     }
 }

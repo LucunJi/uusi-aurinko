@@ -1,0 +1,44 @@
+{
+  "parent": "uusi-aurinko:tablet_kill",
+  "display": {
+    "icon": {
+      "item": "minecraft:wither_skeleton_skull"
+    },
+    "title": {
+      "translate": "advancements.uusi-aurinko.tablet_kill_wither.title"
+    },
+    "description": {
+      "translate": "advancements.uusi-aurinko.tablet_kill_wither.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "uusi-aurinko:tablet_kill_wither": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "predicate": {
+              "type": "minecraft:wither"
+            },
+            "entity": "this"
+          }
+        ],
+        "killing_blow": {
+          "direct_entity": {
+            "type": "uusi-aurinko:emerald_tablet"
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "uusi-aurinko:tablet_kill_wither"
+    ]
+  ]
+}

@@ -64,6 +64,13 @@ public enum HardcodedLanguageEntries {
             Pair.of("advancements.uusi-aurinko.rise_dark_new_sun.title", "新秩序"),
             Pair.of("advancements.uusi-aurinko.rise_dark_new_sun.description", "在末地升起黑色新日"),
 
+            Pair.of("advancements.uusi-aurinko.tablet_kill.title", "物理法师"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill.description", "使用石板造成击杀\n走近后右击拾起"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill_player.title", "简单的几何学"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill_player.description", "使用石板杀死另一名玩家"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill_wither.title", "神板粉碎击！"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill_wither.description", "使用石板杀死凋灵"),
+
             Pair.of("config.uusi-aurinko.change_fluid_rendering", "流体方块的渲染效果改变了。按下 F3+T 使其生效。"),
 
             Pair.of("container.uusi-aurinko.item_pedestal", "物品底座"),
@@ -122,6 +129,13 @@ public enum HardcodedLanguageEntries {
             Pair.of("advancements.uusi-aurinko.dark_new_sun.description", "Make the new sun turn dark"),
             Pair.of("advancements.uusi-aurinko.rise_dark_new_sun.title", "The New Order"),
             Pair.of("advancements.uusi-aurinko.rise_dark_new_sun.description", "Make the dark new sun rise up in the End"),
+
+            Pair.of("advancements.uusi-aurinko.tablet_kill.title", "The Magic of Physics"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill.description", "Kill with a tablet\nGet close and right click to pick it up"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill_player.title", "Simple Geometry"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill_player.description", "Kill another player with a tablet"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill_wither.title", "God Tablet Smasher!"),
+            Pair.of("advancements.uusi-aurinko.tablet_kill_wither.description", "Kill the Wither with a tablet"),
 
             Pair.of("config.uusi-aurinko.change_fluid_rendering", "The rendering effect of fluid blocks is changed. Press F3+T to take effect."),
 

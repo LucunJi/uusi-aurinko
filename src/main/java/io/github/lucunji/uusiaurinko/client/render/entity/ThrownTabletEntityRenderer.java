@@ -31,7 +31,7 @@ public class ThrownTabletEntityRenderer extends EntityRenderer<ThrownTabletEntit
         IBakedModel ibakedmodel = this.itemRenderer.getItemModelWithOverrides(itemStack, entityIn.world, null);
         //noinspection deprecation
         Vector3f modelScale = ibakedmodel.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.copy();
-        float scale = 1 / Math.max(Math.max(modelScale.getX(), modelScale.getY()), modelScale.getZ());
+        float scale = 0.8F / Math.max(Math.max(modelScale.getX(), modelScale.getY()), modelScale.getZ());
         matrixStackIn.scale(scale, scale, scale);
 
 

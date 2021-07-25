@@ -1,0 +1,35 @@
+{
+  "parent": "uusi-aurinko:root",
+  "display": {
+    "icon": {
+      "item": "minecraft:zombie_head"
+    },
+    "title": {
+      "translate": "advancements.uusi-aurinko.tablet_kill.title"
+    },
+    "description": {
+      "translate": "advancements.uusi-aurinko.tablet_kill.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "uusi-aurinko:tablet_kill": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "killing_blow": {
+          "direct_entity": {
+            "type": "uusi-aurinko:emerald_tablet"
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "uusi-aurinko:tablet_kill"
+    ]
+  ]
+}

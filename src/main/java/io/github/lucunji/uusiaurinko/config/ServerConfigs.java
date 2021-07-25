@@ -65,6 +65,8 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
     public final ItemTaggedListConfigValue PEDESTAL_SPECIAL_ITEMS;
 
+    public final ForgeConfigSpec.ConfigValue<Double> EMERALD_TABLET_BASE_DAMAGE;
+
     public ServerConfigs(ForgeConfigSpec.Builder builder) {
         FIRE_STONE_IGNITE_BLOCK_RANGE = defineInteger(builder,
                 "Kiuaskivi may ignite blocks in the cuboid which goes from (-range, -range, -range) to (range, range + 2, range)\n" +
@@ -270,6 +272,12 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
                         "at the block below it.",
                 "pedestal_special_items", Lists.newArrayList("#uusi-aurinko:pedestal_special_items")
         ), this);
+
+        EMERALD_TABLET_BASE_DAMAGE = defineDouble(builder,
+                "The base damage of thrown emerald tablet.\n" +
+                        "The actual damage equals to (speed * speed * baseDamage).\n" +
+                        "Set this value to 0 to disable.",
+                "emerald_tablet_base_damage", 40, 0, Integer.MAX_VALUE);
     }
 
     @Override

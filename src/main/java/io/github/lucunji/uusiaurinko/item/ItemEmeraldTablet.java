@@ -2,13 +2,13 @@ package io.github.lucunji.uusiaurinko.item;
 
 import io.github.lucunji.uusiaurinko.entity.ModEntityTypes;
 import io.github.lucunji.uusiaurinko.entity.ThrownTabletEntity;
-import net.minecraft.entity.LivingEntity;
+import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -34,13 +34,18 @@ public class ItemEmeraldTablet extends ItemBase {
         if (!worldIn.isRemote && playerIn.getHeldItem(handIn).getItem() == this) {
             playerIn.getHeldItem(handIn).shrink(1);
             playerIn.getCooldownTracker().setCooldown(this, 30);
-            // TODO: add sound
+            worldIn.playSound(null, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(),
+                    ModSoundEvents.ENTITY_EMERALD_TABLET_THROW.get(), SoundCategory.NEUTRAL,
+                    0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+
             ThrownTabletEntity tabletEntity = new ThrownTabletEntity(ModEntityTypes.EMERALD_TABLET.get(), worldIn);
+            if (playerIn.isCreative()) tabletEntity.setDisappear(true);
             tabletEntity.setShooter(playerIn);
             tabletEntity.setPosition(playerIn.getPosX(), playerIn.getPosYEye(), playerIn.getPosZ());
             Vector3d lookVec = playerIn.getLookVec();
             tabletEntity.shoot(lookVec.getX(), lookVec.getY(), lookVec.getZ(), 0.8F, 0);
             worldIn.addEntity(tabletEntity);
+            playerIn.addStat(Stats.ITEM_USED.get(this), 1);
         }
         return ActionResult.resultSuccess(playerIn.getHeldItem(handIn));
     }

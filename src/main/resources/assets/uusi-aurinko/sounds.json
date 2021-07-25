@@ -1,4 +1,22 @@
 {
+  "entity.emerald_tablet.throw": {
+    "subtitle": "subtitles.uusi-aurinko.entity.emerald_tablet.throw",
+    "sounds": [
+      "minecraft:random/bow"
+    ]
+  },
+  "entity.emerald_tablet.hit": {
+    "subtitle": "subtitles.uusi-aurinko.entity.emerald_tablet.hit",
+    "sounds": [
+      "uusi-aurinko:stone_hit"
+    ]
+  },
+  "entity.emerald_tablet.land": {
+    "subtitle": "subtitles.uusi-aurinko.entity.emerald_tablet.land",
+    "sounds": [
+      "uusi-aurinko:stone_land"
+    ]
+  },
   "entity.radiative_stone.throw": {
     "subtitle": "subtitles.uusi-aurinko.entity.radiative_stone.throw",
     "sounds": [
