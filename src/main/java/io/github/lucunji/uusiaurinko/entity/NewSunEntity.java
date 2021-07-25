@@ -9,6 +9,7 @@ import io.github.lucunji.uusiaurinko.util.ModDamageSource;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,6 +20,7 @@ import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.*;
@@ -27,11 +29,14 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static io.github.lucunji.uusiaurinko.UusiAurinko.MODID;
@@ -61,6 +66,8 @@ public class NewSunEntity extends Entity {
             EntityDataManager.createKey(NewSunEntity.class, DataSerializers.BLOCK_POS);
 
     private static final int SIZE_INCREMENT_PER_STONE = 1;
+
+    private static Method attackDragonFromMethodCache = null;
 
     private int killCount = 0;
 
@@ -220,14 +227,25 @@ public class NewSunEntity extends Entity {
                     continue;
                 }
 
-                if (fusionAmount > 0)
-                    entity.attackEntityFrom(ModDamageSource.SUN_FUSION, fusionAmount);
+                if (fusionAmount > 0) {
+                    if (entity instanceof EnderDragonEntity) {
+                        NewSunEntity.tryAttackDragonFrom(((EnderDragonEntity) entity), ModDamageSource.SUN_FUSION, fusionAmount);
+                    } else {
+                        entity.attackEntityFrom(ModDamageSource.SUN_FUSION, fusionAmount);
+                    }
+                }
 
             }
 
             if (blazeAmount > 0 && entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(this.getEntityFireDamageRadius())) {
                 entity.setFire(10);
-                if (entity instanceof LivingEntity) entity.attackEntityFrom(ModDamageSource.SUN_BLAZE, blazeAmount);
+                if (entity instanceof LivingEntity){
+                    if (entity instanceof EnderDragonEntity) {
+                        NewSunEntity.tryAttackDragonFrom(((EnderDragonEntity) entity), ModDamageSource.SUN_BLAZE, blazeAmount);
+                    } else {
+                        entity.attackEntityFrom(ModDamageSource.SUN_BLAZE, blazeAmount);
+                    }
+                }
             }
 
             if (this.getSunState() == SunState.NEW_BORN
@@ -411,6 +429,27 @@ public class NewSunEntity extends Entity {
     @Override
     public IPacket<?> createSpawnPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
+    }
+
+    private static void tryAttackDragonFrom(EnderDragonEntity dragon, DamageSource damageSource, float amount) {
+        try {
+            if (attackDragonFromMethodCache == null) {
+                // attackDragonFrom
+                Method temp = ObfuscationReflectionHelper.findMethod(EnderDragonEntity.class, "func_82195_e", DamageSource.class, float.class);
+                temp.setAccessible(true);
+                attackDragonFromMethodCache = temp;
+            }
+            attackDragonFromMethodCache.invoke(dragon, damageSource, amount);
+        } catch (ObfuscationReflectionHelper.UnableToFindMethodException e) {
+            LOGGER.error("Could not find the obfuscated method 'func_82195_e'(attackDragonFrom) in class 'EnderDragonEntity'", e);
+        } catch (SecurityException e) {
+            LOGGER.error("Could not make the obfuscated field 'func_82195_e'(attackDragonFrom) in class 'EnderDragonEntity' accessible", e);
+        } catch (IllegalAccessException e) {
+            LOGGER.error("Could not invoke the obfuscated field 'func_82195_e'(attackDragonFrom) in class 'EnderDragonEntity'", e);
+        } catch (InvocationTargetException e) {
+            LOGGER.error("An exception is thrown from the obfuscated field 'func_82195_e'(attackDragonFrom) in class 'EnderDragonEntity'", e);
+
+        }
     }
 
     /* ------------------------------ Getters & Setters ------------------------------ */
