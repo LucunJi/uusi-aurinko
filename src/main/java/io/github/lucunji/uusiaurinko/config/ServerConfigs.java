@@ -216,11 +216,10 @@ public class ServerConfigs extends LoadListeningConfigManagerAbstract {
 
 
         NEW_SUN_RISE_UP = defineBoolean(builder,
-                "Decides if the new sun flies to a specific position in the world after consuming a specific amount of entities.\n" +
+                "Sets the created new suns' RiseUp NBT data, which decides if the new sun flies to a specific position in the world after consuming enough creatures..\n" +
                         "It is y=200 at the spawn point in the overworld, y=100 with x and z equal to 1/8 of the overworld's spawn point in the nether,\n" +
                         "and y=200, x=z=0 in the end.\n" +
-                        "Changing this config does not affect those already created new suns.\n" +
-                        "This config can be overridden in game by setting the RiseUp NBT data of the new sun entity.",
+                        "Changing this config does not affect the NBT data of existing new suns.",
                 "new_sun_rise_up", true);
         NEW_SUN_DESTROY_RATE = defineInteger(builder,
                 "The maximum amount of blocks destroyed by the new sun per tick.\n" +
