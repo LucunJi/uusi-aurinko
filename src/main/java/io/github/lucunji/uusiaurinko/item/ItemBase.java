@@ -22,7 +22,6 @@ public class ItemBase extends Item {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
         if (ClientUtil.isShiftDown()) {
             addTranslationAsLines(tooltip, this.getTranslationKey() + ".tooltip");
             addTranslationAsLines(tooltip, "tooltip.uusi-aurinko.shift_less");
@@ -34,7 +33,7 @@ public class ItemBase extends Item {
     /**
      * fix rendering error of newline symbols (\n) in some languages(such as Chinese) by split lines explicitly
      */
-    private static void addTranslationAsLines(List<ITextComponent> tooltip, String translationKey) {
+    protected static void addTranslationAsLines(List<ITextComponent> tooltip, String translationKey) {
         String[] lines = new TranslationTextComponent(translationKey).getString().split("\n");
         for (String line : lines)
             tooltip.add(new StringTextComponent(line));

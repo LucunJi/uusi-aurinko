@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.events;
 
+import io.github.lucunji.uusiaurinko.item.ItemEmeraldTablet;
 import io.github.lucunji.uusiaurinko.item.ModItems;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.entity.merchant.villager.VillagerProfession;
@@ -24,10 +25,13 @@ public class VillagerTradesEventListener {
     public static void onCollectingVillagerTrades(VillagerTradesEvent villagerTradesEvent) {
         if (villagerTradesEvent.getType() == VillagerProfession.CLERIC) {
             Int2ObjectMap<List<VillagerTrades.ITrade>> trades = villagerTradesEvent.getTrades();
+            ItemEmeraldTablet tabletItem = ModItems.EMERALD_TABLET.get();
+            ItemStack tablet = new ItemStack(tabletItem, 1);
+            tabletItem.setTabletType(tablet, -1);
             trades.get(5).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(Items.EMERALD, 32),
                     new ItemStack(Items.EMERALD_BLOCK, 6),
-                    new ItemStack(ModItems.EMERALD_TABLET.get(), 1),
+                    tablet,
                     3,
                     50,
                     0.02F

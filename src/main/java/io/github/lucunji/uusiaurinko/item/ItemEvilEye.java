@@ -28,7 +28,6 @@ public class ItemEvilEye extends ArmorItem {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
         if (ClientUtil.isShiftDown()) {
             addTranslationAsLines(tooltip, this.getTranslationKey() + ".tooltip");
             addTranslationAsLines(tooltip, "tooltip.uusi-aurinko.shift_less");

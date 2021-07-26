@@ -1,6 +1,7 @@
 package io.github.lucunji.uusiaurinko.entity;
 
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
+import io.github.lucunji.uusiaurinko.item.ItemEmeraldTablet;
 import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
 import net.minecraft.block.BlockState;
@@ -10,10 +11,12 @@ import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.entity.projectile.ThrowableEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -30,6 +33,7 @@ public class ThrownTabletEntity extends ThrowableEntity {
     private boolean leftOwner;
     private int age;
     private boolean disappear;
+    private int tabletType;
 
     public ThrownTabletEntity(EntityType<? extends ThrownTabletEntity> entityEntityType, World world) {
         super(entityEntityType, world);
@@ -227,7 +231,7 @@ public class ThrownTabletEntity extends ThrowableEntity {
         if (baseDmg > 0 && result.getEntity().attackEntityFrom(
                 DamageSource.causeThrownDamage(this, this.getShooter()),
                 (float) (this.getMotion().lengthSquared() * baseDmg))) {
-            this.playSound(ModSoundEvents.ENTITY_EMERALD_TABLET_HIT.get(), 0.7F, 1F / (this.rand.nextFloat() * 0.2F + 0.9F));
+            this.playSound(ModSoundEvents.ENTITY_EMERALD_TABLET_HIT.get(), 1F, 1F / (this.rand.nextFloat() * 0.2F + 0.9F));
         }
         this.setMotion(this.getMotion().scale(0.6));
     }
@@ -240,12 +244,20 @@ public class ThrownTabletEntity extends ThrowableEntity {
         super.func_230299_a_(result);
 
         // prevent the entity from straightly going into the ground
-        Vector3d hitVec = result.getHitVec().subtract(this.getPosX(), this.getPosY(), this.getPosZ());
-        this.setMotion(hitVec);
-        Vector3d hitVecScaled = hitVec.normalize().scale(0.05F);
-        this.setRawPosition(this.getPosX() - hitVecScaled.x, this.getPosY() - hitVecScaled.y, this.getPosZ() - hitVecScaled.z);
+        if (result.getFace() == Direction.UP) {
+            Vector3d hitVec = result.getHitVec().subtract(this.getPosX(), this.getPosY(), this.getPosZ());
+            this.setMotion(hitVec);
+            Vector3d hitVecScaled = hitVec.normalize().scale(0.05F);
+            this.setRawPosition(this.getPosX() - hitVecScaled.x, this.getPosY() - hitVecScaled.y, this.getPosZ() - hitVecScaled.z);
+            this.inGround = true;
+        } else {
+            Vector3d hitVec = result.getHitVec().subtract(this.getPosX(), this.getPosY(), this.getPosZ());
+            Vector3d faceNormalVec = Vector3d.copy(result.getFace().getDirectionVec());
+            Vector3d reflectVec = hitVec.subtract(faceNormalVec.scale(hitVec.dotProduct(faceNormalVec) * 2)).scale(0.5);
+            this.setMotion(reflectVec);
+            this.setRawPosition(this.getPosX() + reflectVec.x, this.getPosY() + reflectVec.y, this.getPosZ() + reflectVec.z);
+        }
         this.playSound(ModSoundEvents.ENTITY_EMERALD_TABLET_LAND.get(), 0.5F, 1F / (this.rand.nextFloat() * 0.2F + 0.9F));
-        this.inGround = true;
     }
 
     /**
@@ -280,6 +292,7 @@ public class ThrownTabletEntity extends ThrowableEntity {
         }
         compound.putInt("Age", this.age);
         compound.putBoolean("Disappear", this.disappear);
+        compound.putInt("TabletType", this.tabletType);
     }
 
     @Override
@@ -289,6 +302,7 @@ public class ThrownTabletEntity extends ThrowableEntity {
         this.leftOwner = compound.getBoolean("LeftOwner");
         this.age = compound.getInt("Age");
         this.disappear = compound.getBoolean("Disappear");
+        this.tabletType = compound.getInt("TabletType");
     }
 
     @Override
@@ -316,20 +330,33 @@ public class ThrownTabletEntity extends ThrowableEntity {
 
     @Override
     public ActionResultType applyPlayerInteraction(PlayerEntity player, Vector3d vec, Hand hand) {
-        if (player.getDistanceSq(this) < 3) {
-            if (!player.world.isRemote
-                    // if disappear == true, the player won't get a tablet in its inventory.
-                    && (this.disappear || player.addItemStackToInventory(ModItems.EMERALD_TABLET.get().getDefaultInstance()))) {
-                this.remove();
+        if (this.inGround) {
+            if (player.getDistanceSq(this) < 3) {
+                if (!player.world.isRemote
+                        // if disappear == true, the player won't get a tablet in its inventory.
+                        && (this.disappear || player.addItemStackToInventory(this.getItem()))) {
+                    this.remove();
+                }
+                return ActionResultType.SUCCESS;
             }
-            return ActionResultType.SUCCESS;
+            player.sendStatusMessage(new TranslationTextComponent(
+                    this.getType().getTranslationKey() + ".too_far_away"), true);
+            return ActionResultType.FAIL;
         }
-        player.sendStatusMessage(new TranslationTextComponent(
-                this.getType().getTranslationKey() + ".too_far_away"), true);
-        return ActionResultType.FAIL;
+        return ActionResultType.PASS;
     }
 
     public void setDisappear(boolean disappear) {
         this.disappear = disappear;
+    }
+
+    public void setTabletType(int tabletType) {
+        this.tabletType = tabletType;
+    }
+
+    public ItemStack getItem() {
+        ItemStack itemStack = ModItems.EMERALD_TABLET.get().getDefaultInstance();
+        ModItems.EMERALD_TABLET.get().setTabletType(itemStack, this.tabletType);
+        return itemStack;
     }
 }
