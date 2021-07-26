@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "side": "uusi-aurinko:block/shattered_temple_bricks",
+    "bottom": "uusi-aurinko:block/shattered_temple_bricks",
+    "top": "uusi-aurinko:block/shattered_temple_bricks"
+  }
+}

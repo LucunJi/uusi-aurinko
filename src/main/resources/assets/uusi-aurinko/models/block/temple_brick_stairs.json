@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "uusi-aurinko:block/temple_bricks",
-    "top": "uusi-aurinko:block/temple_bricks",
-    "side": "uusi-aurinko:block/temple_bricks"
-  }
-}

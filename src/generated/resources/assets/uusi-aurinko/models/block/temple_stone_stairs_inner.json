@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "side": "uusi-aurinko:block/temple_stone",
+    "bottom": "uusi-aurinko:block/temple_stone",
+    "top": "uusi-aurinko:block/temple_stone"
+  }
+}

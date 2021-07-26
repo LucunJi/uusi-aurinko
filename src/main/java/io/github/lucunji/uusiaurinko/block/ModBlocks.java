@@ -65,7 +65,7 @@ public class ModBlocks {
             () -> new Block(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
     @Itemize
     @Localize(locales = "zh_cn", translations = "磨制神殿石台阶")
-    public static final RegistryObject<Block> POLISHED_TEMPLE_STONE_SLAB = BLOCKS.register("polished_temple_stone_slab",
+    public static final RegistryObject<SlabBlock> POLISHED_TEMPLE_STONE_SLAB = BLOCKS.register("polished_temple_stone_slab",
             () -> new SlabBlock(AbstractBlock.Properties.from(POLISHED_TEMPLE_STONE.get())));
     @Itemize
     @Localize(locales = "zh_cn", translations = "磨制神殿石楼梯")

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "uusi-aurinko:block/temple_stone",
-    "top": "uusi-aurinko:block/temple_stone",
-    "side": "uusi-aurinko:block/temple_stone"
-  }
-}

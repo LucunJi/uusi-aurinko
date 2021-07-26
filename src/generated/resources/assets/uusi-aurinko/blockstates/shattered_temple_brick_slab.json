@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=top": {
+      "model": "uusi-aurinko:block/shattered_temple_brick_slab_top"
+    },
+    "type=bottom": {
+      "model": "uusi-aurinko:block/shattered_temple_brick_slab"
+    },
+    "type=double": {
+      "model": "uusi-aurinko:block/shattered_temple_bricks"
+    }
+  }
+}
