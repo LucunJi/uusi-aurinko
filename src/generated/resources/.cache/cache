@@ -18,8 +18,8 @@ c5882c019dc5ae3212487d8b7fcaa7c3dfc88c17 assets/uusi-aurinko/blockstates/temple_
 77e76f14e090020bb8889d25e697e69683abed9c assets/uusi-aurinko/blockstates/temple_stone_slab.json
 0ae504dd54fd353c10f04890f3c195768090ba1c assets/uusi-aurinko/blockstates/temple_stone_stairs.json
 b266aeceab3844460780923af9832cde05ed02bf assets/uusi-aurinko/blockstates/temple_stone_wall.json
-f75f2a244f2906be58e2bf458964534879b3f19f assets/uusi-aurinko/lang/en_us.json
-c363766e4764aca560eb0a88201eadc56bbb1f11 assets/uusi-aurinko/lang/zh_cn.json
+116386ad140aa9d8b762672c3d7c36b7cb9ffb07 assets/uusi-aurinko/lang/en_us.json
+c2dd2a2590c2029aad733938d8f6de7718bbfe36 assets/uusi-aurinko/lang/zh_cn.json
 15972897ffca9127b6048a80440d9c29a3a568b8 assets/uusi-aurinko/models/block/polished_temple_stone.json
 7dd2d82e801a0ddd8084f80f9cda480d33362224 assets/uusi-aurinko/models/block/polished_temple_stone_slab.json
 cb33f7dfe637eac949af6262c34f975270a979f7 assets/uusi-aurinko/models/block/polished_temple_stone_slab_top.json
@@ -93,3 +93,4 @@ ce22305564cbd7ca12622a520e1b7785f2e1a851 assets/uusi-aurinko/models/item/temple_
 7187d2743f1d650daf5912425bf466867e125da3 assets/uusi-aurinko/models/item/temple_stone_slab.json
 2f1c67769ed4586429996f62d53f6784ba8a3be2 assets/uusi-aurinko/models/item/temple_stone_stairs.json
 68de1d7adfab8ce1e4d50e0861fdab58e0efa026 assets/uusi-aurinko/models/item/temple_stone_wall.json
+b9b4c2836b9fdb16745305d519ee0b78647b0fef assets/uusi-aurinko/models/item/transmuting_temple_bricks.json

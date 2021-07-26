@@ -53,6 +53,7 @@
   "block.uusi-aurinko.temple_stone_stairs": "神殿石楼梯",
   "block.uusi-aurinko.temple_stone_wall": "神殿石墙",
   "block.uusi-aurinko.transmuting_block": "转化方块",
+  "block.uusi-aurinko.transmuting_temple_bricks": "转化神殿砖",
   "config.uusi-aurinko.change_fluid_rendering": "流体方块的渲染效果改变了。按下 F3+T 使其生效。",
   "container.uusi-aurinko.item_pedestal": "物品底座",
   "death.attack.uusi-aurinko.electricity": "%1$s感受到了贯穿身体的高压电流",

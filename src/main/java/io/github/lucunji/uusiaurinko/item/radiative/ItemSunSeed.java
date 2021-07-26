@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.item.radiative;
 
+import io.github.lucunji.uusiaurinko.block.ModBlocks;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
 import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.util.ModSoundEvents;
@@ -10,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -49,26 +51,40 @@ public class ItemSunSeed extends ItemRadiative {
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         super.onEntityItemUpdate(stack, entity);
         World world = entity.world;
-        long dayTime = world.getDayTime();
-        BlockPos pos = entity.getPosition();
         double x = entity.getPosX();
         double y = entity.getPosY();
         double z = entity.getPosZ();
-        if (!world.isRemote && dayTime >= 5300 && dayTime <= 6700 && world.getLightFor(LightType.SKY, pos) == 15) {
-            StructureStart<?> start = ((ServerWorld) world).getStructureManager()
-                    .getStructureStart(pos, false, Structure.DESERT_PYRAMID);
+        if (!entity.world.isRemote && this.shouldTransmute(stack, entity)) {
+            ItemStack newStack = new ItemStack(ModItems.SUN_STONE.get());
+            entity.setItem(newStack);
+            // FIXME: make the particle prettier
+            ((ServerWorld) world).spawnParticle(new ItemParticleData(ParticleTypes.ITEM, newStack),
+                    x, y, z, 25, 1, 1, 1, 0);
+            world.playSound(null, x, y, z, ModSoundEvents.ITEM_SUN_STONE_AMBIENT.get(),
+                    SoundCategory.BLOCKS, 1F, 1.25F);
+        }
+        return false;
+    }
+
+    private boolean shouldTransmute(ItemStack stack, ItemEntity entity) {
+        World world = entity.world;
+        long dayTime = world.getDayTime();
+        BlockPos pos = entity.getPosition();
+        if (dayTime >= 5300 && dayTime <= 6700 && world.getLightFor(LightType.SKY, pos) == 15) {
+            StructureStart<?> start = ((ServerWorld) world).getStructureManager().getStructureStart(pos, false, Structure.DESERT_PYRAMID);
             if (start != StructureStart.DUMMY) {
                 MutableBoundingBox boundingBox = start.getBoundingBox();
                 if (pos.getX() == boundingBox.minX + 10 && pos.getZ() == boundingBox.minZ + 10) {
-                    ItemStack newStack = new ItemStack(ModItems.SUN_STONE.get());
-                    entity.setItem(newStack);
-                    // FIXME: make the particle prettier
-                    ((ServerWorld) world).spawnParticle(new ItemParticleData(ParticleTypes.ITEM, newStack),
-                            x, y, z, 25, 1, 1, 1, 0);
-                    world.playSound(null, x, y, z, ModSoundEvents.ITEM_SUN_STONE_AMBIENT.get(),
-                            SoundCategory.BLOCKS, 1F, 1.25F);
+                    return true;
                 }
             }
+        }
+        BlockPos.Mutable mutable = pos.toMutable();
+        for (int i = 0; i < 5; i++) {
+            if (world.getBlockState(mutable).getBlock() == ModBlocks.TRANSMUTING_TEMPLE_BRICKS.get()) {
+                return true;
+            }
+            mutable.move(Direction.DOWN);
         }
         return false;
     }

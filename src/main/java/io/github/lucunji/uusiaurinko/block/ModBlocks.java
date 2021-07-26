@@ -132,6 +132,11 @@ public class ModBlocks {
     public static final RegistryObject<Block> RUNE_TEMPLE_BRICKS = BLOCKS.register("rune_temple_bricks",
             () -> new Block(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
 
+    @Itemize(parentModel = MODID + ":block/rune_temple_bricks_1")
+    @Localize(locales = "zh_cn", translations = "转化神殿砖")
+    public static final RegistryObject<Block> TRANSMUTING_TEMPLE_BRICKS = BLOCKS.register("transmuting_temple_bricks",
+            () -> new Block(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
+
     @Itemize(parentModel = MODID + ":block/chiseled_temple_bricks_1")
     @Localize(locales = "zh_cn", translations = "錾制神殿砖")
     public static final RegistryObject<Block> CHISELED_TEMPLE_BRICKS = BLOCKS.register("chiseled_temple_bricks",

@@ -53,6 +53,7 @@
   "block.uusi-aurinko.temple_stone_stairs": "Temple Stone Stairs",
   "block.uusi-aurinko.temple_stone_wall": "Temple Stone Wall",
   "block.uusi-aurinko.transmuting_block": "Transmuting Block",
+  "block.uusi-aurinko.transmuting_temple_bricks": "Transmuting Temple Bricks",
   "config.uusi-aurinko.change_fluid_rendering": "The rendering effect of fluid blocks is changed. Press F3+T to take effect.",
   "container.uusi-aurinko.item_pedestal": "Item Pedestal",
   "death.attack.uusi-aurinko.electricity": "%1$s experienced high voltage passing through the body",
