@@ -6,6 +6,7 @@ import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.item.radiative.ItemRadiative;
 import io.github.lucunji.uusiaurinko.network.ModDataSerializers;
 import io.github.lucunji.uusiaurinko.util.ModDamageSource;
+import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
@@ -14,18 +15,24 @@ import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.RegistryObject;
@@ -276,7 +283,7 @@ public class NewSunEntity extends Entity {
         for (BlockPos pos : this.getAffectedBlocks(radius, amount)) {
             if (pos.distanceSq(this.getPositionCenter(), true) > this.getVaporizeBlockRadius()
                     && Math.random() < 0.3) {
-                world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+                world.setBlockState(pos, AbstractFireBlock.getFireForPlacement(this.world, pos));
             } else {
                 world.setBlockState(pos, Blocks.AIR.getDefaultState());
             }
@@ -323,17 +330,17 @@ public class NewSunEntity extends Entity {
 
             Vector3d vec = Vector3d.copy(p).add(0.5, 0.5, 0.5);
             vec = vec.subtract(this.getPositionCenter()).normalize().scale(radius).add(this.getPositionCenter());
-            p = this.world.rayTraceBlocks(new RayTraceContext(
+            p = this.rayTraceBlocks(new RayTraceContext(
                     this.getPositionCenter(),
                     vec,
-                    RayTraceContext.BlockMode.COLLIDER,
+                    RayTraceContext.BlockMode.OUTLINE,
                     RayTraceContext.FluidMode.SOURCE_ONLY, // ignore non-source fluid blocks
                     null)
             ).getPos();
 
             if (this.world.isAirBlock(p)) continue;
             BlockState blockState = world.getBlockState(p);
-            if (blockState.matchesBlock(Blocks.FIRE)
+            if (blockState.isIn(BlockTags.FIRE)
                     || (!blockState.getFluidState().isEmpty() && !blockState.getFluidState().isSource())
                     || ServerConfigs.INSTANCE.NEW_SUN_DESTROY_BLACKLIST.contains(world.getBlockState(p))) continue;
             results.add(p);
@@ -632,5 +639,28 @@ public class NewSunEntity extends Entity {
             this.item = item;
             this.texture = texture;
         }
+    }
+
+    /**
+     * Customized block raytrace function.
+     */
+    private BlockRayTraceResult rayTraceBlocks(RayTraceContext context) {
+        return IBlockReader.doRayTrace(context, (traceContext, blockPos) -> {
+            BlockState blockstate = this.world.getBlockState(blockPos);
+            FluidState fluidstate = this.world.getFluidState(blockPos);
+            Vector3d vector3d = traceContext.getStartVec();
+            Vector3d vector3d1 = traceContext.getEndVec();
+            // ignores fire block
+            VoxelShape voxelShape = blockstate.getBlock().isIn(BlockTags.FIRE) ? VoxelShapes.empty() : traceContext.getBlockShape(blockstate, this.world, blockPos);
+            BlockRayTraceResult blockRayTraceResult = this.world.rayTraceBlocks(vector3d, vector3d1, blockPos, voxelShape, blockstate);
+            VoxelShape voxelShape1 = traceContext.getFluidShape(fluidstate, this.world, blockPos);
+            BlockRayTraceResult blockRayTraceResult1 = voxelShape1.rayTrace(vector3d, vector3d1, blockPos);
+            double d0 = blockRayTraceResult == null ? Double.MAX_VALUE : traceContext.getStartVec().squareDistanceTo(blockRayTraceResult.getHitVec());
+            double d1 = blockRayTraceResult1 == null ? Double.MAX_VALUE : traceContext.getStartVec().squareDistanceTo(blockRayTraceResult1.getHitVec());
+            return d0 <= d1 ? blockRayTraceResult : blockRayTraceResult1;
+        }, (traceContext) -> {
+            Vector3d vector3d = traceContext.getStartVec().subtract(traceContext.getEndVec());
+            return BlockRayTraceResult.createMiss(traceContext.getEndVec(), Direction.getFacingFromVector(vector3d.x, vector3d.y, vector3d.z), new BlockPos(traceContext.getEndVec()));
+        });
     }
 }
