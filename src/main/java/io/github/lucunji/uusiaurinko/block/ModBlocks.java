@@ -54,19 +54,27 @@ public class ModBlocks {
     @Localize(locales = "zh_cn", translations = "神殿石楼梯")
     public static final RegistryObject<StairsBlock> TEMPLE_STONE_STAIRS = BLOCKS.register("temple_stone_stairs",
             () -> makeStair(TEMPLE_STONE.get()));
+    @Itemize(parentModel = MODID + ":block/temple_stone_wall_inventory")
+    @Localize(locales = "zh_cn", translations = "神殿石墙")
+        public static final RegistryObject<WallBlock> TEMPLE_STONE_WALL = BLOCKS.register("temple_stone_wall",
+            () -> new WallBlock(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
 
     @Itemize
-    @Localize(locales = "zh_cn", translations = "磨制神殿石砖")
+    @Localize(locales = "zh_cn", translations = "磨制神殿石")
     public static final RegistryObject<Block> POLISHED_TEMPLE_STONE = BLOCKS.register("polished_temple_stone",
             () -> new Block(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
     @Itemize
-    @Localize(locales = "zh_cn", translations = "磨制神殿石砖台阶")
+    @Localize(locales = "zh_cn", translations = "磨制神殿石台阶")
     public static final RegistryObject<Block> POLISHED_TEMPLE_STONE_SLAB = BLOCKS.register("polished_temple_stone_slab",
             () -> new SlabBlock(AbstractBlock.Properties.from(POLISHED_TEMPLE_STONE.get())));
     @Itemize
-    @Localize(locales = "zh_cn", translations = "磨制神殿石砖楼梯")
+    @Localize(locales = "zh_cn", translations = "磨制神殿石楼梯")
     public static final RegistryObject<StairsBlock> POLISHED_TEMPLE_STONE_STAIRS = BLOCKS.register("polished_temple_stone_stairs",
             () -> makeStair(POLISHED_TEMPLE_STONE.get()));
+    @Itemize(parentModel = MODID + ":block/polished_temple_stone_wall_inventory")
+    @Localize(locales = "zh_cn", translations = "磨制神殿石墙")
+        public static final RegistryObject<WallBlock> POLISHED_TEMPLE_STONE_WALL = BLOCKS.register("polished_temple_stone_wall",
+            () -> new WallBlock(AbstractBlock.Properties.from(POLISHED_TEMPLE_STONE.get())));
 
     @Itemize
     @Localize(locales = "zh_cn", translations = "神殿石砖")
@@ -80,6 +88,10 @@ public class ModBlocks {
     @Localize(locales = "zh_cn", translations = "神殿石砖楼梯")
     public static final RegistryObject<StairsBlock> TEMPLE_STONE_BRICK_STAIRS = BLOCKS.register("temple_stone_brick_stairs",
             () -> makeStair(TEMPLE_STONE_BRICKS.get()));
+    @Itemize(parentModel = MODID + ":block/temple_stone_brick_wall_inventory")
+    @Localize(locales = "zh_cn", translations = "神殿石砖墙")
+        public static final RegistryObject<WallBlock> TEMPLE_STONE_BRICK_WALL = BLOCKS.register("temple_stone_brick_wall",
+            () -> new WallBlock(AbstractBlock.Properties.from(TEMPLE_STONE_BRICKS.get())));
 
     @Itemize
     @Localize(locales = "zh_cn", translations = "神殿砖")
@@ -93,6 +105,10 @@ public class ModBlocks {
     @Localize(locales = "zh_cn", translations = "神殿砖楼梯")
     public static final RegistryObject<StairsBlock> TEMPLE_BRICK_STAIRS = BLOCKS.register("temple_brick_stairs",
             () -> makeStair(TEMPLE_BRICKS.get()));
+    @Itemize(parentModel = MODID + ":block/temple_brick_wall_inventory")
+    @Localize(locales = "zh_cn", translations = "神殿砖墙")
+        public static final RegistryObject<WallBlock> TEMPLE_BRICK_WALL = BLOCKS.register("temple_brick_wall",
+            () -> new WallBlock(AbstractBlock.Properties.from(TEMPLE_BRICKS.get())));
 
     @Itemize
     @Localize(locales = "zh_cn", translations = "碎裂神殿石")
@@ -106,6 +122,10 @@ public class ModBlocks {
     @Localize(locales = "zh_cn", translations = "碎裂神殿石楼梯")
     public static final RegistryObject<StairsBlock> SHATTERED_TEMPLE_BRICK_STAIRS = BLOCKS.register("shattered_temple_brick_stairs",
             () -> makeStair(SHATTERED_TEMPLE_BRICKS.get()));
+    @Itemize(parentModel = MODID + ":block/shattered_temple_brick_wall_inventory")
+    @Localize(locales = "zh_cn", translations = "碎裂神殿石砖墙")
+        public static final RegistryObject<WallBlock> SHATTERED_TEMPLE_BRICK_WALL = BLOCKS.register("shattered_temple_brick_wall",
+            () -> new WallBlock(AbstractBlock.Properties.from(SHATTERED_TEMPLE_BRICKS.get())));
 
     @Itemize(parentModel = MODID + ":block/rune_temple_bricks_1")
     @Localize(locales = "zh_cn", translations = "符文神殿砖")

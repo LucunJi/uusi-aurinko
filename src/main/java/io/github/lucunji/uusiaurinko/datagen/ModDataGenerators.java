@@ -2,9 +2,7 @@ package io.github.lucunji.uusiaurinko.datagen;
 
 import com.google.common.collect.Lists;
 import io.github.lucunji.uusiaurinko.block.ModBlocks;
-import io.github.lucunji.uusiaurinko.datagen.client.Localize;
-import io.github.lucunji.uusiaurinko.datagen.client.ModItemModelProvider;
-import io.github.lucunji.uusiaurinko.datagen.client.ModLanguageProvider;
+import io.github.lucunji.uusiaurinko.datagen.client.*;
 import io.github.lucunji.uusiaurinko.effects.ModEffects;
 import io.github.lucunji.uusiaurinko.entity.ModEntityTypes;
 import io.github.lucunji.uusiaurinko.item.ModItems;
@@ -30,6 +28,9 @@ public class ModDataGenerators {
         ExistingFileHelper existingFileHelper = gatherDataEvent.getExistingFileHelper();
 
         if (gatherDataEvent.includeClient()) {
+            // the adding order matters!
+            dataGenerator.addProvider(new ModBlockModelProvider(dataGenerator, MODID, existingFileHelper));
+            dataGenerator.addProvider(new ModBlockStateProvider(dataGenerator, MODID, existingFileHelper));
             dataGenerator.addProvider(new ModItemModelProvider(dataGenerator, MODID, existingFileHelper));
             makeLanguageProviders(dataGenerator, existingFileHelper, MODID,
                     ModBlocks.class, ModItems.class, ModEntityTypes.class, ModEffects.class, ModSoundEvents.class

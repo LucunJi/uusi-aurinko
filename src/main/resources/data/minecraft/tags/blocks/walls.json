@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "uusi-aurinko:temple_stone_wall",
+    "uusi-aurinko:polished_temple_stone_wall",
+    "uusi-aurinko:temple_stone_brick_wall",
+    "uusi-aurinko:temple_brick_wall",
+    "uusi-aurinko:shattered_temple_brick_wall"
+  ]
+}
