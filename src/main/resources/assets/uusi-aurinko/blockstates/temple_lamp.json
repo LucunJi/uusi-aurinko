@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "uusi-aurinko:block/temple_lamp_1"
+      },
+      {
+        "model": "uusi-aurinko:block/temple_lamp_2"
+      },
+      {
+        "model": "uusi-aurinko:block/temple_lamp_3"
+      },
+      {
+        "model": "uusi-aurinko:block/temple_lamp_4"
+      }
+    ]
+  }
+}

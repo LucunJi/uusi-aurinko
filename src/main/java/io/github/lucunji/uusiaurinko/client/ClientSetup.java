@@ -1,5 +1,6 @@
 package io.github.lucunji.uusiaurinko.client;
 
+import io.github.lucunji.uusiaurinko.block.ModBlocks;
 import io.github.lucunji.uusiaurinko.config.ClientConfigs;
 import io.github.lucunji.uusiaurinko.entity.ModEntityTypes;
 import io.github.lucunji.uusiaurinko.fluid.ModFluids;
@@ -29,5 +30,7 @@ public class ClientSetup {
             ModFluids.FLUIDS.getEntries().forEach(registryObject ->
                     RenderTypeLookup.setRenderLayer(registryObject.get(), RenderType.getTranslucent()));
         }
+
+        RenderTypeLookup.setRenderLayer(ModBlocks.ITEM_PEDESTAL_COVER.get(), RenderType.getCutout());
     }
 }

@@ -1,0 +1,33 @@
+{
+	"credit": "Made by XeKr with Blockbench",
+	"parent": "minecraft:block/block",
+	"textures": {
+		"end": "uusi-aurinko:block/temple_stone",
+		"particle": "uusi-aurinko:block/item_pedestal_cover",
+		"cover": "uusi-aurinko:block/item_pedestal_cover"
+	},
+	"elements": [
+		{
+			"from": [2, 0, 2],
+			"to": [14, 16, 14],
+			"faces": {
+				"north": {"uv": [2, 0, 14, 16], "texture": "#cover"},
+				"east": {"uv": [2, 0, 14, 16], "texture": "#cover"},
+				"south": {"uv": [2, 0, 14, 16], "texture": "#cover"},
+				"west": {"uv": [2, 0, 14, 16], "texture": "#cover"},
+				"up": {"uv": [2, 2, 14, 14], "texture": "#end"}
+			}
+		},
+		{
+			"from": [14, 14, 14],
+			"to": [2, 0, 2],
+			"faces": {
+				"north": {"uv": [14, 16, 2, 2], "texture": "#cover"},
+				"east": {"uv": [14, 16, 2, 2], "texture": "#cover"},
+				"south": {"uv": [14, 16, 2, 2], "texture": "#cover"},
+				"west": {"uv": [14, 16, 2, 2], "texture": "#cover"},
+				"down": {"uv": [2, 2, 14, 14], "texture": "#end"}
+			}
+		}
+	]
+}

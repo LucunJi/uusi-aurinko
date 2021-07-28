@@ -56,7 +56,7 @@ public class ModBlocks {
             () -> makeStair(TEMPLE_STONE.get()));
     @Itemize(parentModel = MODID + ":block/temple_stone_wall_inventory")
     @Localize(locales = "zh_cn", translations = "神殿石墙")
-        public static final RegistryObject<WallBlock> TEMPLE_STONE_WALL = BLOCKS.register("temple_stone_wall",
+    public static final RegistryObject<WallBlock> TEMPLE_STONE_WALL = BLOCKS.register("temple_stone_wall",
             () -> new WallBlock(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
 
     @Itemize
@@ -73,7 +73,8 @@ public class ModBlocks {
             () -> makeStair(POLISHED_TEMPLE_STONE.get()));
     @Itemize(parentModel = MODID + ":block/polished_temple_stone_wall_inventory")
     @Localize(locales = "zh_cn", translations = "磨制神殿石墙")
-        public static final RegistryObject<WallBlock> POLISHED_TEMPLE_STONE_WALL = BLOCKS.register("polished_temple_stone_wall",
+    public static final RegistryObject<WallBlock> POLISHED_TEMPLE_STONE_WALL = BLOCKS.register("polished_temple_stone_wall",
+
             () -> new WallBlock(AbstractBlock.Properties.from(POLISHED_TEMPLE_STONE.get())));
 
     @Itemize
@@ -90,7 +91,7 @@ public class ModBlocks {
             () -> makeStair(TEMPLE_STONE_BRICKS.get()));
     @Itemize(parentModel = MODID + ":block/temple_stone_brick_wall_inventory")
     @Localize(locales = "zh_cn", translations = "神殿石砖墙")
-        public static final RegistryObject<WallBlock> TEMPLE_STONE_BRICK_WALL = BLOCKS.register("temple_stone_brick_wall",
+    public static final RegistryObject<WallBlock> TEMPLE_STONE_BRICK_WALL = BLOCKS.register("temple_stone_brick_wall",
             () -> new WallBlock(AbstractBlock.Properties.from(TEMPLE_STONE_BRICKS.get())));
 
     @Itemize
@@ -107,7 +108,7 @@ public class ModBlocks {
             () -> makeStair(TEMPLE_BRICKS.get()));
     @Itemize(parentModel = MODID + ":block/temple_brick_wall_inventory")
     @Localize(locales = "zh_cn", translations = "神殿砖墙")
-        public static final RegistryObject<WallBlock> TEMPLE_BRICK_WALL = BLOCKS.register("temple_brick_wall",
+    public static final RegistryObject<WallBlock> TEMPLE_BRICK_WALL = BLOCKS.register("temple_brick_wall",
             () -> new WallBlock(AbstractBlock.Properties.from(TEMPLE_BRICKS.get())));
 
     @Itemize
@@ -124,13 +125,25 @@ public class ModBlocks {
             () -> makeStair(SHATTERED_TEMPLE_BRICKS.get()));
     @Itemize(parentModel = MODID + ":block/shattered_temple_brick_wall_inventory")
     @Localize(locales = "zh_cn", translations = "碎裂神殿石砖墙")
-        public static final RegistryObject<WallBlock> SHATTERED_TEMPLE_BRICK_WALL = BLOCKS.register("shattered_temple_brick_wall",
+    public static final RegistryObject<WallBlock> SHATTERED_TEMPLE_BRICK_WALL = BLOCKS.register("shattered_temple_brick_wall",
             () -> new WallBlock(AbstractBlock.Properties.from(SHATTERED_TEMPLE_BRICKS.get())));
 
     @Itemize(parentModel = MODID + ":block/rune_temple_bricks_1")
     @Localize(locales = "zh_cn", translations = "符文神殿砖")
     public static final RegistryObject<Block> RUNE_TEMPLE_BRICKS = BLOCKS.register("rune_temple_bricks",
-            () -> new Block(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
+            () -> new Block(AbstractBlock.Properties
+                    .from(TEMPLE_STONE.get())
+                    .setLightLevel(state -> 7)
+                    .setEmmisiveRendering((a, b, c) -> true) // prevent weird rendering when the block has a light level less than 15
+            ));
+
+    @Itemize(parentModel = MODID + ":block/temple_lamp_1")
+    @Localize(locales = "zh_cn", translations = "神殿灯")
+    public static final RegistryObject<Block> TEMPLE_LAMP = BLOCKS.register("temple_lamp",
+            () -> new Block(AbstractBlock.Properties
+                    .from(TEMPLE_STONE.get())
+                    .setLightLevel(state -> 15)
+            ));
 
     @Itemize(parentModel = MODID + ":block/rune_temple_bricks_1")
     @Localize(locales = "zh_cn", translations = "转化神殿砖")
@@ -146,6 +159,16 @@ public class ModBlocks {
     @Localize(locales = "zh_cn", translations = "物品底座")
     public static final RegistryObject<PedestalBlock> ITEM_PEDESTAL = BLOCKS.register("item_pedestal",
             () -> new PedestalBlock(AbstractBlock.Properties.from(TEMPLE_STONE.get())));
+
+    @Itemize(maxStackSize = 16, parentModel = MODID + ":block/item_pedestal_cover")
+    @Localize(locales = "zh_cn", translations = "物品底座罩子")
+    public static final RegistryObject<PedestalCoverBlock> ITEM_PEDESTAL_COVER = BLOCKS.register("item_pedestal_cover",
+            () -> new PedestalCoverBlock(AbstractBlock.Properties
+                    .create(Material.GLASS)
+                    .hardnessAndResistance(0.3F)
+                    .sound(SoundType.GLASS)
+                    .notSolid()
+            ));
 
     /*==================== Fluids ====================*/
     @Localize(locales = "zh_cn", translations = "排泄物")
