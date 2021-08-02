@@ -330,7 +330,7 @@ public class ThrownTabletEntity extends ThrowableEntity {
 
     @Override
     public ActionResultType applyPlayerInteraction(PlayerEntity player, Vector3d vec, Hand hand) {
-        if (this.inGround) {
+        if (this.inGround && this.isAlive()) { // must be alive (not removed), or player can dupe this item by fast-clicking
             if (player.getDistanceSq(this) < 3) {
                 if (!player.world.isRemote
                         // if disappear == true, the player won't get a tablet in its inventory.

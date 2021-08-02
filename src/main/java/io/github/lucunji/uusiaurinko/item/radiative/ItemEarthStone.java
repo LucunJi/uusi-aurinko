@@ -7,7 +7,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,6 +14,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.stats.Stats;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -45,15 +47,17 @@ public class ItemEarthStone extends ItemRadiative {
     }
 
     @Override
-    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-        if (entity instanceof PlayerEntity && !entity.world.isRemote) {
-            PlayerEntity player = (PlayerEntity) entity;
-            ServerWorld world = (ServerWorld) player.world;
-            if (player.getCooledAttackStrength(0.5F) >= 1.0F) {
-                earthquake(world, player);
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+        if (!worldIn.isRemote() && playerIn.isSneaking()) {
+            if (playerIn.getCooledAttackStrength(0.5F) >= 1.0F) {
+                earthquake(worldIn, playerIn);
+                playerIn.addStat(Stats.ITEM_USED.get(this), 1);
+                playerIn.getCooldownTracker().setCooldown(this, 60);
             }
+            return ActionResult.resultSuccess(playerIn.getHeldItem(handIn));
+        } else {
+            return super.onItemRightClick(worldIn, playerIn, handIn);
         }
-        return super.onEntitySwing(stack, entity);
     }
 
     private static void earthquake(World world, PlayerEntity player) {
