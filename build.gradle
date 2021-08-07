@@ -18,7 +18,7 @@ mixin {
 }
 
 group = 'io.github.lucunji'
-version = '0.2.3'
+version = '0.2.4'
 archivesBaseName = 'uusi-aurinko'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
