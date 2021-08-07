@@ -2,6 +2,7 @@ package io.github.lucunji.uusiaurinko.entity;
 
 import io.github.lucunji.uusiaurinko.advancements.ModCriteriaTriggers;
 import io.github.lucunji.uusiaurinko.config.ServerConfigs;
+import io.github.lucunji.uusiaurinko.config.loadlistening.EntityTypeTaggedListConfigValue;
 import io.github.lucunji.uusiaurinko.item.ModItems;
 import io.github.lucunji.uusiaurinko.item.radiative.ItemRadiative;
 import io.github.lucunji.uusiaurinko.network.ModDataSerializers;
@@ -215,6 +216,9 @@ public class NewSunEntity extends Entity {
         float blazeAmount = ServerConfigs.INSTANCE.NEW_SUN_BLAZE_DAMAGE_AMOUNT.get().floatValue();
         float fusionAmount = ServerConfigs.INSTANCE.NEW_SUN_FUSION_DAMAGE_AMOUNT.get().floatValue();
 
+        EntityTypeTaggedListConfigValue blazeImmuneTypes = ServerConfigs.INSTANCE.NEW_SUN_BLAZE_DAMAGE_IMMUNE_ENTITY_TYPES;
+        EntityTypeTaggedListConfigValue fusionImmuneTypes = ServerConfigs.INSTANCE.NEW_SUN_FUSION_DAMAGE_IMMUNE_ENTITY_TYPES;
+
         for (Entity entity : entities) {
             if (entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(this.getEntityFusionDamageRadius())) {
                 if (this.getSunState() == SunState.GROWING
@@ -234,7 +238,8 @@ public class NewSunEntity extends Entity {
                     continue;
                 }
 
-                if (fusionAmount > 0) {
+                if (fusionAmount > 0
+                        && !fusionImmuneTypes.contains(entity)) {
                     if (entity instanceof EnderDragonEntity) {
                         NewSunEntity.tryAttackDragonFrom(((EnderDragonEntity) entity), ModDamageSource.SUN_FUSION, fusionAmount);
                     } else {
@@ -244,7 +249,9 @@ public class NewSunEntity extends Entity {
 
             }
 
-            if (blazeAmount > 0 && entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(this.getEntityFireDamageRadius())) {
+            if (blazeAmount > 0
+                    && !blazeImmuneTypes.contains(entity)
+                    && entity.getDistanceSq(this.getPositionCenter()) < MathHelper.squareFloat(this.getEntityFireDamageRadius())) {
                 entity.setFire(10);
                 if (entity instanceof LivingEntity){
                     if (entity instanceof EnderDragonEntity) {
