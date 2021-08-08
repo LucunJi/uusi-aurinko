@@ -49,7 +49,7 @@ public class ItemEarthStone extends ItemRadiative {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
         if (!worldIn.isRemote() && playerIn.isSneaking()) {
-            if (playerIn.getCooledAttackStrength(0.5F) >= 1.0F) {
+            if (playerIn.getCooledAttackStrength(0.5F) >= 1.0F && !this.isInactive(playerIn.getHeldItem(handIn))) {
                 earthquake(worldIn, playerIn);
                 playerIn.addStat(Stats.ITEM_USED.get(this), 1);
                 playerIn.getCooldownTracker().setCooldown(this, 60);
