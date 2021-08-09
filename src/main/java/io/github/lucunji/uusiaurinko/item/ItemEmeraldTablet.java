@@ -56,7 +56,7 @@ public class ItemEmeraldTablet extends ItemBase {
 
     @Override
     public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        if (this.getTabletType(stack) == -1) {
+        if (!worldIn.isRemote && this.getTabletType(stack) == -1) {
             this.setTabletType(stack, new Random().nextInt(TYPE_MAX + 1));
         }
     }
