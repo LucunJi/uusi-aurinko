@@ -20,10 +20,10 @@ This mod is published under [GPL-3.0 license](./LICENSE).
 
 The sound effects
 "[electricity_1.ogg](./src/main/resources/assets/uusi-aurinko/sounds/electricity_1.ogg)" and
-"[electricity_2.ogg](./src/main/resources/assets/uusi-aurinko/sounds/electricity_1.ogg)"
+"[electricity_2.ogg](./src/main/resources/assets/uusi-aurinko/sounds/electricity_2.ogg)"
 are derivatives of 
 "[Shock Sound Effect](https://www.freesoundslibrary.com/shock-sound-effect/)"
 by spanac, used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-The modifications are cropping, amplifying and reducing into mono sound.
+The modifications are cropping, amplifying, reducing into mono sound and converting format to `.ogg`.
 "electricity_1.ogg" and "electricity_2.ogg" are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) by 
 [LucunJi](https://github.com/LucunJi).
